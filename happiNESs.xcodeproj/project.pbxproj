@@ -9,8 +9,11 @@
 /* Begin PBXBuildFile section */
 		8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1762C1CB9B3001B44B5 /* happiNESs.docc */; };
 		8744B17D2C1CB9B3001B44B5 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
-		8744B1822C1CB9B3001B44B5 /* happiNESsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1812C1CB9B3001B44B5 /* happiNESsTests.swift */; };
+		8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1812C1CB9B3001B44B5 /* CPUTests.swift */; };
 		8744B1832C1CB9B3001B44B5 /* happiNESs.h in Headers */ = {isa = PBXBuildFile; fileRef = 8744B1752C1CB9B3001B44B5 /* happiNESs.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */; };
+		8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B18E2C1CBB46001B44B5 /* Opcode.swift */; };
+		8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1902C1CC0C4001B44B5 /* CPU.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,7 +31,10 @@
 		8744B1752C1CB9B3001B44B5 /* happiNESs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = happiNESs.h; sourceTree = "<group>"; };
 		8744B1762C1CB9B3001B44B5 /* happiNESs.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = happiNESs.docc; sourceTree = "<group>"; };
 		8744B17C2C1CB9B3001B44B5 /* happiNESsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = happiNESsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8744B1812C1CB9B3001B44B5 /* happiNESsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = happiNESsTests.swift; sourceTree = "<group>"; };
+		8744B1812C1CB9B3001B44B5 /* CPUTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUTests.swift; sourceTree = "<group>"; };
+		8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressingMode.swift; sourceTree = "<group>"; };
+		8744B18E2C1CBB46001B44B5 /* Opcode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opcode.swift; sourceTree = "<group>"; };
+		8744B1902C1CC0C4001B44B5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +79,9 @@
 			children = (
 				8744B1752C1CB9B3001B44B5 /* happiNESs.h */,
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
+				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
+				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
+				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -80,7 +89,7 @@
 		8744B1802C1CB9B3001B44B5 /* happiNESsTests */ = {
 			isa = PBXGroup;
 			children = (
-				8744B1812C1CB9B3001B44B5 /* happiNESsTests.swift */,
+				8744B1812C1CB9B3001B44B5 /* CPUTests.swift */,
 			);
 			path = happiNESsTests;
 			sourceTree = "<group>";
@@ -194,6 +203,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
+				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
+				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -202,7 +214,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8744B1822C1CB9B3001B44B5 /* happiNESsTests.swift in Sources */,
+				8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +418,7 @@
 		8744B18A2C1CB9B3001B44B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GARV9392W2;
@@ -421,6 +434,7 @@
 		8744B18B2C1CB9B3001B44B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GARV9392W2;
