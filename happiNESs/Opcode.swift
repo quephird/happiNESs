@@ -73,7 +73,7 @@ extension Opcode {
         case .staAbsoluteX: .absoluteX
         case .staAbsoluteY: .absoluteY
         case .staIndirectX: .indirectX
-        case .staIndirectY: .indirectX
+        case .staIndirectY: .indirectY
 
         case .taxImplicit: .implicit
         case .inxImplicit: .implicit

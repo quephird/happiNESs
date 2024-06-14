@@ -9,7 +9,7 @@ import XCTest
 @testable import happiNESs
 
 final class CPUTests: XCTestCase {
-    func testInxOverflow() throws {
+    func testInxOverflow() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0xFF, 0xAA, 0xE8, 0xE8, 0x00]
         cpu.loadAndRun(program: program)
@@ -209,6 +209,50 @@ final class CPUTests: XCTestCase {
         cpu.loadAndRun(program: program);
 
         XCTAssertEqual(cpu.readByte(address: 0x0030), 0x42);
+    }
+
+    func testStaAbsolute() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x42, 0x8D, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
+    }
+
+    func testStaAbsoluteX() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x34, 0x9D, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
+    }
+
+    func testStaAbsoluteY() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0x99, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
+    }
+
+    func testStaIndirectX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x34);
+        cpu.writeByte(address: 0x0031, byte: 0x12);
+        let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0x81, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
+    }
+
+    func testStaIndirectY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x00);
+        cpu.writeByte(address: 0x0031, byte: 0x12);
+        let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0x91, 0x30, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
     }
 
     func testTaxMoveAToX() {
