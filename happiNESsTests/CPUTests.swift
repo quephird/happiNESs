@@ -716,6 +716,54 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
     }
 
+    func testStxZeroPage() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA2, 0x42, 0x86, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0010), 0x42);
+    }
+
+    func testStxZeroPageY() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA2, 0x42, 0xA0, 0x20, 0x96, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0030), 0x42);
+    }
+
+    func testStxAbsolute() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA2, 0x42, 0x8E, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
+    }
+
+    func testStyZeroPage() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA0, 0x42, 0x84, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0010), 0x42);
+    }
+
+    func testStyZeroPageX() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA0, 0x42, 0xA2, 0x20, 0x94, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0030), 0x42);
+    }
+
+    func testStyAbsolute() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA0, 0x42, 0x8C, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
+    }
+
     func testTaxMoveAToX() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0x0A, 0xAA, 0x00];

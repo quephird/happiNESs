@@ -152,6 +152,16 @@ extension CPU {
         self.writeByte(address: address, byte: self.accumulator);
     }
 
+    mutating func stx(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        self.writeByte(address: address, byte: self.xRegister);
+    }
+
+    mutating func sty(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        self.writeByte(address: address, byte: self.yRegister);
+    }
+
     mutating func tax() {
         self.xRegister = self.accumulator;
         self.updateZeroAndNegativeFlags(result: self.xRegister)
@@ -205,6 +215,10 @@ extension CPU {
                     self.ror(addressingMode: opcode.addressingMode)
                 case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
                     self.sta(addressingMode: opcode.addressingMode)
+                case .stxZeroPage, .stxZeroPageY, .stxAbsolute:
+                    self.stx(addressingMode: opcode.addressingMode)
+                case .styZeroPage, .styZeroPageY, .styAbsolute:
+                    self.sty(addressingMode: opcode.addressingMode)
                 case .tax:
                     self.tax()
                 case .inx:

@@ -90,6 +90,14 @@ enum Opcode: UInt8 {
     case staIndirectX = 0x81
     case staIndirectY = 0x91
 
+    case stxZeroPage = 0x86
+    case stxZeroPageY = 0x96
+    case stxAbsolute = 0x8E
+
+    case styZeroPage = 0x84
+    case styZeroPageY = 0x94
+    case styAbsolute = 0x8C
+
     case tax = 0xAA
 }
 
@@ -180,6 +188,14 @@ extension Opcode {
         case .staIndirectX: .indirectX
         case .staIndirectY: .indirectY
 
+        case .stxZeroPage: .zeroPage
+        case .stxZeroPageY: .zeroPageY
+        case .stxAbsolute: .absolute
+
+        case .styZeroPage: .zeroPage
+        case .styZeroPageY: .zeroPageX
+        case .styAbsolute: .absolute
+
         case .tax: .implicit
         }
     }
@@ -269,6 +285,14 @@ extension Opcode {
         case .staAbsoluteY: 3
         case .staIndirectX: 2
         case .staIndirectY: 2
+
+        case .stxZeroPage: 2
+        case .stxZeroPageY: 2
+        case .stxAbsolute: 3
+
+        case .styZeroPage: 2
+        case .styZeroPageY: 2
+        case .styAbsolute: 3
 
         case .tax: 1
         }
