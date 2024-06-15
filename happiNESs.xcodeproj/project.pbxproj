@@ -14,6 +14,7 @@
 		8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */; };
 		8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B18E2C1CBB46001B44B5 /* Opcode.swift */; };
 		8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1902C1CC0C4001B44B5 /* CPU.swift */; };
+		8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1922C1D6D59001B44B5 /* StatusRegister.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +36,7 @@
 		8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressingMode.swift; sourceTree = "<group>"; };
 		8744B18E2C1CBB46001B44B5 /* Opcode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opcode.swift; sourceTree = "<group>"; };
 		8744B1902C1CC0C4001B44B5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
+		8744B1922C1D6D59001B44B5 /* StatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRegister.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,8 +82,9 @@
 				8744B1752C1CB9B3001B44B5 /* happiNESs.h */,
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
-				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
+				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
+				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -205,6 +208,7 @@
 			files = (
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
+				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 			);

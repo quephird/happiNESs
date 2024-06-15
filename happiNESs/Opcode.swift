@@ -15,6 +15,12 @@ enum Opcode: UInt8 {
     case andIndirectX = 0x21
     case andIndirectY = 0x31
 
+    case aslAccumlator = 0x0A
+    case aslZeroPage = 0x06
+    case aslZeroPageX = 0x16
+    case aslAbsolute = 0x0E
+    case aslAbsoluteX = 0x1E
+
     case `break` = 0x00
 
     case eorImmediate = 0x49
@@ -25,6 +31,8 @@ enum Opcode: UInt8 {
     case eorAbsoluteY = 0x59
     case eorIndirectX = 0x41
     case eorIndirectY = 0x51
+
+    case inxImplicit = 0xE8
 
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
@@ -65,7 +73,6 @@ enum Opcode: UInt8 {
     case staIndirectY = 0x91
 
     case taxImplicit = 0xAA
-    case inxImplicit = 0xE8
 }
 
 extension Opcode {
@@ -80,6 +87,12 @@ extension Opcode {
         case .andIndirectX: .indirectX
         case .andIndirectY: .indirectY
 
+        case .aslAccumlator: .accumulator
+        case .aslZeroPage: .zeroPage
+        case .aslZeroPageX: .zeroPageX
+        case .aslAbsolute: .absolute
+        case .aslAbsoluteX: .absoluteX
+
         case .`break`: .implicit
 
         case .eorImmediate: .immediate
@@ -90,6 +103,8 @@ extension Opcode {
         case .eorAbsoluteY: .absoluteY
         case .eorIndirectX: .indirectX
         case .eorIndirectY: .indirectY
+
+        case .inxImplicit: .implicit
 
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
@@ -130,7 +145,6 @@ extension Opcode {
         case .staIndirectY: .indirectY
 
         case .taxImplicit: .implicit
-        case .inxImplicit: .implicit
         }
     }
 
@@ -145,6 +159,12 @@ extension Opcode {
         case .andIndirectX: 2
         case .andIndirectY: 2
 
+        case .aslAccumlator: 1
+        case .aslZeroPage: 2
+        case .aslZeroPageX: 2
+        case .aslAbsolute: 3
+        case .aslAbsoluteX: 3
+
         case .break: 1
 
         case .eorImmediate: 2
@@ -155,6 +175,8 @@ extension Opcode {
         case .eorAbsoluteY: 3
         case .eorIndirectX: 2
         case .eorIndirectY: 2
+
+        case .inxImplicit: 1
 
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
@@ -195,7 +217,6 @@ extension Opcode {
         case .staIndirectY: 2
 
         case .taxImplicit: 1
-        case .inxImplicit: 1
         }
     }
 }

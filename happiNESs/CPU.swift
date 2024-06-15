@@ -9,7 +9,7 @@ let RESET_VECTOR_ADDRESS: UInt16 = 0xFFFC;
 
 public struct CPU {
     public var accumulator: UInt8
-    public var statusRegister: UInt8
+    public var statusRegister: StatusRegister
     public var xRegister: UInt8
     public var yRegister: UInt8
     public var programCounter: UInt16
@@ -17,11 +17,19 @@ public struct CPU {
 
     init() {
         self.accumulator = 0x00
-        self.statusRegister = 0x00
+        self.statusRegister = StatusRegister(rawValue: 0x00)
         self.xRegister = 0x00
         self.yRegister = 0x00
         self.programCounter = 0x0000
         self.memory = [UInt8](repeating: 0x00, count: 0xFFFF)
+    }
+
+    mutating func reset() {
+        self.accumulator = 0x00;
+        self.xRegister = 0x00;
+        self.yRegister = 0x00;
+        self.statusRegister.reset();
+        self.programCounter = self.readWord(address: RESET_VECTOR_ADDRESS);
     }
 }
 
@@ -31,6 +39,21 @@ extension CPU {
         let value = self.readByte(address: address);
         self.accumulator &= value;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
+    mutating func asl(addressingMode: AddressingMode) {
+        if addressingMode == .accumulator {
+            self.statusRegister[.carry] = self.accumulator >> 7 == 1
+            self.accumulator <<= 1
+            self.updateZeroAndNegativeFlags(result: self.accumulator)
+        } else {
+            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let value = self.readByte(address: address);
+
+            self.statusRegister[.carry] = value >> 7 == 1
+            self.writeByte(address: address, byte: value << 1)
+            self.updateZeroAndNegativeFlags(result: value << 1)
+        }
     }
 
     mutating func eor(addressingMode: AddressingMode) {
@@ -84,17 +107,8 @@ extension CPU {
     }
 
     mutating func updateZeroAndNegativeFlags(result: UInt8) {
-        if result == 0 {
-            self.statusRegister |= 0b0000_0010;
-        } else {
-            self.statusRegister &= 0b1111_1101;
-        }
-
-        if (result & 0b1000_0000) != 0 {
-            self.statusRegister |= 0b1000_0000;
-        } else {
-            self.statusRegister &= 0b0111_1111;
-        }
+        self.statusRegister[.zero] = result == 0
+        self.statusRegister[.negative] = (result & 0b1000_0000) != 0
     }
 }
 
@@ -110,36 +124,31 @@ extension CPU {
         self.writeWord(address: RESET_VECTOR_ADDRESS, word: 0x8000);
     }
 
-    mutating func reset() {
-        self.accumulator = 0x00;
-        self.xRegister = 0x00;
-        self.yRegister = 0x00;
-        self.statusRegister = 0x00;
-        self.programCounter = self.readWord(address: RESET_VECTOR_ADDRESS);
-    }
-
     mutating func run() {
         while true {
             let byte = self.readByte(address: self.programCounter);
             if let opcode = Opcode(rawValue: byte) {
                 self.programCounter += 1;
+                // TODO: switch over opcode, and make case lists reference Opcode cases
                 switch byte {
                 case 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31:
-                    self.and(addressingMode: opcode.addressingMode);
+                    self.and(addressingMode: opcode.addressingMode)
+                case 0x0A, 0x06, 0x16, 0x0E, 0x1E:
+                    self.asl(addressingMode: opcode.addressingMode)
                 case 0x00:
                     return;
                 case 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51:
-                    self.eor(addressingMode: opcode.addressingMode);
+                    self.eor(addressingMode: opcode.addressingMode)
                 case 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1:
-                    self.lda(addressingMode: opcode.addressingMode);
+                    self.lda(addressingMode: opcode.addressingMode)
                 case 0xA2, 0xA6, 0xB6, 0xAE, 0xBE:
-                    self.ldx(addressingMode: opcode.addressingMode);
+                    self.ldx(addressingMode: opcode.addressingMode)
                 case 0xA0, 0xA4, 0xB4, 0xAC, 0xBC:
-                    self.ldy(addressingMode: opcode.addressingMode);
+                    self.ldy(addressingMode: opcode.addressingMode)
                 case 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11:
-                    self.ora(addressingMode: opcode.addressingMode);
+                    self.ora(addressingMode: opcode.addressingMode)
                 case 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91:
-                    self.sta(addressingMode: opcode.addressingMode);
+                    self.sta(addressingMode: opcode.addressingMode)
                 case 0xAA:
                     self.tax()
                 case 0xE8:
