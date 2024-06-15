@@ -538,6 +538,124 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.accumulator, 0b1111_0101);
     }
 
+    func testRolAccumulator() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0b1111_1111, 0x2A, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_1111);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
+    func testRolZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0042, byte: 0b0000_0001)
+        let program: [UInt8] = [0x26, 0x42, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0010);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testRolZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0042, byte: 0b0000_0010)
+        let program: [UInt8] = [0xA2, 0x21, 0x36, 0x21, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0100);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testRolAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
+        let program: [UInt8] = [0x2E, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
+    func testRolAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
+        let program: [UInt8] = [0xA2, 0x34, 0x3E, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
+    func testRorAccumulator() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0b1111_1111, 0x6A, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_1111);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
+    func testRorZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0042, byte: 0b0000_0001)
+        let program: [UInt8] = [0x66, 0x42, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0042), 0b1000_0000);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
+    func testRorZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0042, byte: 0b0000_0010)
+        let program: [UInt8] = [0xA2, 0x21, 0x76, 0x21, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0001);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testRorAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
+        let program: [UInt8] = [0x6E, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testRorAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
+        let program: [UInt8] = [0xA2, 0x34, 0x7E, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
     func testStaZeroPage() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0x42, 0x85, 0x10, 0x00];

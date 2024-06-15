@@ -70,6 +70,18 @@ enum Opcode: UInt8 {
     case oraIndirectX = 0x01
     case oraIndirectY = 0x11
 
+    case rolAccumlator = 0x2A
+    case rolZeroPage = 0x26
+    case rolZeroPageX = 0x36
+    case rolAbsolute = 0x2E
+    case rolAbsoluteX = 0x3E
+
+    case rorAccumlator = 0x6A
+    case rorZeroPage = 0x66
+    case rorZeroPageX = 0x76
+    case rorAbsolute = 0x6E
+    case rorAbsoluteX = 0x7E
+
     case staZeroPage = 0x85
     case staZeroPageX = 0x95
     case staAbsolute = 0x8D
@@ -148,6 +160,18 @@ extension Opcode {
         case .oraIndirectX: .indirectX
         case .oraIndirectY: .indirectY
 
+        case .rolAccumlator: .accumulator
+        case .rolZeroPage: .zeroPage
+        case .rolZeroPageX: .zeroPageX
+        case .rolAbsolute: .absolute
+        case .rolAbsoluteX: .absoluteX
+
+        case .rorAccumlator: .accumulator
+        case .rorZeroPage: .zeroPage
+        case .rorZeroPageX: .zeroPageX
+        case .rorAbsolute: .absolute
+        case .rorAbsoluteX: .absoluteX
+
         case .staZeroPage: .zeroPage
         case .staZeroPageX: .zeroPageX
         case .staAbsolute: .absolute
@@ -225,6 +249,18 @@ extension Opcode {
         case .oraAbsoluteY: 3
         case .oraIndirectX: 2
         case .oraIndirectY: 2
+
+        case .rolAccumlator: 1
+        case .rolZeroPage: 2
+        case .rolZeroPageX: 2
+        case .rolAbsolute: 3
+        case .rolAbsoluteX: 3
+
+        case .rorAccumlator: 1
+        case .rorZeroPage: 2
+        case .rorZeroPageX: 2
+        case .rorAbsolute: 3
+        case .rorAbsoluteX: 3
 
         case .staZeroPage: 2
         case .staZeroPageX: 2

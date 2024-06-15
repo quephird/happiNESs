@@ -111,6 +111,42 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.accumulator)
     }
 
+    mutating func rol(addressingMode: AddressingMode) {
+        if addressingMode == .accumulator {
+            let carry = self.accumulator >> 7
+            self.statusRegister[.carry] = carry == 1
+            self.accumulator = (self.accumulator << 1) | carry
+            self.updateZeroAndNegativeFlags(result: self.accumulator)
+        } else {
+            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let value = self.readByte(address: address);
+            let carry = value >> 7
+
+            self.statusRegister[.carry] = carry == 1
+            let newValue = value << 1 | carry
+            self.writeByte(address: address, byte: newValue)
+            self.updateZeroAndNegativeFlags(result: newValue)
+        }
+    }
+
+    mutating func ror(addressingMode: AddressingMode) {
+        if addressingMode == .accumulator {
+            let carry = self.accumulator & 0b0000_0001
+            self.statusRegister[.carry] = carry == 1
+            self.accumulator = (self.accumulator >> 1) | carry << 7
+            self.updateZeroAndNegativeFlags(result: self.accumulator)
+        } else {
+            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let value = self.readByte(address: address);
+            let carry = value & 0b0000_0001
+
+            self.statusRegister[.carry] = carry == 1
+            let newValue = value >> 1 | carry << 7
+            self.writeByte(address: address, byte: newValue)
+            self.updateZeroAndNegativeFlags(result: newValue)
+        }
+    }
+
     mutating func sta(addressingMode: AddressingMode) {
         let address = self.getOperandAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.accumulator);
@@ -163,6 +199,10 @@ extension CPU {
                     self.lsr(addressingMode: opcode.addressingMode)
                 case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                     self.ora(addressingMode: opcode.addressingMode)
+                case .rolAccumlator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
+                    self.rol(addressingMode: opcode.addressingMode)
+                case .rorAccumlator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
+                    self.ror(addressingMode: opcode.addressingMode)
                 case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
                     self.sta(addressingMode: opcode.addressingMode)
                 case .tax:
