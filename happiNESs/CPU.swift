@@ -26,6 +26,13 @@ public struct CPU {
 }
 
 extension CPU {
+    mutating func and(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+        self.accumulator &= value;
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
     mutating func inx() {
         self.xRegister = self.xRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.xRegister)
@@ -103,6 +110,8 @@ extension CPU {
             if let opcode = Opcode(rawValue: byte) {
                 self.programCounter += 1;
                 switch byte {
+                case 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31:
+                    self.and(addressingMode: opcode.addressingMode);
                 case 0x00:
                     return;
                 case 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1:
