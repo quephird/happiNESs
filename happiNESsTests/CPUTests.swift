@@ -92,6 +92,81 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.xRegister, 0x01)
     }
 
+    func testEorImmediate() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0b1111_0000, 0x49, 0b0000_1111, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_1111);
+    }
+
+    func testEorZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0010, byte: 0b0101_0101);
+        let program: [UInt8] = [0xA9, 0b1111_0000, 0x45, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1010_0101);
+    }
+
+    func testEorZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0b0101_0101);
+        let program: [UInt8] = [0xA9, 0b1111_0000, 0xA2, 0x20, 0x55, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1010_0101);
+    }
+
+    func testEorAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0x4D, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0000);
+    }
+
+    func testEorAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x34, 0x5D, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0000);
+    }
+
+    func testEorAbsoluteY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x59, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0000);
+    }
+
+    func testEorIndirectX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        cpu.writeByte(address: 0x0030, byte: 0x34);
+        cpu.writeByte(address: 0x0031, byte: 0x12);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x20, 0x41, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0000);
+    }
+
+    func testEorIndirectY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x00);
+        cpu.writeByte(address: 0x0031, byte: 0x12);
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x51, 0x30, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0000);
+    }
+
     func testLdaImmediate() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0x05, 0x00];
@@ -268,6 +343,81 @@ final class CPUTests: XCTestCase {
         cpu.loadAndRun(program: program);
 
         XCTAssertEqual(cpu.yRegister, 0xF0);
+    }
+
+    func testOraImmediate() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0b1111_0000, 0x09, 0b0000_1111, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_1111);
+    }
+
+    func testOraZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0010, byte: 0b0101_0101);
+        let program: [UInt8] = [0xA9, 0b1111_0000, 0x05, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
+    }
+
+    func testOraZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0b0101_0101);
+        let program: [UInt8] = [0xA9, 0b1111_0000, 0xA2, 0x20, 0x15, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
+    }
+
+    func testOraAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0x0D, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
+    }
+
+    func testOraAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x34, 0x1D, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
+    }
+
+    func testOraAbsoluteY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x19, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
+    }
+
+    func testOraIndirectX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        cpu.writeByte(address: 0x0030, byte: 0x34);
+        cpu.writeByte(address: 0x0031, byte: 0x12);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x20, 0x01, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
+    }
+
+    func testOraIndirectY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x00);
+        cpu.writeByte(address: 0x0031, byte: 0x12);
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101);
+        let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x11, 0x30, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_0101);
     }
 
     func testStaZeroPage() {

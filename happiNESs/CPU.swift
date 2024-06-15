@@ -33,6 +33,13 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.accumulator)
     }
 
+    mutating func eor(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+        self.accumulator ^= value;
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
     mutating func inx() {
         self.xRegister = self.xRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.xRegister)
@@ -57,6 +64,13 @@ extension CPU {
         let value = self.readByte(address: address);
         self.yRegister = value;
         self.updateZeroAndNegativeFlags(result: self.yRegister)
+    }
+
+    mutating func ora(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+        self.accumulator |= value;
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
     }
 
     mutating func sta(addressingMode: AddressingMode) {
@@ -114,12 +128,16 @@ extension CPU {
                     self.and(addressingMode: opcode.addressingMode);
                 case 0x00:
                     return;
+                case 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51:
+                    self.eor(addressingMode: opcode.addressingMode);
                 case 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1:
                     self.lda(addressingMode: opcode.addressingMode);
                 case 0xA2, 0xA6, 0xB6, 0xAE, 0xBE:
                     self.ldx(addressingMode: opcode.addressingMode);
                 case 0xA0, 0xA4, 0xB4, 0xAC, 0xBC:
                     self.ldy(addressingMode: opcode.addressingMode);
+                case 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11:
+                    self.ora(addressingMode: opcode.addressingMode);
                 case 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91:
                     self.sta(addressingMode: opcode.addressingMode);
                 case 0xAA:

@@ -17,6 +17,15 @@ enum Opcode: UInt8 {
 
     case `break` = 0x00
 
+    case eorImmediate = 0x49
+    case eorZeroPage = 0x45
+    case eorZeroPageX = 0x55
+    case eorAbsolute = 0x4D
+    case eorAbsoluteX = 0x5D
+    case eorAbsoluteY = 0x59
+    case eorIndirectX = 0x41
+    case eorIndirectY = 0x51
+
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
     case ldaZeroPageX = 0xB5
@@ -37,6 +46,15 @@ enum Opcode: UInt8 {
     case ldyZeroPageX = 0xB4
     case ldyAbsolute = 0xAC
     case ldyAbsoluteX = 0xBC
+
+    case oraImmediate = 0x09
+    case oraZeroPage = 0x05
+    case oraZeroPageX = 0x15
+    case oraAbsolute = 0x0D
+    case oraAbsoluteX = 0x1D
+    case oraAbsoluteY = 0x19
+    case oraIndirectX = 0x01
+    case oraIndirectY = 0x11
 
     case staZeroPage = 0x85
     case staZeroPageX = 0x95
@@ -64,6 +82,15 @@ extension Opcode {
 
         case .`break`: .implicit
 
+        case .eorImmediate: .immediate
+        case .eorZeroPage: .zeroPage
+        case .eorZeroPageX: .zeroPageX
+        case .eorAbsolute: .absolute
+        case .eorAbsoluteX: .absoluteX
+        case .eorAbsoluteY: .absoluteY
+        case .eorIndirectX: .indirectX
+        case .eorIndirectY: .indirectY
+
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
         case .ldaZeroPageX: .zeroPageX
@@ -84,6 +111,15 @@ extension Opcode {
         case .ldyZeroPageX: .zeroPageX
         case .ldyAbsolute: .absolute
         case .ldyAbsoluteX: .absoluteX
+
+        case .oraImmediate: .immediate
+        case .oraZeroPage: .zeroPage
+        case .oraZeroPageX: .zeroPageX
+        case .oraAbsolute: .absolute
+        case .oraAbsoluteX: .absoluteX
+        case .oraAbsoluteY: .absoluteY
+        case .oraIndirectX: .indirectX
+        case .oraIndirectY: .indirectY
 
         case .staZeroPage: .zeroPage
         case .staZeroPageX: .zeroPageX
@@ -111,6 +147,15 @@ extension Opcode {
 
         case .break: 1
 
+        case .eorImmediate: 2
+        case .eorZeroPage: 2
+        case .eorZeroPageX: 2
+        case .eorAbsolute: 3
+        case .eorAbsoluteX: 3
+        case .eorAbsoluteY: 3
+        case .eorIndirectX: 2
+        case .eorIndirectY: 2
+
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
         case .ldaZeroPageX: 2
@@ -131,6 +176,15 @@ extension Opcode {
         case .ldyZeroPageX: 2
         case .ldyAbsolute: 3
         case .ldyAbsoluteX: 3
+
+        case .oraImmediate: 2
+        case .oraZeroPage: 2
+        case .oraZeroPageX: 2
+        case .oraAbsolute: 3
+        case .oraAbsoluteX: 3
+        case .oraAbsoluteY: 3
+        case .oraIndirectX: 2
+        case .oraIndirectY: 2
 
         case .staZeroPage: 2
         case .staZeroPageX: 2
