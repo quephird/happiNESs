@@ -32,7 +32,7 @@ enum Opcode: UInt8 {
     case eorIndirectX = 0x41
     case eorIndirectY = 0x51
 
-    case inxImplicit = 0xE8
+    case inx = 0xE8
 
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
@@ -72,7 +72,7 @@ enum Opcode: UInt8 {
     case staIndirectX = 0x81
     case staIndirectY = 0x91
 
-    case taxImplicit = 0xAA
+    case tax = 0xAA
 }
 
 extension Opcode {
@@ -104,7 +104,7 @@ extension Opcode {
         case .eorIndirectX: .indirectX
         case .eorIndirectY: .indirectY
 
-        case .inxImplicit: .implicit
+        case .inx: .implicit
 
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
@@ -144,7 +144,7 @@ extension Opcode {
         case .staIndirectX: .indirectX
         case .staIndirectY: .indirectY
 
-        case .taxImplicit: .implicit
+        case .tax: .implicit
         }
     }
 
@@ -176,7 +176,7 @@ extension Opcode {
         case .eorIndirectX: 2
         case .eorIndirectY: 2
 
-        case .inxImplicit: 1
+        case .inx: 1
 
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
@@ -216,7 +216,7 @@ extension Opcode {
         case .staIndirectX: 2
         case .staIndirectY: 2
 
-        case .taxImplicit: 1
+        case .tax: 1
         }
     }
 }

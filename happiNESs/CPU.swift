@@ -129,32 +129,29 @@ extension CPU {
             let byte = self.readByte(address: self.programCounter);
             if let opcode = Opcode(rawValue: byte) {
                 self.programCounter += 1;
-                // TODO: switch over opcode, and make case lists reference Opcode cases
-                switch byte {
-                case 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31:
+                switch opcode {
+                case .andImmediate, .andZeroPage, .andZeroPageX, .andAbsolute, .andAbsoluteX, .andAbsoluteY, .andIndirectX, .andIndirectY:
                     self.and(addressingMode: opcode.addressingMode)
-                case 0x0A, 0x06, 0x16, 0x0E, 0x1E:
+                case .aslAccumlator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
                     self.asl(addressingMode: opcode.addressingMode)
-                case 0x00:
+                case .break:
                     return;
-                case 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51:
+                case .eorImmediate, .eorZeroPage, .eorZeroPageX, .eorAbsolute, .eorAbsoluteX, .eorAbsoluteY, .eorIndirectX, .eorIndirectY:
                     self.eor(addressingMode: opcode.addressingMode)
-                case 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9, 0xA1, 0xB1:
+                case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
                     self.lda(addressingMode: opcode.addressingMode)
-                case 0xA2, 0xA6, 0xB6, 0xAE, 0xBE:
+                case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
                     self.ldx(addressingMode: opcode.addressingMode)
-                case 0xA0, 0xA4, 0xB4, 0xAC, 0xBC:
+                case .ldyImmediate, .ldyZeroPage, .ldyZeroPageX, .ldyAbsolute, .ldyAbsoluteX:
                     self.ldy(addressingMode: opcode.addressingMode)
-                case 0x09, 0x05, 0x15, 0x0D, 0x1D, 0x19, 0x01, 0x11:
+                case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                     self.ora(addressingMode: opcode.addressingMode)
-                case 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91:
+                case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
                     self.sta(addressingMode: opcode.addressingMode)
-                case 0xAA:
+                case .tax:
                     self.tax()
-                case 0xE8:
+                case .inx:
                     self.inx()
-                default:
-                    fatalError("Implement other opcodes!!!")
                 }
 
                 self.programCounter += UInt16(opcode.instructionLength - 1)
