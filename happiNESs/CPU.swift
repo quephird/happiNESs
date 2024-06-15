@@ -89,6 +89,21 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.yRegister)
     }
 
+    mutating func lsr(addressingMode: AddressingMode) {
+        if addressingMode == .accumulator {
+            self.statusRegister[.carry] = self.accumulator & 0b0000_0001 == 1
+            self.accumulator >>= 1
+            self.updateZeroAndNegativeFlags(result: self.accumulator)
+        } else {
+            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let value = self.readByte(address: address);
+
+            self.statusRegister[.carry] = value & 0b0000_0001 == 1
+            self.writeByte(address: address, byte: value >> 1)
+            self.updateZeroAndNegativeFlags(result: value >> 1)
+        }
+    }
+
     mutating func ora(addressingMode: AddressingMode) {
         let address = self.getOperandAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
@@ -144,6 +159,8 @@ extension CPU {
                     self.ldx(addressingMode: opcode.addressingMode)
                 case .ldyImmediate, .ldyZeroPage, .ldyZeroPageX, .ldyAbsolute, .ldyAbsoluteX:
                     self.ldy(addressingMode: opcode.addressingMode)
+                case .lsrAccumlator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
+                    self.lsr(addressingMode: opcode.addressingMode)
                 case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                     self.ora(addressingMode: opcode.addressingMode)
                 case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:

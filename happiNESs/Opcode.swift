@@ -55,6 +55,12 @@ enum Opcode: UInt8 {
     case ldyAbsolute = 0xAC
     case ldyAbsoluteX = 0xBC
 
+    case lsrAccumlator = 0x4A
+    case lsrZeroPage = 0x46
+    case lsrZeroPageX = 0x56
+    case lsrAbsolute = 0x4E
+    case lsrAbsoluteX = 0x5E
+
     case oraImmediate = 0x09
     case oraZeroPage = 0x05
     case oraZeroPageX = 0x15
@@ -127,6 +133,12 @@ extension Opcode {
         case .ldyAbsolute: .absolute
         case .ldyAbsoluteX: .absoluteX
 
+        case .lsrAccumlator: .accumulator
+        case .lsrZeroPage: .zeroPage
+        case .lsrZeroPageX: .zeroPageX
+        case .lsrAbsolute: .absolute
+        case .lsrAbsoluteX: .absoluteX
+
         case .oraImmediate: .immediate
         case .oraZeroPage: .zeroPage
         case .oraZeroPageX: .zeroPageX
@@ -198,6 +210,12 @@ extension Opcode {
         case .ldyZeroPageX: 2
         case .ldyAbsolute: 3
         case .ldyAbsoluteX: 3
+
+        case .lsrAccumlator: 1
+        case .lsrZeroPage: 2
+        case .lsrZeroPageX: 2
+        case .lsrAbsolute: 3
+        case .lsrAbsoluteX: 3
 
         case .oraImmediate: 2
         case .oraZeroPage: 2
