@@ -21,6 +21,9 @@ enum Opcode: UInt8 {
     case aslAbsolute = 0x0E
     case aslAbsoluteX = 0x1E
 
+    case bitZeroPage = 0x24
+    case bitAbsolute = 0x2C
+
     case `break` = 0x00
 
     case eorImmediate = 0x49
@@ -61,6 +64,8 @@ enum Opcode: UInt8 {
     case lsrAbsolute = 0x4E
     case lsrAbsoluteX = 0x5E
 
+    case nop = 0xEA
+
     case oraImmediate = 0x09
     case oraZeroPage = 0x05
     case oraZeroPageX = 0x15
@@ -99,6 +104,11 @@ enum Opcode: UInt8 {
     case styAbsolute = 0x8C
 
     case tax = 0xAA
+    case tay = 0xA8
+    case tsx = 0xBA
+    case txa = 0x8A
+    case txs = 0x9A
+    case tya = 0x98
 }
 
 extension Opcode {
@@ -118,6 +128,9 @@ extension Opcode {
         case .aslZeroPageX: .zeroPageX
         case .aslAbsolute: .absolute
         case .aslAbsoluteX: .absoluteX
+
+        case .bitZeroPage: .zeroPage
+        case .bitAbsolute: .absolute
 
         case .`break`: .implicit
 
@@ -159,6 +172,8 @@ extension Opcode {
         case .lsrAbsolute: .absolute
         case .lsrAbsoluteX: .absoluteX
 
+        case .nop: .implicit
+
         case .oraImmediate: .immediate
         case .oraZeroPage: .zeroPage
         case .oraZeroPageX: .zeroPageX
@@ -197,6 +212,11 @@ extension Opcode {
         case .styAbsolute: .absolute
 
         case .tax: .implicit
+        case .tay: .implicit
+        case .tsx: .implicit
+        case .txa: .implicit
+        case .txs: .implicit
+        case .tya: .implicit
         }
     }
 
@@ -216,6 +236,9 @@ extension Opcode {
         case .aslZeroPageX: 2
         case .aslAbsolute: 3
         case .aslAbsoluteX: 3
+
+        case .bitZeroPage: 2
+        case .bitAbsolute: 3
 
         case .break: 1
 
@@ -257,6 +280,8 @@ extension Opcode {
         case .lsrAbsolute: 3
         case .lsrAbsoluteX: 3
 
+        case .nop: 1
+
         case .oraImmediate: 2
         case .oraZeroPage: 2
         case .oraZeroPageX: 2
@@ -295,6 +320,11 @@ extension Opcode {
         case .styAbsolute: 3
 
         case .tax: 1
+        case .tay: 1
+        case .tsx: 1
+        case .txa: 1
+        case .txs: 1
+        case .tya: 1
         }
     }
 }

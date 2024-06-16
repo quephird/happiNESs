@@ -143,6 +143,28 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(cpu.statusRegister[.carry]);
     }
 
+    func testBitZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0042, byte: 0b1110_0101)
+        let program: [UInt8] = [0xA9, 0b0001_1010, 0x24, 0x42, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+        XCTAssertTrue(cpu.statusRegister[.overflow]);
+    }
+
+    func testBitAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
+        let program: [UInt8] = [0xA9, 0b1101_1010, 0x2C, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.overflow]);
+    }
+
     func testEorImmediate() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x49, 0b0000_1111, 0x00];
@@ -764,11 +786,61 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42);
     }
 
-    func testTaxMoveAToX() {
+    func testTax() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0x0A, 0xAA, 0x00];
         cpu.loadAndRun(program: program);
         XCTAssertEqual(cpu.xRegister, 0x0A);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+    }
+
+    func testTay() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0xA8, 0x00];
+        cpu.loadAndRun(program: program);
+        XCTAssertEqual(cpu.yRegister, 0xFF);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testTsx() {
+        var cpu = CPU()
+        // NOTA BENE: the stack pointer upon initialization is set to 0xFF
+        let program: [UInt8] = [0xBA, 0x00];
+        cpu.loadAndRun(program: program);
+        XCTAssertEqual(cpu.xRegister, 0xFF);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testTxa() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA2, 0xFF, 0x8A, 0x00];
+        cpu.loadAndRun(program: program);
+        XCTAssertEqual(cpu.accumulator, 0xFF);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testTxs() {
+        var cpu = CPU()
+        // NOTA BENE: the stack pointer upon initialization is set to 0xFF
+        let program: [UInt8] = [0xA2, 0x00, 0x9A, 0x00];
+        cpu.loadAndRun(program: program);
+        XCTAssertEqual(cpu.stackPointer, 0x00);
+        XCTAssertTrue(cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+    }
+
+    func testTya() {
+        var cpu = CPU()
+        // NOTA BENE: the stack pointer upon initialization is set to 0xFF
+        let program: [UInt8] = [0xA0, 0x00, 0x98, 0x00];
+        cpu.loadAndRun(program: program);
+        XCTAssertEqual(cpu.accumulator, 0x00);
+        XCTAssertTrue(cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
     }
 
     func testFiveOpcodesWorkingTogether() {

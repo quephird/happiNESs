@@ -6,12 +6,14 @@
 //
 
 let RESET_VECTOR_ADDRESS: UInt16 = 0xFFFC;
+let RESET_STACK_POINTER_VALUE: UInt8 = 0xFF
 
 public struct CPU {
     public var accumulator: UInt8
     public var statusRegister: StatusRegister
     public var xRegister: UInt8
     public var yRegister: UInt8
+    public var stackPointer: UInt8
     public var programCounter: UInt16
     public var memory: [UInt8]
 
@@ -20,15 +22,17 @@ public struct CPU {
         self.statusRegister = StatusRegister(rawValue: 0x00)
         self.xRegister = 0x00
         self.yRegister = 0x00
+        self.stackPointer = RESET_STACK_POINTER_VALUE
         self.programCounter = 0x0000
         self.memory = [UInt8](repeating: 0x00, count: 0xFFFF)
     }
 
     mutating func reset() {
         self.accumulator = 0x00;
+        self.statusRegister.reset();
         self.xRegister = 0x00;
         self.yRegister = 0x00;
-        self.statusRegister.reset();
+        self.stackPointer = RESET_STACK_POINTER_VALUE
         self.programCounter = self.readWord(address: RESET_VECTOR_ADDRESS);
     }
 }
@@ -54,6 +58,15 @@ extension CPU {
             self.writeByte(address: address, byte: value << 1)
             self.updateZeroAndNegativeFlags(result: value << 1)
         }
+    }
+
+    mutating func bit(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+        let result = self.accumulator & value;
+        self.statusRegister[.negative] = value >> 7 == 1
+        self.statusRegister[.overflow] = value >> 6 & 0b0000_0001 == 1
+        self.statusRegister[.zero] = result == 0
     }
 
     mutating func eor(addressingMode: AddressingMode) {
@@ -102,6 +115,10 @@ extension CPU {
             self.writeByte(address: address, byte: value >> 1)
             self.updateZeroAndNegativeFlags(result: value >> 1)
         }
+    }
+
+    mutating func nop() {
+        // For now do nothing but presumably later we'll have to account for CPU cycles
     }
 
     mutating func ora(addressingMode: AddressingMode) {
@@ -167,6 +184,31 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.xRegister)
     }
 
+    mutating func tay() {
+        self.yRegister = self.accumulator;
+        self.updateZeroAndNegativeFlags(result: self.yRegister)
+    }
+
+    mutating func tsx() {
+        self.xRegister = self.stackPointer;
+        self.updateZeroAndNegativeFlags(result: self.xRegister)
+    }
+
+    mutating func txa() {
+        self.accumulator = self.xRegister;
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
+    mutating func txs() {
+        self.stackPointer = self.xRegister;
+        self.updateZeroAndNegativeFlags(result: self.stackPointer)
+    }
+
+    mutating func tya() {
+        self.accumulator = self.yRegister;
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
     mutating func updateZeroAndNegativeFlags(result: UInt8) {
         self.statusRegister[.zero] = result == 0
         self.statusRegister[.negative] = (result & 0b1000_0000) != 0
@@ -195,10 +237,14 @@ extension CPU {
                     self.and(addressingMode: opcode.addressingMode)
                 case .aslAccumlator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
                     self.asl(addressingMode: opcode.addressingMode)
+                case .bitZeroPage, .bitAbsolute:
+                    self.bit(addressingMode: opcode.addressingMode)
                 case .break:
                     return;
                 case .eorImmediate, .eorZeroPage, .eorZeroPageX, .eorAbsolute, .eorAbsoluteX, .eorAbsoluteY, .eorIndirectX, .eorIndirectY:
                     self.eor(addressingMode: opcode.addressingMode)
+                case .inx:
+                    self.inx()
                 case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
                     self.lda(addressingMode: opcode.addressingMode)
                 case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
@@ -207,6 +253,8 @@ extension CPU {
                     self.ldy(addressingMode: opcode.addressingMode)
                 case .lsrAccumlator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
                     self.lsr(addressingMode: opcode.addressingMode)
+                case .nop:
+                    self.nop()
                 case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                     self.ora(addressingMode: opcode.addressingMode)
                 case .rolAccumlator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
@@ -221,8 +269,16 @@ extension CPU {
                     self.sty(addressingMode: opcode.addressingMode)
                 case .tax:
                     self.tax()
-                case .inx:
-                    self.inx()
+                case .tay:
+                    self.tay()
+                case .tsx:
+                    self.tsx()
+                case .txa:
+                    self.txa()
+                case .txs:
+                    self.txs()
+                case .tya:
+                    self.tya()
                 }
 
                 self.programCounter += UInt16(opcode.instructionLength - 1)
