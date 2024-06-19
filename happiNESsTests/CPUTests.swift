@@ -560,6 +560,61 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.accumulator, 0b1111_0101);
     }
 
+    func testPha() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x42, 0x48, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x01FF), 0x42);
+        XCTAssertEqual(cpu.stackPointer, 0xFE);
+    }
+
+    func testPhp() {
+        var cpu = CPU()
+        // NOTA BENE: We can't directly manipulate the status register
+        // so we do it imdirectly by loading the accumulator with a value
+        // that affects it.
+        let program: [UInt8] = [0xA9, 0xFF, 0x08, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(0b1000_0000, cpu.readByte(address: 0x01FF));
+        XCTAssertEqual(cpu.stackPointer, 0xFE);
+    }
+
+    func testPla() {
+        var cpu = CPU()
+        // NOTA BENE: Although we can write directly to the area of memory
+        // reserved for the stack, we would bypass the machinery guarding
+        // the stack, and we don't want to load a value into the accumulator,
+        // push it onto the stack, then pull it back out because that would
+        // be circular and not prove much. So, instead we set the accumulator
+        // to a value which will set flags in the status register, then
+        // push the status register onto the stack, and then finally pop
+        // the stack onto the accumulator with a _different_ value.
+        let program: [UInt8] = [0xA9, 0xFF, 0x08, 0x68, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0b1000_0000);
+        XCTAssertEqual(cpu.stackPointer, 0xFF);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testPlp() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0x00]
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.stackPointer, 0xFF);
+        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.statusRegister[.overflow])
+        XCTAssertTrue(cpu.statusRegister[.break])
+        XCTAssertTrue(cpu.statusRegister[.interrupt])
+        XCTAssertTrue(cpu.statusRegister[.zero])
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
     func testRolAccumulator() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0b1111_1111, 0x2A, 0x00];

@@ -75,6 +75,11 @@ enum Opcode: UInt8 {
     case oraIndirectX = 0x01
     case oraIndirectY = 0x11
 
+    case pha = 0x48
+    case php = 0x08
+    case pla = 0x68
+    case plp = 0x28
+
     case rolAccumlator = 0x2A
     case rolZeroPage = 0x26
     case rolZeroPageX = 0x36
@@ -183,6 +188,11 @@ extension Opcode {
         case .oraIndirectX: .indirectX
         case .oraIndirectY: .indirectY
 
+        case .pha: .implicit
+        case .php: .implicit
+        case .pla: .implicit
+        case .plp: .implicit
+
         case .rolAccumlator: .accumulator
         case .rolZeroPage: .zeroPage
         case .rolZeroPageX: .zeroPageX
@@ -290,6 +300,11 @@ extension Opcode {
         case .oraAbsoluteY: 3
         case .oraIndirectX: 2
         case .oraIndirectY: 2
+
+        case .pha: 1
+        case .php: 1
+        case .pla: 1
+        case .plp: 1
 
         case .rolAccumlator: 1
         case .rolZeroPage: 2

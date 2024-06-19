@@ -7,6 +7,7 @@
 
 let RESET_VECTOR_ADDRESS: UInt16 = 0xFFFC;
 let RESET_STACK_POINTER_VALUE: UInt8 = 0xFF
+let STACK_BOTTOM_MEMORY_ADDRESS: UInt16 = 0x0100;
 
 public struct CPU {
     public var accumulator: UInt8
@@ -126,6 +127,36 @@ extension CPU {
         let value = self.readByte(address: address);
         self.accumulator |= value;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
+    mutating private func pushStack(byte: UInt8) {
+        self.writeByte(address: STACK_BOTTOM_MEMORY_ADDRESS + UInt16(self.stackPointer), byte: byte)
+        self.stackPointer = self.stackPointer &- 1
+    }
+
+    mutating private func popStack() -> UInt8 {
+        self.stackPointer = self.stackPointer &+ 1
+        let byte = self.readByte(address: STACK_BOTTOM_MEMORY_ADDRESS + UInt16(self.stackPointer))
+        return byte
+    }
+
+    mutating func pha() {
+        self.pushStack(byte: self.accumulator)
+    }
+
+    mutating func php() {
+        self.pushStack(byte: self.statusRegister.rawValue)
+    }
+
+    mutating func pla() {
+        self.accumulator = self.popStack()
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
+    mutating func plp() {
+        // TODO: Come back to this and check to see if any bits
+        // in the status register need to be explicitly set
+        self.statusRegister.rawValue = self.popStack()
     }
 
     mutating func rol(addressingMode: AddressingMode) {
@@ -257,6 +288,14 @@ extension CPU {
                     self.nop()
                 case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                     self.ora(addressingMode: opcode.addressingMode)
+                case .pha:
+                    self.pha()
+                case .php:
+                    self.php()
+                case .pla:
+                    self.pla()
+                case .plp:
+                    self.plp()
                 case .rolAccumlator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
                     self.rol(addressingMode: opcode.addressingMode)
                 case .rorAccumlator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
