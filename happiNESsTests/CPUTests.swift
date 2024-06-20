@@ -165,6 +165,38 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.overflow]);
     }
 
+    func testClc() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0x18, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testCld() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0xD8, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.decimalMode]);
+    }
+
+    func testCli() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0x58, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.interrupt]);
+    }
+
+    func testClv() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0xB8, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.overflow]);
+    }
+
     func testDecZeroPage() {
         var cpu = CPU()
         cpu.writeByte(address: 0x10, byte: 0x55);
@@ -843,6 +875,30 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.zero]);
         XCTAssertTrue(!cpu.statusRegister[.negative]);
         XCTAssertTrue(!cpu.statusRegister[.carry]);
+    }
+
+    func testSec() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0x38, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(cpu.statusRegister[.carry]);
+    }
+
+    func testSed() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0xF8, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(cpu.statusRegister[.decimalMode]);
+    }
+
+    func testSei() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0x78, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(cpu.statusRegister[.interrupt]);
     }
 
     func testStaZeroPage() {

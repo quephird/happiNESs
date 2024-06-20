@@ -26,6 +26,11 @@ enum Opcode: UInt8 {
 
     case `break` = 0x00
 
+    case clc = 0x18
+    case cld = 0xD8
+    case cli = 0x58
+    case clv = 0xB8
+
     case decZeroPage = 0xC6
     case decZeroPageX = 0xD6
     case decAbsolute = 0xCE
@@ -106,6 +111,10 @@ enum Opcode: UInt8 {
     case rorAbsolute = 0x6E
     case rorAbsoluteX = 0x7E
 
+    case sec = 0x38
+    case sed = 0xF8
+    case sei = 0x78
+
     case staZeroPage = 0x85
     case staZeroPageX = 0x95
     case staAbsolute = 0x8D
@@ -152,6 +161,11 @@ extension Opcode {
         case .bitAbsolute: .absolute
 
         case .`break`: .implicit
+
+        case .clc: .implicit
+        case .cld: .implicit
+        case .cli: .implicit
+        case .clv: .implicit
 
         case .decZeroPage: .zeroPage
         case .decZeroPageX: .zeroPageX
@@ -233,6 +247,10 @@ extension Opcode {
         case .rorAbsolute: .absolute
         case .rorAbsoluteX: .absoluteX
 
+        case .sec: .implicit
+        case .sed: .implicit
+        case .sei: .implicit
+
         case .staZeroPage: .zeroPage
         case .staZeroPageX: .zeroPageX
         case .staAbsolute: .absolute
@@ -279,6 +297,11 @@ extension Opcode {
         case .bitAbsolute: 3
 
         case .break: 1
+
+        case .clc: 1
+        case .cld: 1
+        case .cli: 1
+        case .clv: 1
 
         case .decZeroPage: 2
         case .decZeroPageX: 2
@@ -359,6 +382,10 @@ extension Opcode {
         case .rorZeroPageX: 2
         case .rorAbsolute: 3
         case .rorAbsoluteX: 3
+
+        case .sec: 1
+        case .sed: 1
+        case .sei: 1
 
         case .staZeroPage: 2
         case .staZeroPageX: 2

@@ -70,6 +70,26 @@ extension CPU {
         self.statusRegister[.zero] = result == 0
     }
 
+    mutating private func clearBit(bit: StatusRegister.Element) {
+        self.statusRegister[bit] = false
+    }
+
+    mutating func clc() {
+        self.clearBit(bit: .carry)
+    }
+
+    mutating func cld() {
+        self.clearBit(bit: .decimalMode)
+    }
+
+    mutating func cli() {
+        self.clearBit(bit: .interrupt)
+    }
+
+    mutating func clv() {
+        self.clearBit(bit: .overflow)
+    }
+
     mutating func dec(addressingMode: AddressingMode) {
         let address = self.getOperandAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
@@ -225,6 +245,22 @@ extension CPU {
         }
     }
 
+    mutating private func setBit(bit: StatusRegister.Element) {
+        self.statusRegister[bit] = true
+    }
+
+    mutating func sec() {
+        self.setBit(bit: .carry)
+    }
+
+    mutating func sed() {
+        self.setBit(bit: .decimalMode)
+    }
+
+    mutating func sei() {
+        self.setBit(bit: .interrupt)
+    }
+
     mutating func sta(addressingMode: AddressingMode) {
         let address = self.getOperandAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.accumulator);
@@ -302,6 +338,14 @@ extension CPU {
                     self.bit(addressingMode: opcode.addressingMode)
                 case .break:
                     return;
+                case .clc:
+                    self.clc()
+                case .cld:
+                    self.cld()
+                case .cli:
+                    self.cli()
+                case .clv:
+                    self.clv()
                 case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
                     self.dec(addressingMode: opcode.addressingMode)
                 case .dex:
@@ -340,6 +384,12 @@ extension CPU {
                     self.rol(addressingMode: opcode.addressingMode)
                 case .rorAccumlator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
                     self.ror(addressingMode: opcode.addressingMode)
+                case .sec:
+                    self.sec()
+                case .sed:
+                    self.sed()
+                case .sei:
+                    self.sei()
                 case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
                     self.sta(addressingMode: opcode.addressingMode)
                 case .stxZeroPage, .stxZeroPageY, .stxAbsolute:
