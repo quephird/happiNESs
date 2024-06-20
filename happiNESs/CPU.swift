@@ -70,6 +70,24 @@ extension CPU {
         self.statusRegister[.zero] = result == 0
     }
 
+    mutating func dec(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+        self.writeByte(address: address, byte: value &- 1)
+        self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
+    }
+
+    mutating func dex() {
+        self.xRegister = self.xRegister &- 1
+        self.updateZeroAndNegativeFlags(result: self.xRegister)
+    }
+
+    mutating func dey() {
+        self.yRegister = self.yRegister &- 1
+        self.updateZeroAndNegativeFlags(result: self.yRegister)
+    }
+
+
     mutating func eor(addressingMode: AddressingMode) {
         let address = self.getOperandAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
@@ -77,9 +95,21 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.accumulator)
     }
 
+    mutating func inc(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+        self.writeByte(address: address, byte: value &+ 1)
+        self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
+    }
+
     mutating func inx() {
         self.xRegister = self.xRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.xRegister)
+    }
+
+    mutating func iny() {
+        self.yRegister = self.yRegister &+ 1
+        self.updateZeroAndNegativeFlags(result: self.yRegister)
     }
 
     mutating func lda(addressingMode: AddressingMode) {
@@ -272,10 +302,20 @@ extension CPU {
                     self.bit(addressingMode: opcode.addressingMode)
                 case .break:
                     return;
+                case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
+                    self.dec(addressingMode: opcode.addressingMode)
+                case .dex:
+                    self.dex()
+                case .dey:
+                    self.dey()
                 case .eorImmediate, .eorZeroPage, .eorZeroPageX, .eorAbsolute, .eorAbsoluteX, .eorAbsoluteY, .eorIndirectX, .eorIndirectY:
                     self.eor(addressingMode: opcode.addressingMode)
+                case .incZeroPage, .incZeroPageX, .incAbsolute, .incAbsoluteX:
+                    self.inc(addressingMode: opcode.addressingMode)
                 case .inx:
                     self.inx()
+                case .iny:
+                    self.iny()
                 case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
                     self.lda(addressingMode: opcode.addressingMode)
                 case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:

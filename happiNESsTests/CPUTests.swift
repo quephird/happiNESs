@@ -165,6 +165,66 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.overflow]);
     }
 
+    func testDecZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x10, byte: 0x55);
+        let program: [UInt8] = [0xC6, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x10), 0x54);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+    }
+
+    func testDecZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x30, byte: 0x00);
+        let program: [UInt8] = [0xA2, 0x20, 0xD6, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x30), 0xFF);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testDecAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x55);
+        let program: [UInt8] = [0xCE, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x54);
+    }
+
+    func testDecAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x55);
+        let program: [UInt8] = [0xA2, 0x34, 0xDE, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x54);
+    }
+
+    func testDexOverflow() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x00, 0xAA, 0xCA, 0x00]
+        cpu.loadAndRun(program: program)
+
+        XCTAssertEqual(cpu.xRegister, 0xFF)
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testDeyOverflow() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x00, 0xA8, 0x88, 0x00]
+        cpu.loadAndRun(program: program)
+
+        XCTAssertEqual(cpu.yRegister, 0xFF)
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
     func testEorImmediate() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x49, 0b0000_1111, 0x00];
@@ -240,12 +300,64 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.accumulator, 0b1111_0000);
     }
 
+    func testIncZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x10, byte: 0x55);
+        let program: [UInt8] = [0xE6, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x10), 0x56);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+    }
+
+    func testIncZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x30, byte: 0xFF);
+        let program: [UInt8] = [0xA2, 0x20, 0xF6, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x30), 0x00);
+        XCTAssertTrue(cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+    }
+
+    func testIncAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x55);
+        let program: [UInt8] = [0xEE, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x56);
+    }
+
+    func testIncAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x55);
+        let program: [UInt8] = [0xA2, 0x34, 0xFE, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0x56);
+    }
+
     func testInxOverflow() {
         var cpu = CPU()
-        let program: [UInt8] = [0xA9, 0xFF, 0xAA, 0xE8, 0xE8, 0x00]
+        let program: [UInt8] = [0xA9, 0xFF, 0xAA, 0xE8, 0x00]
         cpu.loadAndRun(program: program)
 
-        XCTAssertEqual(cpu.xRegister, 0x01)
+        XCTAssertEqual(cpu.xRegister, 0x00)
+        XCTAssertTrue(cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
+    }
+
+    func testInyOverflow() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0xFF, 0xA8, 0xC8, 0x00]
+        cpu.loadAndRun(program: program)
+
+        XCTAssertEqual(cpu.yRegister, 0x00)
+        XCTAssertTrue(cpu.statusRegister[.zero]);
+        XCTAssertTrue(!cpu.statusRegister[.negative]);
     }
 
     func testLdaImmediate() {

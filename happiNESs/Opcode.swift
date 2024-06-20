@@ -26,6 +26,14 @@ enum Opcode: UInt8 {
 
     case `break` = 0x00
 
+    case decZeroPage = 0xC6
+    case decZeroPageX = 0xD6
+    case decAbsolute = 0xCE
+    case decAbsoluteX = 0xDE
+
+    case dex = 0xCA
+    case dey = 0x88
+
     case eorImmediate = 0x49
     case eorZeroPage = 0x45
     case eorZeroPageX = 0x55
@@ -35,7 +43,13 @@ enum Opcode: UInt8 {
     case eorIndirectX = 0x41
     case eorIndirectY = 0x51
 
+    case incZeroPage = 0xE6
+    case incZeroPageX = 0xF6
+    case incAbsolute = 0xEE
+    case incAbsoluteX = 0xFE
+
     case inx = 0xE8
+    case iny = 0xC8
 
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
@@ -139,6 +153,14 @@ extension Opcode {
 
         case .`break`: .implicit
 
+        case .decZeroPage: .zeroPage
+        case .decZeroPageX: .zeroPageX
+        case .decAbsolute: .absolute
+        case .decAbsoluteX: .absoluteX
+
+        case .dex: .implicit
+        case .dey: .implicit
+
         case .eorImmediate: .immediate
         case .eorZeroPage: .zeroPage
         case .eorZeroPageX: .zeroPageX
@@ -148,7 +170,13 @@ extension Opcode {
         case .eorIndirectX: .indirectX
         case .eorIndirectY: .indirectY
 
+        case .incZeroPage: .zeroPage
+        case .incZeroPageX: .zeroPageX
+        case .incAbsolute: .absolute
+        case .incAbsoluteX: .absoluteX
+
         case .inx: .implicit
+        case .iny: .implicit
 
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
@@ -252,6 +280,14 @@ extension Opcode {
 
         case .break: 1
 
+        case .decZeroPage: 2
+        case .decZeroPageX: 2
+        case .decAbsolute: 3
+        case .decAbsoluteX: 3
+
+        case .dex: 1
+        case .dey: 1
+
         case .eorImmediate: 2
         case .eorZeroPage: 2
         case .eorZeroPageX: 2
@@ -261,7 +297,13 @@ extension Opcode {
         case .eorIndirectX: 2
         case .eorIndirectY: 2
 
+        case .incZeroPage: 2
+        case .incZeroPageX: 2
+        case .incAbsolute: 3
+        case .incAbsoluteX: 3
+
         case .inx: 1
+        case .iny: 1
 
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
