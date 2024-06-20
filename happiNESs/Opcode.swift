@@ -40,6 +40,14 @@ enum Opcode: UInt8 {
     case cmpIndirectX = 0xC1
     case cmpIndirectY = 0xD1
 
+    case cpxImmediate = 0xE0
+    case cpxZeroPage = 0xE4
+    case cpxAbsolute = 0xEC
+
+    case cpyImmediate = 0xC0
+    case cpyZeroPage = 0xC4
+    case cpyAbsolute = 0xCC
+
     case decZeroPage = 0xC6
     case decZeroPageX = 0xD6
     case decAbsolute = 0xCE
@@ -185,6 +193,14 @@ extension Opcode {
         case .cmpIndirectX: .indirectX
         case .cmpIndirectY: .indirectY
 
+        case .cpxImmediate: .immediate
+        case .cpxZeroPage: .zeroPage
+        case .cpxAbsolute: .absolute
+
+        case .cpyImmediate: .immediate
+        case .cpyZeroPage: .zeroPage
+        case .cpyAbsolute: .absolute
+
         case .decZeroPage: .zeroPage
         case .decZeroPageX: .zeroPageX
         case .decAbsolute: .absolute
@@ -329,6 +345,14 @@ extension Opcode {
         case .cmpAbsoluteY: 3
         case .cmpIndirectX: 2
         case .cmpIndirectY: 2
+
+        case .cpxImmediate: 2
+        case .cpxZeroPage: 2
+        case .cpxAbsolute: 3
+
+        case .cpyImmediate: 2
+        case .cpyZeroPage: 2
+        case .cpyAbsolute: 3
 
         case .decZeroPage: 2
         case .decZeroPageX: 2

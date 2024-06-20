@@ -90,12 +90,24 @@ extension CPU {
         self.clearBit(bit: .overflow)
     }
 
-    mutating func cmp(addressingMode: AddressingMode) {
+    mutating private func compareMemory(addressingMode: AddressingMode, to registerValue: UInt8) {
         let address = self.getOperandAddress(addressingMode: addressingMode)
-        let value = self.readByte(address: address)
+        let memoryValue = self.readByte(address: address)
 
-        self.statusRegister[.carry] = (value <= self.accumulator)
-        self.updateZeroAndNegativeFlags(result: self.accumulator &- value)
+        self.statusRegister[.carry] = (memoryValue <= registerValue)
+        self.updateZeroAndNegativeFlags(result: registerValue &- memoryValue)
+    }
+
+    mutating func cmp(addressingMode: AddressingMode) {
+        self.compareMemory(addressingMode: addressingMode, to: self.accumulator)
+    }
+
+    mutating func cpx(addressingMode: AddressingMode) {
+        self.compareMemory(addressingMode: addressingMode, to: self.xRegister)
+    }
+
+    mutating func cpy(addressingMode: AddressingMode) {
+        self.compareMemory(addressingMode: addressingMode, to: self.yRegister)
     }
 
     mutating func dec(addressingMode: AddressingMode) {
@@ -356,6 +368,10 @@ extension CPU {
                     self.clv()
                 case .cmpImmediate, .cmpZeroPage, .cmpZeroPageX, .cmpAbsolute, .cmpAbsoluteX, .cmpAbsoluteY, .cmpIndirectX, .cmpIndirectY:
                     self.cmp(addressingMode: opcode.addressingMode)
+                case .cpxImmediate, .cpxZeroPage, .cpxAbsolute:
+                    self.cpx(addressingMode: opcode.addressingMode)
+                case .cpyImmediate, .cpyZeroPage, .cpyAbsolute:
+                    self.cpy(addressingMode: opcode.addressingMode)
                 case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
                     self.dec(addressingMode: opcode.addressingMode)
                 case .dex:
