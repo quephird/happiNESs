@@ -90,9 +90,17 @@ extension CPU {
         self.clearBit(bit: .overflow)
     }
 
+    mutating func cmp(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+
+        self.statusRegister[.carry] = (value <= self.accumulator)
+        self.updateZeroAndNegativeFlags(result: self.accumulator &- value)
+    }
+
     mutating func dec(addressingMode: AddressingMode) {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
-        let value = self.readByte(address: address);
+        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value &- 1)
         self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
     }
@@ -346,6 +354,8 @@ extension CPU {
                     self.cli()
                 case .clv:
                     self.clv()
+                case .cmpImmediate, .cmpZeroPage, .cmpZeroPageX, .cmpAbsolute, .cmpAbsoluteX, .cmpAbsoluteY, .cmpIndirectX, .cmpIndirectY:
+                    self.cmp(addressingMode: opcode.addressingMode)
                 case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
                     self.dec(addressingMode: opcode.addressingMode)
                 case .dex:

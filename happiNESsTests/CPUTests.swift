@@ -197,6 +197,97 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.overflow]);
     }
 
+    func testCmpImmediate() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x42, 0xC9, 0x43, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xC5, 0x30, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0xD5, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xCD, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x34, 0xDD, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpAbsoluteY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0xD9, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpIndirectX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x34)
+        cpu.writeByte(address: 0x0031, byte: 0x12)
+        cpu.writeByte(address: 0x1234, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0xC1, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
+    func testCmpIndirectY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x00)
+        cpu.writeByte(address: 0x0031, byte: 0x12)
+        cpu.writeByte(address: 0x1234, byte: 0x43)
+        let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0xD1, 0x30, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertTrue(!cpu.statusRegister[.carry]);
+        XCTAssertTrue(!cpu.statusRegister[.zero]);
+        XCTAssertTrue(cpu.statusRegister[.negative]);
+    }
+
     func testDecZeroPage() {
         var cpu = CPU()
         cpu.writeByte(address: 0x10, byte: 0x55);
