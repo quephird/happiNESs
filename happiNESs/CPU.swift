@@ -39,10 +39,23 @@ public struct CPU {
 }
 
 extension CPU {
+    mutating func adc(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        let carry = self.statusRegister.rawValue & 0x01
+
+        let oldAccumulator = self.accumulator
+        let sum = UInt16(self.accumulator) + UInt16(value) + UInt16(carry)
+        self.accumulator = UInt8(sum & 0xFF)
+        self.statusRegister[.carry] = sum > 0xFF
+        self.statusRegister[.overflow] = ((oldAccumulator ^ self.accumulator) & (value ^ self.accumulator) & 0x80) > 0
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
     mutating func and(addressingMode: AddressingMode) {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
-        let value = self.readByte(address: address);
-        self.accumulator &= value;
+        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        self.accumulator &= value
         self.updateZeroAndNegativeFlags(result: self.accumulator)
     }
 
@@ -350,6 +363,8 @@ extension CPU {
             if let opcode = Opcode(rawValue: byte) {
                 self.programCounter += 1;
                 switch opcode {
+                case .adcImmediate, .adcZeroPage, .adcZeroPageX, .adcAbsolute, .adcAbsoluteX, .adcAbsoluteY, .adcIndirectX, .adcIndirectY:
+                    self.adc(addressingMode: opcode.addressingMode)
                 case .andImmediate, .andZeroPage, .andZeroPageX, .andAbsolute, .andAbsoluteX, .andAbsoluteY, .andIndirectX, .andIndirectY:
                     self.and(addressingMode: opcode.addressingMode)
                 case .aslAccumlator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:

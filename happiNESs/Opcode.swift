@@ -6,6 +6,15 @@
 //
 
 enum Opcode: UInt8 {
+    case adcImmediate = 0x69
+    case adcZeroPage = 0x65
+    case adcZeroPageX = 0x75
+    case adcAbsolute = 0x6D
+    case adcAbsoluteX = 0x7D
+    case adcAbsoluteY = 0x79
+    case adcIndirectX = 0x61
+    case adcIndirectY = 0x71
+
     case andImmediate = 0x29
     case andZeroPage = 0x25
     case andZeroPageX = 0x35
@@ -159,6 +168,15 @@ enum Opcode: UInt8 {
 extension Opcode {
     var addressingMode: AddressingMode {
         switch self {
+        case .adcImmediate: .immediate
+        case .adcZeroPage: .zeroPage
+        case .adcZeroPageX: .zeroPageX
+        case .adcAbsolute: .absolute
+        case .adcAbsoluteX: .absoluteX
+        case .adcAbsoluteY: .absoluteY
+        case .adcIndirectX: .indirectX
+        case .adcIndirectY: .indirectY
+
         case .andImmediate: .immediate
         case .andZeroPage: .zeroPage
         case .andZeroPageX: .zeroPageX
@@ -312,6 +330,15 @@ extension Opcode {
 
     var instructionLength: Int {
         switch self {
+        case .adcImmediate: 2
+        case .adcZeroPage: 2
+        case .adcZeroPageX: 2
+        case .adcAbsolute: 3
+        case .adcAbsoluteX: 3
+        case .adcAbsoluteY: 3
+        case .adcIndirectX: 2
+        case .adcIndirectY: 2
+
         case .andImmediate: 2
         case .andZeroPage: 2
         case .andZeroPageX: 2
