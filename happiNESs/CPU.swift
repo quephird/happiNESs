@@ -42,13 +42,12 @@ extension CPU {
     mutating func adc(addressingMode: AddressingMode) {
         let address = self.getOperandAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
-        let carry = self.statusRegister.rawValue & 0x01
+        let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
 
-        let oldAccumulator = self.accumulator
         let sum = UInt16(self.accumulator) + UInt16(value) + UInt16(carry)
-        self.accumulator = UInt8(sum & 0xFF)
         self.statusRegister[.carry] = sum > 0xFF
-        self.statusRegister[.overflow] = ((oldAccumulator ^ self.accumulator) & (value ^ self.accumulator) & 0x80) > 0
+        self.statusRegister[.overflow] = ((UInt8(sum & 0xFF) ^ self.accumulator) & (UInt8(sum & 0xFF) ^ value) & 0x80) == 0x80
+        self.accumulator = UInt8(sum & 0xFF)
         self.updateZeroAndNegativeFlags(result: self.accumulator)
     }
 
@@ -278,6 +277,18 @@ extension CPU {
         }
     }
 
+    mutating func sbc(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        let borrow: UInt8 = self.statusRegister[.carry] ? 0x00 : 0x01
+
+        let sum = UInt16(self.accumulator) + UInt16(~value) + UInt16(borrow)
+        self.statusRegister[.carry] = sum > 0xFF
+        self.statusRegister[.overflow] = ((UInt8(sum & 0xFF) ^ self.accumulator) & (UInt8(sum & 0xFF) ^ value) & 0x80) == 0x80
+        self.accumulator = UInt8(sum & 0xFF)
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+    }
+
     mutating private func setBit(bit: StatusRegister.Element) {
         self.statusRegister[bit] = true
     }
@@ -367,7 +378,7 @@ extension CPU {
                     self.adc(addressingMode: opcode.addressingMode)
                 case .andImmediate, .andZeroPage, .andZeroPageX, .andAbsolute, .andAbsoluteX, .andAbsoluteY, .andIndirectX, .andIndirectY:
                     self.and(addressingMode: opcode.addressingMode)
-                case .aslAccumlator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
+                case .aslAccumulator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
                     self.asl(addressingMode: opcode.addressingMode)
                 case .bitZeroPage, .bitAbsolute:
                     self.bit(addressingMode: opcode.addressingMode)
@@ -407,7 +418,7 @@ extension CPU {
                     self.ldx(addressingMode: opcode.addressingMode)
                 case .ldyImmediate, .ldyZeroPage, .ldyZeroPageX, .ldyAbsolute, .ldyAbsoluteX:
                     self.ldy(addressingMode: opcode.addressingMode)
-                case .lsrAccumlator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
+                case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
                     self.lsr(addressingMode: opcode.addressingMode)
                 case .nop:
                     self.nop()
@@ -421,10 +432,12 @@ extension CPU {
                     self.pla()
                 case .plp:
                     self.plp()
-                case .rolAccumlator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
+                case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
                     self.rol(addressingMode: opcode.addressingMode)
-                case .rorAccumlator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
+                case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
                     self.ror(addressingMode: opcode.addressingMode)
+                case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
+                    self.sbc(addressingMode: opcode.addressingMode)
                 case .sec:
                     self.sec()
                 case .sed:

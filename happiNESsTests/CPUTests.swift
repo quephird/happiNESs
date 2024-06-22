@@ -1139,6 +1139,113 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.carry])
     }
 
+    func testSbcImmediate() {
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x32, 0xE9, 0x50, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0xE2)
+        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(cpu.statusRegister[.negative])
+    }
+
+    func testSbcZeroPage() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0042, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xE5, 0x42, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertFalse(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
+    func testSbcZeroPageX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x20, 0xF5, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertFalse(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
+    func testSbcAbsolute() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xED, 0x34, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertFalse(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
+    func testSbcAbsoluteX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x34, 0xFD, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertFalse(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
+    func testSbcAbsoluteY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xA0, 0x34, 0xF9, 0x00, 0x12, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertFalse(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
+    func testSbcIndirectX() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x34)
+        cpu.writeByte(address: 0x0031, byte: 0x12)
+        cpu.writeByte(address: 0x1234, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x20, 0xE1, 0x10, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
+    func testSbcIndirectY() {
+        var cpu = CPU()
+        cpu.writeByte(address: 0x0030, byte: 0x00)
+        cpu.writeByte(address: 0x0031, byte: 0x12)
+        cpu.writeByte(address: 0x1234, byte: 0x20)
+        let program: [UInt8] = [0xA9, 0x30, 0xA0, 0x34, 0xF1, 0x30, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.zero])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
+    }
+
     func testSec() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0x38, 0x00]

@@ -24,7 +24,7 @@ enum Opcode: UInt8 {
     case andIndirectX = 0x21
     case andIndirectY = 0x31
 
-    case aslAccumlator = 0x0A
+    case aslAccumulator = 0x0A
     case aslZeroPage = 0x06
     case aslZeroPageX = 0x16
     case aslAbsolute = 0x0E
@@ -103,7 +103,7 @@ enum Opcode: UInt8 {
     case ldyAbsolute = 0xAC
     case ldyAbsoluteX = 0xBC
 
-    case lsrAccumlator = 0x4A
+    case lsrAccumulator = 0x4A
     case lsrZeroPage = 0x46
     case lsrZeroPageX = 0x56
     case lsrAbsolute = 0x4E
@@ -125,17 +125,26 @@ enum Opcode: UInt8 {
     case pla = 0x68
     case plp = 0x28
 
-    case rolAccumlator = 0x2A
+    case rolAccumulator = 0x2A
     case rolZeroPage = 0x26
     case rolZeroPageX = 0x36
     case rolAbsolute = 0x2E
     case rolAbsoluteX = 0x3E
 
-    case rorAccumlator = 0x6A
+    case rorAccumulator = 0x6A
     case rorZeroPage = 0x66
     case rorZeroPageX = 0x76
     case rorAbsolute = 0x6E
     case rorAbsoluteX = 0x7E
+
+    case sbcImmediate = 0xE9
+    case sbcZeroPage = 0xE5
+    case sbcZeroPageX = 0xF5
+    case sbcAbsolute = 0xED
+    case sbcAbsoluteX = 0xFD
+    case sbcAbsoluteY = 0xF9
+    case sbcIndirectX = 0xE1
+    case sbcIndirectY = 0xF1
 
     case sec = 0x38
     case sed = 0xF8
@@ -186,7 +195,7 @@ extension Opcode {
         case .andIndirectX: .indirectX
         case .andIndirectY: .indirectY
 
-        case .aslAccumlator: .accumulator
+        case .aslAccumulator: .accumulator
         case .aslZeroPage: .zeroPage
         case .aslZeroPageX: .zeroPageX
         case .aslAbsolute: .absolute
@@ -265,7 +274,7 @@ extension Opcode {
         case .ldyAbsolute: .absolute
         case .ldyAbsoluteX: .absoluteX
 
-        case .lsrAccumlator: .accumulator
+        case .lsrAccumulator: .accumulator
         case .lsrZeroPage: .zeroPage
         case .lsrZeroPageX: .zeroPageX
         case .lsrAbsolute: .absolute
@@ -287,17 +296,26 @@ extension Opcode {
         case .pla: .implicit
         case .plp: .implicit
 
-        case .rolAccumlator: .accumulator
+        case .rolAccumulator: .accumulator
         case .rolZeroPage: .zeroPage
         case .rolZeroPageX: .zeroPageX
         case .rolAbsolute: .absolute
         case .rolAbsoluteX: .absoluteX
 
-        case .rorAccumlator: .accumulator
+        case .rorAccumulator: .accumulator
         case .rorZeroPage: .zeroPage
         case .rorZeroPageX: .zeroPageX
         case .rorAbsolute: .absolute
         case .rorAbsoluteX: .absoluteX
+
+        case .sbcImmediate: .immediate
+        case .sbcZeroPage: .zeroPage
+        case .sbcZeroPageX: .zeroPageX
+        case .sbcAbsolute: .absolute
+        case .sbcAbsoluteX: .absoluteX
+        case .sbcAbsoluteY: .absoluteY
+        case .sbcIndirectX: .indirectX
+        case .sbcIndirectY: .indirectY
 
         case .sec: .implicit
         case .sed: .implicit
@@ -348,7 +366,7 @@ extension Opcode {
         case .andIndirectX: 2
         case .andIndirectY: 2
 
-        case .aslAccumlator: 1
+        case .aslAccumulator: 1
         case .aslZeroPage: 2
         case .aslZeroPageX: 2
         case .aslAbsolute: 3
@@ -427,7 +445,7 @@ extension Opcode {
         case .ldyAbsolute: 3
         case .ldyAbsoluteX: 3
 
-        case .lsrAccumlator: 1
+        case .lsrAccumulator: 1
         case .lsrZeroPage: 2
         case .lsrZeroPageX: 2
         case .lsrAbsolute: 3
@@ -449,17 +467,26 @@ extension Opcode {
         case .pla: 1
         case .plp: 1
 
-        case .rolAccumlator: 1
+        case .rolAccumulator: 1
         case .rolZeroPage: 2
         case .rolZeroPageX: 2
         case .rolAbsolute: 3
         case .rolAbsoluteX: 3
 
-        case .rorAccumlator: 1
+        case .rorAccumulator: 1
         case .rorZeroPage: 2
         case .rorZeroPageX: 2
         case .rorAbsolute: 3
         case .rorAbsoluteX: 3
+
+        case .sbcImmediate: 2
+        case .sbcZeroPage: 2
+        case .sbcZeroPageX: 2
+        case .sbcAbsolute: 3
+        case .sbcAbsoluteX: 3
+        case .sbcAbsoluteY: 3
+        case .sbcIndirectX: 2
+        case .sbcIndirectY: 2
 
         case .sec: 1
         case .sed: 1
