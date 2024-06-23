@@ -159,6 +159,22 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.xRegister)
     }
 
+    mutating func jmp(addressingMode: AddressingMode) {
+        let address = self.getOperandAddress(addressingMode: addressingMode)
+        self.programCounter = address
+    }
+
+    mutating func jsr() {
+        let subroutineAddress = self.getOperandAddress(addressingMode: .absolute);
+        // ACHTUNG!!! Note that this is pointing to the last byte of the `JSR` instruction!
+        let returnAddress = self.programCounter + 2 - 1
+        let returnAddressHigh = UInt8(returnAddress >> 8)
+        let returnAddressLow = UInt8(returnAddress & 0xFF)
+        self.pushStack(byte: returnAddressHigh)
+        self.pushStack(byte: returnAddressLow)
+        self.programCounter = subroutineAddress
+    }
+
     mutating func iny() {
         self.yRegister = self.yRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.yRegister)
@@ -275,6 +291,14 @@ extension CPU {
             self.writeByte(address: address, byte: newValue)
             self.updateZeroAndNegativeFlags(result: newValue)
         }
+    }
+
+    mutating func rts() {
+        let addressLow = self.popStack()
+        let addressHigh = self.popStack()
+        // ACHTUNG!!! Note that this only works in conjunction with the `JSR` instruction!
+        let address = UInt16(addressHigh) << 8 | UInt16(addressLow) + 1
+        self.programCounter = address
     }
 
     mutating func sbc(addressingMode: AddressingMode) {
@@ -412,6 +436,10 @@ extension CPU {
                     self.inx()
                 case .iny:
                     self.iny()
+                case .jmpAbsolute, .jmpIndirect:
+                    self.jmp(addressingMode: opcode.addressingMode)
+                case .jsr:
+                    self.jsr()
                 case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
                     self.lda(addressingMode: opcode.addressingMode)
                 case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
@@ -436,6 +464,8 @@ extension CPU {
                     self.rol(addressingMode: opcode.addressingMode)
                 case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
                     self.ror(addressingMode: opcode.addressingMode)
+                case .rts:
+                    self.rts()
                 case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
                     self.sbc(addressingMode: opcode.addressingMode)
                 case .sec:
@@ -464,7 +494,9 @@ extension CPU {
                     self.tya()
                 }
 
-                self.programCounter += UInt16(opcode.instructionLength - 1)
+                if !opcode.manipulatesProgramCounter {
+                    self.programCounter += UInt16(opcode.instructionLength - 1)
+                }
             } else {
                 fatalError("Whoops! Instruction \(byte) not recognized!!!")
             }
@@ -491,6 +523,9 @@ extension CPU {
         case .absoluteY:
             let baseAddress = self.readWord(address: self.programCounter)
             return baseAddress &+ UInt16(self.yRegister)
+        case .indirect:
+            let baseAddress = self.readWord(address: self.programCounter)
+            return self.readWord(address: baseAddress)
         case .indirectX:
             // operand_ptr = *(void **)(constant_byte + x_register)
             let baseAddress = self.readByte(address: self.programCounter)

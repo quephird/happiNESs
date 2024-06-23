@@ -82,6 +82,11 @@ enum Opcode: UInt8 {
     case inx = 0xE8
     case iny = 0xC8
 
+    case jmpAbsolute = 0x4C
+    case jmpIndirect = 0x6C
+
+    case jsr = 0x20
+
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
     case ldaZeroPageX = 0xB5
@@ -136,6 +141,8 @@ enum Opcode: UInt8 {
     case rorZeroPageX = 0x76
     case rorAbsolute = 0x6E
     case rorAbsoluteX = 0x7E
+
+    case rts = 0x60
 
     case sbcImmediate = 0xE9
     case sbcZeroPage = 0xE5
@@ -253,6 +260,11 @@ extension Opcode {
         case .inx: .implicit
         case .iny: .implicit
 
+        case .jmpAbsolute: .absolute
+        case .jmpIndirect: .indirect
+
+        case .jsr: .absolute
+
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
         case .ldaZeroPageX: .zeroPageX
@@ -307,6 +319,8 @@ extension Opcode {
         case .rorZeroPageX: .zeroPageX
         case .rorAbsolute: .absolute
         case .rorAbsoluteX: .absoluteX
+
+        case .rts: .implicit
 
         case .sbcImmediate: .immediate
         case .sbcZeroPage: .zeroPage
@@ -424,6 +438,11 @@ extension Opcode {
         case .inx: 1
         case .iny: 1
 
+        case .jmpAbsolute: 3
+        case .jmpIndirect: 3
+
+        case .jsr: 3
+
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
         case .ldaZeroPageX: 2
@@ -479,6 +498,8 @@ extension Opcode {
         case .rorAbsolute: 3
         case .rorAbsoluteX: 3
 
+        case .rts: 1
+
         case .sbcImmediate: 2
         case .sbcZeroPage: 2
         case .sbcZeroPageX: 2
@@ -514,6 +535,17 @@ extension Opcode {
         case .txa: 1
         case .txs: 1
         case .tya: 1
+        }
+    }
+}
+
+extension Opcode {
+    var manipulatesProgramCounter: Bool {
+        switch self {
+        case .jmpAbsolute, .jmpIndirect: true
+        case .jsr: true
+        case .rts: true
+        default: false
         }
     }
 }

@@ -654,6 +654,41 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.negative])
     }
 
+    func testJmpAbsolute() {
+        // NOTA BENE: This little program sets the program counter
+        // ahead of the LDA instruction such that the accumulator
+        // never gets initialized.
+        var cpu = CPU()
+        let program: [UInt8] = [0x4C, 0x05, 0x80, 0xA9, 0xFF, 0x00]
+        cpu.loadAndRun(program: program)
+
+        XCTAssertEqual(cpu.accumulator, 0x00)
+    }
+
+    func testJmpIndirect() {
+        // NOTA BENE: This program does the same as the above, albeit
+        // via indirect addressing.
+        var cpu = CPU()
+        cpu.writeByte(address: 0x1234, byte: 0x05)
+        cpu.writeByte(address: 0x1235, byte: 0x80)
+        let program: [UInt8] = [0x6C, 0x34, 0x12, 0xA9, 0xFF, 0x00]
+        cpu.loadAndRun(program: program)
+
+        XCTAssertEqual(cpu.accumulator, 0x00)
+    }
+
+    func testJsr() {
+        // NOTA BENE: This little program actually involves `JMP` and `RTS` instructions.
+        // First, we jump to a subroutine to load the accumulator with 0xFF, then we return,
+        // via `RTS`, to the point ahead of the `JSR` instruction which then `JMP`s to the
+        // last byte of the program.
+        var cpu = CPU()
+        let program: [UInt8] = [0x20, 0x06, 0x80, 0x4C, 0x0A, 0x80, 0xA9, 0xFF, 0x60, 0x00]
+        cpu.loadAndRun(program: program)
+
+        XCTAssertEqual(cpu.accumulator, 0xFF)
+    }
+
     func testLdaImmediate() {
         var cpu = CPU()
         let program: [UInt8] = [0xA9, 0x05, 0x00]
@@ -1137,6 +1172,20 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(!cpu.statusRegister[.negative])
         XCTAssertTrue(!cpu.statusRegister[.carry])
+    }
+
+    func testRts() {
+        // NOTA BENE: This program is a little evil: the memory address of the
+        // program that I want to return to after the RTS instruction is a 0x8007,
+        // which will load 0xFF into the accumulator. So... first I need to push
+        // the high bits of that address (0x80) onto the stack through the accumulator,
+        // then the low bits (0x07) onto the stack. I wanted this test to be isolated
+        // from the one for JSR.
+        var cpu = CPU()
+        let program: [UInt8] = [0xA9, 0x80, 0x48, 0xA9, 0x06, 0x48, 0x60, 0xA9, 0xFF, 0x00];
+        cpu.loadAndRun(program: program);
+
+        XCTAssertEqual(cpu.accumulator, 0xFF)
     }
 
     func testSbcImmediate() {
