@@ -392,114 +392,118 @@ extension CPU {
         self.writeWord(address: RESET_VECTOR_ADDRESS, word: 0x8000);
     }
 
+    mutating func executeInstruction() {
+        let byte = self.readByte(address: self.programCounter);
+        if let opcode = Opcode(rawValue: byte) {
+            self.programCounter += 1;
+            switch opcode {
+            case .adcImmediate, .adcZeroPage, .adcZeroPageX, .adcAbsolute, .adcAbsoluteX, .adcAbsoluteY, .adcIndirectX, .adcIndirectY:
+                self.adc(addressingMode: opcode.addressingMode)
+            case .andImmediate, .andZeroPage, .andZeroPageX, .andAbsolute, .andAbsoluteX, .andAbsoluteY, .andIndirectX, .andIndirectY:
+                self.and(addressingMode: opcode.addressingMode)
+            case .aslAccumulator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
+                self.asl(addressingMode: opcode.addressingMode)
+            case .bitZeroPage, .bitAbsolute:
+                self.bit(addressingMode: opcode.addressingMode)
+            case .break:
+                return;
+            case .clc:
+                self.clc()
+            case .cld:
+                self.cld()
+            case .cli:
+                self.cli()
+            case .clv:
+                self.clv()
+            case .cmpImmediate, .cmpZeroPage, .cmpZeroPageX, .cmpAbsolute, .cmpAbsoluteX, .cmpAbsoluteY, .cmpIndirectX, .cmpIndirectY:
+                self.cmp(addressingMode: opcode.addressingMode)
+            case .cpxImmediate, .cpxZeroPage, .cpxAbsolute:
+                self.cpx(addressingMode: opcode.addressingMode)
+            case .cpyImmediate, .cpyZeroPage, .cpyAbsolute:
+                self.cpy(addressingMode: opcode.addressingMode)
+            case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
+                self.dec(addressingMode: opcode.addressingMode)
+            case .dex:
+                self.dex()
+            case .dey:
+                self.dey()
+            case .eorImmediate, .eorZeroPage, .eorZeroPageX, .eorAbsolute, .eorAbsoluteX, .eorAbsoluteY, .eorIndirectX, .eorIndirectY:
+                self.eor(addressingMode: opcode.addressingMode)
+            case .incZeroPage, .incZeroPageX, .incAbsolute, .incAbsoluteX:
+                self.inc(addressingMode: opcode.addressingMode)
+            case .inx:
+                self.inx()
+            case .iny:
+                self.iny()
+            case .jmpAbsolute, .jmpIndirect:
+                self.jmp(addressingMode: opcode.addressingMode)
+            case .jsr:
+                self.jsr()
+            case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
+                self.lda(addressingMode: opcode.addressingMode)
+            case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
+                self.ldx(addressingMode: opcode.addressingMode)
+            case .ldyImmediate, .ldyZeroPage, .ldyZeroPageX, .ldyAbsolute, .ldyAbsoluteX:
+                self.ldy(addressingMode: opcode.addressingMode)
+            case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
+                self.lsr(addressingMode: opcode.addressingMode)
+            case .nop:
+                self.nop()
+            case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
+                self.ora(addressingMode: opcode.addressingMode)
+            case .pha:
+                self.pha()
+            case .php:
+                self.php()
+            case .pla:
+                self.pla()
+            case .plp:
+                self.plp()
+            case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
+                self.rol(addressingMode: opcode.addressingMode)
+            case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
+                self.ror(addressingMode: opcode.addressingMode)
+            case .rts:
+                self.rts()
+            case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
+                self.sbc(addressingMode: opcode.addressingMode)
+            case .sec:
+                self.sec()
+            case .sed:
+                self.sed()
+            case .sei:
+                self.sei()
+            case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
+                self.sta(addressingMode: opcode.addressingMode)
+            case .stxZeroPage, .stxZeroPageY, .stxAbsolute:
+                self.stx(addressingMode: opcode.addressingMode)
+            case .styZeroPage, .styZeroPageY, .styAbsolute:
+                self.sty(addressingMode: opcode.addressingMode)
+            case .tax:
+                self.tax()
+            case .tay:
+                self.tay()
+            case .tsx:
+                self.tsx()
+            case .txa:
+                self.txa()
+            case .txs:
+                self.txs()
+            case .tya:
+                self.tya()
+            }
+
+            if !opcode.manipulatesProgramCounter {
+                self.programCounter += UInt16(opcode.instructionLength - 1)
+            }
+        } else {
+            fatalError("Whoops! Instruction \(byte) not recognized!!!")
+        }
+    }
+
     mutating func run() {
         while true {
-            let byte = self.readByte(address: self.programCounter);
-            if let opcode = Opcode(rawValue: byte) {
-                self.programCounter += 1;
-                switch opcode {
-                case .adcImmediate, .adcZeroPage, .adcZeroPageX, .adcAbsolute, .adcAbsoluteX, .adcAbsoluteY, .adcIndirectX, .adcIndirectY:
-                    self.adc(addressingMode: opcode.addressingMode)
-                case .andImmediate, .andZeroPage, .andZeroPageX, .andAbsolute, .andAbsoluteX, .andAbsoluteY, .andIndirectX, .andIndirectY:
-                    self.and(addressingMode: opcode.addressingMode)
-                case .aslAccumulator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
-                    self.asl(addressingMode: opcode.addressingMode)
-                case .bitZeroPage, .bitAbsolute:
-                    self.bit(addressingMode: opcode.addressingMode)
-                case .break:
-                    return;
-                case .clc:
-                    self.clc()
-                case .cld:
-                    self.cld()
-                case .cli:
-                    self.cli()
-                case .clv:
-                    self.clv()
-                case .cmpImmediate, .cmpZeroPage, .cmpZeroPageX, .cmpAbsolute, .cmpAbsoluteX, .cmpAbsoluteY, .cmpIndirectX, .cmpIndirectY:
-                    self.cmp(addressingMode: opcode.addressingMode)
-                case .cpxImmediate, .cpxZeroPage, .cpxAbsolute:
-                    self.cpx(addressingMode: opcode.addressingMode)
-                case .cpyImmediate, .cpyZeroPage, .cpyAbsolute:
-                    self.cpy(addressingMode: opcode.addressingMode)
-                case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
-                    self.dec(addressingMode: opcode.addressingMode)
-                case .dex:
-                    self.dex()
-                case .dey:
-                    self.dey()
-                case .eorImmediate, .eorZeroPage, .eorZeroPageX, .eorAbsolute, .eorAbsoluteX, .eorAbsoluteY, .eorIndirectX, .eorIndirectY:
-                    self.eor(addressingMode: opcode.addressingMode)
-                case .incZeroPage, .incZeroPageX, .incAbsolute, .incAbsoluteX:
-                    self.inc(addressingMode: opcode.addressingMode)
-                case .inx:
-                    self.inx()
-                case .iny:
-                    self.iny()
-                case .jmpAbsolute, .jmpIndirect:
-                    self.jmp(addressingMode: opcode.addressingMode)
-                case .jsr:
-                    self.jsr()
-                case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
-                    self.lda(addressingMode: opcode.addressingMode)
-                case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
-                    self.ldx(addressingMode: opcode.addressingMode)
-                case .ldyImmediate, .ldyZeroPage, .ldyZeroPageX, .ldyAbsolute, .ldyAbsoluteX:
-                    self.ldy(addressingMode: opcode.addressingMode)
-                case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
-                    self.lsr(addressingMode: opcode.addressingMode)
-                case .nop:
-                    self.nop()
-                case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
-                    self.ora(addressingMode: opcode.addressingMode)
-                case .pha:
-                    self.pha()
-                case .php:
-                    self.php()
-                case .pla:
-                    self.pla()
-                case .plp:
-                    self.plp()
-                case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
-                    self.rol(addressingMode: opcode.addressingMode)
-                case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
-                    self.ror(addressingMode: opcode.addressingMode)
-                case .rts:
-                    self.rts()
-                case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
-                    self.sbc(addressingMode: opcode.addressingMode)
-                case .sec:
-                    self.sec()
-                case .sed:
-                    self.sed()
-                case .sei:
-                    self.sei()
-                case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
-                    self.sta(addressingMode: opcode.addressingMode)
-                case .stxZeroPage, .stxZeroPageY, .stxAbsolute:
-                    self.stx(addressingMode: opcode.addressingMode)
-                case .styZeroPage, .styZeroPageY, .styAbsolute:
-                    self.sty(addressingMode: opcode.addressingMode)
-                case .tax:
-                    self.tax()
-                case .tay:
-                    self.tay()
-                case .tsx:
-                    self.tsx()
-                case .txa:
-                    self.txa()
-                case .txs:
-                    self.txs()
-                case .tya:
-                    self.tya()
-                }
-
-                if !opcode.manipulatesProgramCounter {
-                    self.programCounter += UInt16(opcode.instructionLength - 1)
-                }
-            } else {
-                fatalError("Whoops! Instruction \(byte) not recognized!!!")
-            }
+            self.executeInstruction()
         }
     }
 
