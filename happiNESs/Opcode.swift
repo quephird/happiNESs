@@ -142,6 +142,7 @@ enum Opcode: UInt8 {
     case rorAbsolute = 0x6E
     case rorAbsoluteX = 0x7E
 
+    case rti = 0x40
     case rts = 0x60
 
     case sbcImmediate = 0xE9
@@ -320,6 +321,7 @@ extension Opcode {
         case .rorAbsolute: .absolute
         case .rorAbsoluteX: .absoluteX
 
+        case .rti: .implicit
         case .rts: .implicit
 
         case .sbcImmediate: .immediate
@@ -498,6 +500,7 @@ extension Opcode {
         case .rorAbsolute: 3
         case .rorAbsoluteX: 3
 
+        case .rti: 1
         case .rts: 1
 
         case .sbcImmediate: 2

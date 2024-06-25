@@ -61,7 +61,7 @@ final class CPUTests: XCTestCase {
         var cpu = CPU()
         cpu.writeByte(address: 0x1234, byte: 0x7F)
         let program: [UInt8] = [0xA9, 0x81, 0x6D, 0x34, 0x12]
-        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x00)
         XCTAssertTrue(cpu.statusRegister[.carry])
@@ -280,6 +280,19 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.negative])
         XCTAssertTrue(!cpu.statusRegister[.overflow])
+    }
+
+    func testBrk() {
+        var cpu = CPU()
+        // NOTA BENE: This program artificially sets flags in the status register
+        // before the `BRK` instruction eventually pushes it onto the stack
+        let program: [UInt8] = [0x38, 0xF8, 0x00]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 4)
+
+        XCTAssertEqual(cpu.readByte(address: 0x01FF), 0x80)
+        XCTAssertEqual(cpu.readByte(address: 0x01FE), 0x04)
+        XCTAssertEqual(cpu.readByte(address: 0x01FD), 0b0000_1001)
+        XCTAssertEqual(cpu.programCounter, 0x0000)
     }
 
     func testClc() {
@@ -667,12 +680,12 @@ final class CPUTests: XCTestCase {
     func testJmpAbsolute() {
         // NOTA BENE: This little program sets the program counter
         // ahead of the LDA instruction such that the accumulator
-        // never gets initialized.
+        // gets initialized to 0x42 instead of 0xFF.
         var cpu = CPU()
-        let program: [UInt8] = [0x4C, 0x05, 0x80, 0xA9, 0xFF, 0x00]
+        let program: [UInt8] = [0x4C, 0x05, 0x80, 0xA9, 0xFF, 0xA9, 0x42]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0x00)
+        XCTAssertEqual(cpu.accumulator, 0x42)
     }
 
     func testJmpIndirect() {
@@ -681,19 +694,19 @@ final class CPUTests: XCTestCase {
         var cpu = CPU()
         cpu.writeByte(address: 0x1234, byte: 0x05)
         cpu.writeByte(address: 0x1235, byte: 0x80)
-        let program: [UInt8] = [0x6C, 0x34, 0x12, 0xA9, 0xFF, 0x00]
+        let program: [UInt8] = [0x6C, 0x34, 0x12, 0xA9, 0xFF, 0xA9, 0x42]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0x00)
+        XCTAssertEqual(cpu.accumulator, 0x42)
     }
 
     func testJsr() {
         // NOTA BENE: This little program actually involves `JMP` and `RTS` instructions.
         // First, we jump to a subroutine to load the accumulator with 0xFF, then we return,
         // via `RTS`, to the point ahead of the `JSR` instruction which then `JMP`s to the
-        // last byte of the program.
+        // last byte of the program, which is a `NOP`
         var cpu = CPU()
-        let program: [UInt8] = [0x20, 0x06, 0x80, 0x4C, 0x0A, 0x80, 0xA9, 0xFF, 0x60, 0x00]
+        let program: [UInt8] = [0x20, 0x06, 0x80, 0x4C, 0x09, 0x80, 0xA9, 0xFF, 0x60, 0xEA]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 5)
 
         XCTAssertEqual(cpu.accumulator, 0xFF)
@@ -1182,6 +1195,27 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(!cpu.statusRegister[.negative])
         XCTAssertTrue(!cpu.statusRegister[.carry])
+    }
+
+    func testRti() {
+        var cpu = CPU()
+        // NOTA BENE: Wow, is this a hacky test. First I push the high and low
+        // bytes of the memory location just after the end of this program, 0x800A,
+        // onto the stack, then I push a fakey status byte onto the stack, and
+        // finally I issue an `RTI` instruction which should pull everything off of
+        // the stack.
+        let program: [UInt8] = [
+            0xA9, 0x80,
+            0x48,
+            0xA9, 0x0A,
+            0x48,
+            0xA9, 0x80,
+            0x48,
+            0x40]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 7)
+
+        XCTAssertEqual(cpu.programCounter, 0x800A)
+        XCTAssertTrue(cpu.statusRegister[.negative])
     }
 
     func testRts() {

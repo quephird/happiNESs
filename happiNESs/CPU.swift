@@ -25,7 +25,7 @@ public struct CPU {
         self.yRegister = 0x00
         self.stackPointer = RESET_STACK_POINTER_VALUE
         self.programCounter = 0x0000
-        self.memory = [UInt8](repeating: 0x00, count: 0xFFFF)
+        self.memory = [UInt8](repeating: 0x00, count: 65536)
     }
 
     mutating func reset() {
@@ -80,6 +80,21 @@ extension CPU {
         self.statusRegister[.negative] = value >> 7 == 1
         self.statusRegister[.overflow] = value >> 6 & 0b0000_0001 == 1
         self.statusRegister[.zero] = result == 0
+    }
+
+    mutating func brk() {
+        let currentStatus = self.statusRegister.rawValue
+        // NOTA BENE: We've already advanced the program counter upon consuming the
+        // `BRK` byte; now we need to advance it one more time since the byte after
+        // the instruction is ignored, per the documentation. See
+        //
+        //     https://www.pagetable.com/c64ref/6502/?tab=2#BRK
+        self.programCounter += 1
+        self.pushStack(byte: UInt8(self.programCounter >> 8))
+        self.pushStack(byte: UInt8(self.programCounter & 0xFF))
+        self.pushStack(byte: currentStatus)
+        self.programCounter = self.readWord(address: 0xFFFE)
+        self.statusRegister[.interrupt] = true
     }
 
     mutating private func clearBit(bit: StatusRegister.Element) {
@@ -293,6 +308,14 @@ extension CPU {
         }
     }
 
+    mutating func rti() {
+        self.statusRegister.rawValue = self.popStack()
+        let addressLow = self.popStack()
+        let addressHigh = self.popStack()
+        let address = UInt16(addressHigh) << 8 | UInt16(addressLow)
+        self.programCounter = address
+    }
+
     mutating func rts() {
         let addressLow = self.popStack()
         let addressHigh = self.popStack()
@@ -388,7 +411,7 @@ extension CPU {
     }
 
     mutating func load(program: [UInt8]) {
-        self.memory.replaceSubrange(0x8000 ... 0x8000+program.count, with: program)
+        self.memory.replaceSubrange(0x8000 ..< 0x8000+program.count, with: program)
         self.writeWord(address: RESET_VECTOR_ADDRESS, word: 0x8000);
     }
 
@@ -396,6 +419,7 @@ extension CPU {
         let byte = self.readByte(address: self.programCounter);
         if let opcode = Opcode(rawValue: byte) {
             self.programCounter += 1;
+
             switch opcode {
             case .adcImmediate, .adcZeroPage, .adcZeroPageX, .adcAbsolute, .adcAbsoluteX, .adcAbsoluteY, .adcIndirectX, .adcIndirectY:
                 self.adc(addressingMode: opcode.addressingMode)
@@ -406,7 +430,7 @@ extension CPU {
             case .bitZeroPage, .bitAbsolute:
                 self.bit(addressingMode: opcode.addressingMode)
             case .break:
-                return;
+                self.brk()
             case .clc:
                 self.clc()
             case .cld:
@@ -463,6 +487,8 @@ extension CPU {
                 self.rol(addressingMode: opcode.addressingMode)
             case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
                 self.ror(addressingMode: opcode.addressingMode)
+            case .rti:
+                self.rti()
             case .rts:
                 self.rts()
             case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
