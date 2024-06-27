@@ -260,6 +260,50 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(cpu.statusRegister[.carry])
     }
 
+    func testBcc() {
+        var cpu = CPU()
+        // NOTA BENE: This program loads the accumlator with the value 0x10,
+        // then executes the `BCC` instrcution which checks if the carry bit is
+        // zero, then jumps two bytes ahead to an `ADC` instruction which adds
+        // 0x30 to the accumulator.
+        let program: [UInt8] = [
+            0xA9, 0x10,
+            0x90, 0x02,
+            0x69, 0x20,
+            0x69, 0x30,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0x40)
+    }
+
+    func testBcs() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0x01,
+            0x69, 0xFF,
+            0xB0, 0x02,
+            0x69, 0x20,
+            0x69, 0x41,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 4)
+
+        XCTAssertEqual(cpu.accumulator, 0x42)
+    }
+
+    func testBeq() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0x00,
+            0xF0, 0x02,
+            0x69, 0x20,
+            0x69, 0x42,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0x42)
+    }
+
     func testBitZeroPage() {
         var cpu = CPU()
         cpu.writeByte(address: 0x0042, byte: 0b1110_0101)
@@ -282,6 +326,45 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(!cpu.statusRegister[.overflow])
     }
 
+    func testBmi() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0xFF,
+            0x30, 0x02,
+            0xA9, 0x20,
+            0xA9, 0x42,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0x42)
+    }
+
+    func testBne() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0x21,
+            0xD0, 0x02,
+            0x69, 0xDE,
+            0x69, 0x21,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0x42)
+    }
+
+    func testBpl() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0x21,
+            0x10, 0x02,
+            0x69, 0xDE,
+            0x69, 0x21,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0x42)
+    }
+
     func testBrk() {
         var cpu = CPU()
         // NOTA BENE: This program artificially sets flags in the status register
@@ -293,6 +376,34 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.readByte(address: 0x01FE), 0x04)
         XCTAssertEqual(cpu.readByte(address: 0x01FD), 0b0000_1001)
         XCTAssertEqual(cpu.programCounter, 0x0000)
+    }
+
+    func testBvc() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0x21,
+            0x69, 0x21,
+            0x50, 0x02,
+            0xA9, 0xFF,
+            0x69, 0x00,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0x42)
+    }
+
+    func testBvs() {
+        var cpu = CPU()
+        let program: [UInt8] = [
+            0xA9, 0b0111_1111,
+            0x69, 0b0000_0001,
+            0x70, 0x02,
+            0xA9, 0x00,
+            0x69, 0x00,
+        ]
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0b1000_0000)
     }
 
     func testClc() {

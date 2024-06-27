@@ -30,10 +30,21 @@ enum Opcode: UInt8 {
     case aslAbsolute = 0x0E
     case aslAbsoluteX = 0x1E
 
+    case bcc = 0x90
+    case bcs = 0xB0
+    case beq = 0xF0
+
     case bitZeroPage = 0x24
     case bitAbsolute = 0x2C
 
+    case bmi = 0x30
+    case bne = 0xD0
+    case bpl = 0x10
+
     case `break` = 0x00
+
+    case bvc = 0x50
+    case bvs = 0x70
 
     case clc = 0x18
     case cld = 0xD8
@@ -209,10 +220,21 @@ extension Opcode {
         case .aslAbsolute: .absolute
         case .aslAbsoluteX: .absoluteX
 
+        case .bcc: .relative
+        case .bcs: .relative
+        case .beq: .relative
+
         case .bitZeroPage: .zeroPage
         case .bitAbsolute: .absolute
 
+        case .bmi: .relative
+        case .bne: .relative
+        case .bpl: .relative
+
         case .`break`: .implicit
+
+        case .bvc: .relative
+        case .bvs: .relative
 
         case .clc: .implicit
         case .cld: .implicit
@@ -388,10 +410,21 @@ extension Opcode {
         case .aslAbsolute: 3
         case .aslAbsoluteX: 3
 
+        case .bcc: 2
+        case .bcs: 2
+        case .beq: 2
+
         case .bitZeroPage: 2
         case .bitAbsolute: 3
 
+        case .bmi: 2
+        case .bne: 2
+        case .bpl: 2
+
         case .break: 1
+
+        case .bvc: 2
+        case .bvs: 2
 
         case .clc: 1
         case .cld: 1
@@ -538,17 +571,6 @@ extension Opcode {
         case .txa: 1
         case .txs: 1
         case .tya: 1
-        }
-    }
-}
-
-extension Opcode {
-    var manipulatesProgramCounter: Bool {
-        switch self {
-        case .jmpAbsolute, .jmpIndirect: true
-        case .jsr: true
-        case .rts: true
-        default: false
         }
     }
 }
