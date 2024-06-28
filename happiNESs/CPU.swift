@@ -578,7 +578,7 @@ extension CPU {
                 self.bne()
             case .bpl:
                 self.bpl()
-            case .break:
+            case .brk:
                 self.brk()
             case .bvc:
                 self.bvc()

@@ -41,7 +41,7 @@ enum Opcode: UInt8 {
     case bne = 0xD0
     case bpl = 0x10
 
-    case `break` = 0x00
+    case brk = 0x00
 
     case bvc = 0x50
     case bvs = 0x70
@@ -231,7 +231,7 @@ extension Opcode {
         case .bne: .relative
         case .bpl: .relative
 
-        case .`break`: .implicit
+        case .brk: .implicit
 
         case .bvc: .relative
         case .bvs: .relative
@@ -421,7 +421,7 @@ extension Opcode {
         case .bne: 2
         case .bpl: 2
 
-        case .break: 1
+        case .brk: 1
 
         case .bvc: 2
         case .bvs: 2
