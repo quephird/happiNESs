@@ -360,9 +360,9 @@ final class CPUTests: XCTestCase {
         // NOTA BENE: This program artificially sets flags in the status register
         // before the `BRK` instruction eventually pushes it onto the stack
         let program: [UInt8] = [0x38, 0xF8, 0x00]
-        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 4)
+        cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.readByte(address: 0x01FF), 0x80)
+        XCTAssertEqual(cpu.readByte(address: 0x01FF), 0x06)
         XCTAssertEqual(cpu.readByte(address: 0x01FE), 0x04)
         XCTAssertEqual(cpu.readByte(address: 0x01FD), 0b0000_1001)
         XCTAssertEqual(cpu.programCounter, 0x0000)
@@ -783,7 +783,11 @@ final class CPUTests: XCTestCase {
         // ahead of the LDA instruction such that the accumulator
         // gets initialized to 0x42 instead of 0xFF.
         var cpu = CPU()
-        let program: [UInt8] = [0x4C, 0x05, 0x80, 0xA9, 0xFF, 0xA9, 0x42]
+        let program: [UInt8] = [
+            0x4C, 0x05, 0x06,
+            0xA9, 0xFF,
+            0xA9, 0x42
+        ]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -794,7 +798,7 @@ final class CPUTests: XCTestCase {
         // via indirect addressing.
         var cpu = CPU()
         cpu.writeByte(address: 0x1234, byte: 0x05)
-        cpu.writeByte(address: 0x1235, byte: 0x80)
+        cpu.writeByte(address: 0x1235, byte: 0x06)
         let program: [UInt8] = [0x6C, 0x34, 0x12, 0xA9, 0xFF, 0xA9, 0x42]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
@@ -807,7 +811,13 @@ final class CPUTests: XCTestCase {
         // via `RTS`, to the point ahead of the `JSR` instruction which then `JMP`s to the
         // last byte of the program, which is a `NOP`
         var cpu = CPU()
-        let program: [UInt8] = [0x20, 0x06, 0x80, 0x4C, 0x09, 0x80, 0xA9, 0xFF, 0x60, 0xEA]
+        let program: [UInt8] = [
+            0x20, 0x06, 0x06,
+            0x4C, 0x09, 0x06,
+            0xA9, 0xFF,
+            0x60,
+            0xEA
+        ]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 5)
 
         XCTAssertEqual(cpu.accumulator, 0xFF)
@@ -1321,13 +1331,20 @@ final class CPUTests: XCTestCase {
 
     func testRts() {
         // NOTA BENE: This program is a little evil: the memory address of the
-        // program that I want to return to after the RTS instruction is 0x8007,
+        // program that I want to return to after the RTS instruction is 0x0607,
         // which will load 0xFF into the accumulator. So... first I need to push
-        // the high bits of that address (0x80) onto the stack through the accumulator,
+        // the high bits of that address (0x06) onto the stack through the accumulator,
         // then the low bits minus 1 (0x06) onto the stack. I wanted this test to be isolated
         // from the one for JSR.
         var cpu = CPU()
-        let program: [UInt8] = [0xA9, 0x80, 0x48, 0xA9, 0x06, 0x48, 0x60, 0xA9, 0xFF]
+        let program: [UInt8] = [
+            0xA9, 0x06,
+            0x48,
+            0xA9, 0x06,
+            0x48,
+            0x60,
+            0xA9, 0xFF
+        ]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 6)
 
         XCTAssertEqual(cpu.accumulator, 0xFF)
