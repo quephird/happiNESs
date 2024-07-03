@@ -5,12 +5,12 @@
 //  Created by Danielle Kefford on 6/14/24.
 //
 
-let RESET_VECTOR_ADDRESS: UInt16 = 0xFFFC;
-let INTERRUPT_VECTOR_ADDRESS: UInt16 = 0xFFFE
-let RESET_STACK_POINTER_VALUE: UInt8 = 0xFF
-let STACK_BOTTOM_MEMORY_ADDRESS: UInt16 = 0x0100;
-
 public struct CPU {
+    static let resetVectorAddress: UInt16 = 0xFFFC;
+    static let interruptVectorAddress: UInt16 = 0xFFFE
+    static let resetStackPointerValue: UInt8 = 0xFF
+    static let stackBottomMemoryAddress: UInt16 = 0x0100;
+
     public var accumulator: UInt8
     public var statusRegister: StatusRegister
     public var xRegister: UInt8
@@ -24,7 +24,7 @@ public struct CPU {
         self.statusRegister = StatusRegister(rawValue: 0x00)
         self.xRegister = 0x00
         self.yRegister = 0x00
-        self.stackPointer = RESET_STACK_POINTER_VALUE
+        self.stackPointer = Self.resetStackPointerValue
         self.programCounter = 0x0000
         self.memory = [UInt8](repeating: 0x00, count: 65536)
     }
@@ -34,8 +34,8 @@ public struct CPU {
         self.statusRegister.reset();
         self.xRegister = 0x00;
         self.yRegister = 0x00;
-        self.stackPointer = RESET_STACK_POINTER_VALUE
-        self.programCounter = self.readWord(address: RESET_VECTOR_ADDRESS);
+        self.stackPointer = Self.resetStackPointerValue
+        self.programCounter = self.readWord(address: Self.resetVectorAddress);
     }
 }
 
@@ -135,7 +135,7 @@ extension CPU {
         self.pushStack(byte: UInt8(self.programCounter >> 8))
         self.pushStack(byte: UInt8(self.programCounter & 0xFF))
         self.pushStack(byte: currentStatus)
-        self.programCounter = self.readWord(address: INTERRUPT_VECTOR_ADDRESS)
+        self.programCounter = self.readWord(address: Self.interruptVectorAddress)
         self.statusRegister[.interrupt] = true
 
         return true
@@ -338,13 +338,13 @@ extension CPU {
     }
 
     mutating private func pushStack(byte: UInt8) {
-        self.writeByte(address: STACK_BOTTOM_MEMORY_ADDRESS + UInt16(self.stackPointer), byte: byte)
+        self.writeByte(address: Self.stackBottomMemoryAddress + UInt16(self.stackPointer), byte: byte)
         self.stackPointer = self.stackPointer &- 1
     }
 
     mutating private func popStack() -> UInt8 {
         self.stackPointer = self.stackPointer &+ 1
-        let byte = self.readByte(address: STACK_BOTTOM_MEMORY_ADDRESS + UInt16(self.stackPointer))
+        let byte = self.readByte(address: Self.stackBottomMemoryAddress + UInt16(self.stackPointer))
         return byte
     }
 
@@ -549,7 +549,7 @@ extension CPU {
 
     mutating func load(program: [UInt8]) {
         self.memory.replaceSubrange(0x8000 ..< 0x8000+program.count, with: program)
-        self.writeWord(address: RESET_VECTOR_ADDRESS, word: 0x8000);
+        self.writeWord(address: Self.resetVectorAddress, word: 0x8000);
     }
 
     mutating func executeInstruction() {
