@@ -8,16 +8,6 @@
 import XCTest
 @testable import happiNESs
 
-extension CPU {
-    mutating func loadAndExecuteInstructions(program: [UInt8], stoppingAfter: Int) {
-        self.load(program: program)
-        self.reset()
-        (0..<stoppingAfter).forEach { i in
-            self.executeInstruction()
-        }
-    }
-}
-
 final class CPUTests: XCTestCase {
     func testAdcImmediate() {
         var cpu = CPU()
