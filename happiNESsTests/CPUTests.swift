@@ -1348,7 +1348,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x32, 0xE9, 0x50]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0xE2)
+        XCTAssertEqual(cpu.accumulator, 0xE1)
         XCTAssertTrue(!cpu.statusRegister[.carry])
         XCTAssertTrue(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1361,7 +1361,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xE5, 0x42]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertFalse(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1374,7 +1374,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x20, 0xF5, 0x10]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertFalse(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1387,7 +1387,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xED, 0x34, 0x12]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertFalse(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1400,7 +1400,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x34, 0xFD, 0x00, 0x12]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertFalse(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1413,7 +1413,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xA0, 0x34, 0xF9, 0x00, 0x12]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertFalse(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1428,7 +1428,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x20, 0xE1, 0x10]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertTrue(!cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
@@ -1443,7 +1443,7 @@ final class CPUTests: XCTestCase {
         let program: [UInt8] = [0xA9, 0x30, 0xA0, 0x34, 0xF1, 0x30]
         cpu.loadAndExecuteInstructions(program: program, stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.accumulator, 0x10)
+        XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.statusRegister[.carry])
         XCTAssertTrue(!cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])

@@ -438,9 +438,9 @@ extension CPU {
     mutating func sbc(addressingMode: AddressingMode) -> Bool {
         let address = self.getOperandAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
-        let borrow: UInt8 = self.statusRegister[.carry] ? 0x00 : 0x01
+        let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
 
-        let sum = UInt16(self.accumulator) + UInt16(~value) + UInt16(borrow)
+        let sum = UInt16(self.accumulator) + UInt16(~value) + UInt16(carry)
         self.statusRegister[.carry] = sum > 0xFF
         self.statusRegister[.overflow] = ((UInt8(sum & 0xFF) ^ self.accumulator) & (UInt8(sum & 0xFF) ^ value) & 0x80) == 0x80
         self.accumulator = UInt8(sum & 0xFF)
