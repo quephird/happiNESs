@@ -14,8 +14,9 @@ import SwiftUI
     static let clockRate = 14_000
 
     var displayLink: Timer!
-    @ObservationIgnored var cpu: CPU = CPU()
+
     // NOTA BENE: Only the screenBuffer is actually ever changing (for now)
+    @ObservationIgnored var cpu: CPU = CPU()
     var screenBuffer: [NESColor] = [NESColor](repeating: .black, count: 32*32)
 
     internal init() {
@@ -40,23 +41,6 @@ import SwiftUI
             cpu.buttonDown(button: .left)
         case .rightArrow:
             cpu.buttonDown(button: .right)
-        default:
-            return false
-        }
-
-        return true
-    }
-
-    func keyUp(_ press: KeyPress) -> Bool {
-        switch press.key {
-        case .upArrow:
-            cpu.buttonUp(button: .up)
-        case .downArrow:
-            cpu.buttonUp(button: .down)
-        case .leftArrow:
-            cpu.buttonUp(button: .left)
-        case .rightArrow:
-            cpu.buttonUp(button: .right)
         default:
             return false
         }
