@@ -111,12 +111,12 @@
 			isa = PBXGroup;
 			children = (
 				871931EF2C30BB2900A73C22 /* happiNESsApp.swift */,
-				871931F12C30BB2900A73C22 /* ContentView.swift */,
 				8719320A2C3366A900A73C22 /* Console.swift */,
+				871931F12C30BB2900A73C22 /* ContentView.swift */,
+				871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */,
 				871931F32C30BB2C00A73C22 /* Assets.xcassets */,
 				871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */,
 				871931F52C30BB2C00A73C22 /* Preview Content */,
-				871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */,
 			);
 			path = happiNESsApp;
 			sourceTree = "<group>";
@@ -164,10 +164,10 @@
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
+				871932062C30E91D00A73C22 /* NESColor.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
-				871932062C30E91D00A73C22 /* NESColor.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
