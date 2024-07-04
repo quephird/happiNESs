@@ -725,14 +725,7 @@ extension CPU {
     }
 
     mutating func run() {
-        self.runWithCallback(callback: { cpu in
-            // ACHTUNG! Make sure to use `cpu` and not `self` inside this closure!
-        })
-    }
-
-    mutating private func runWithCallback(callback: (inout CPU) -> ()) {
         while true {
-            callback(&self)
             self.executeInstruction()
         }
     }
