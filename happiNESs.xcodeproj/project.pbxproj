@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		871931F02C30BB2900A73C22 /* happiNESsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871931EF2C30BB2900A73C22 /* happiNESsApp.swift */; };
+		871931F22C30BB2900A73C22 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871931F12C30BB2900A73C22 /* ContentView.swift */; };
+		871931F42C30BB2C00A73C22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 871931F32C30BB2C00A73C22 /* Assets.xcassets */; };
+		871931F72C30BB2C00A73C22 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */; };
+		871931FF2C30C3A500A73C22 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
+		871932002C30C3A500A73C22 /* happiNESs.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932042C30C6DC00A73C22 /* JoypadButton.swift */; };
+		871932072C30E91D00A73C22 /* NESColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932062C30E91D00A73C22 /* NESColor.swift */; };
+		871932092C30F5C700A73C22 /* NESColor+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */; };
+		8719320C2C3366B000A73C22 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320A2C3366A900A73C22 /* Console.swift */; };
 		8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1762C1CB9B3001B44B5 /* happiNESs.docc */; };
 		8744B17D2C1CB9B3001B44B5 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
 		8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1812C1CB9B3001B44B5 /* CPUTests.swift */; };
@@ -18,6 +28,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		871932012C30C3A500A73C22 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8744B1692C1CB9B3001B44B5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8744B1712C1CB9B3001B44B5;
+			remoteInfo = happiNESs;
+		};
 		8744B17E2C1CB9B3001B44B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8744B1692C1CB9B3001B44B5 /* Project object */;
@@ -27,7 +44,31 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		871932032C30C3A600A73C22 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				871932002C30C3A500A73C22 /* happiNESs.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		871931ED2C30BB2900A73C22 /* happiNESsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = happiNESsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		871931EF2C30BB2900A73C22 /* happiNESsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = happiNESsApp.swift; sourceTree = "<group>"; };
+		871931F12C30BB2900A73C22 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		871931F32C30BB2C00A73C22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = happiNESsApp.entitlements; sourceTree = "<group>"; };
+		871932042C30C6DC00A73C22 /* JoypadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadButton.swift; sourceTree = "<group>"; };
+		871932062C30E91D00A73C22 /* NESColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESColor.swift; sourceTree = "<group>"; };
+		871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NESColor+SwiftUI.swift"; sourceTree = "<group>"; };
+		8719320A2C3366A900A73C22 /* Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Console.swift; path = happiNESsApp/Console.swift; sourceTree = SOURCE_ROOT; };
 		8744B1722C1CB9B3001B44B5 /* happiNESs.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = happiNESs.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8744B1752C1CB9B3001B44B5 /* happiNESs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = happiNESs.h; sourceTree = "<group>"; };
 		8744B1762C1CB9B3001B44B5 /* happiNESs.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = happiNESs.docc; sourceTree = "<group>"; };
@@ -40,6 +81,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		871931EA2C30BB2900A73C22 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				871931FF2C30C3A500A73C22 /* happiNESs.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8744B16F2C1CB9B3001B44B5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -58,12 +107,43 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		871931EE2C30BB2900A73C22 /* happiNESsApp */ = {
+			isa = PBXGroup;
+			children = (
+				871931EF2C30BB2900A73C22 /* happiNESsApp.swift */,
+				8719320A2C3366A900A73C22 /* Console.swift */,
+				871931F12C30BB2900A73C22 /* ContentView.swift */,
+				871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */,
+				871931F32C30BB2C00A73C22 /* Assets.xcassets */,
+				871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */,
+				871931F52C30BB2C00A73C22 /* Preview Content */,
+			);
+			path = happiNESsApp;
+			sourceTree = "<group>";
+		};
+		871931F52C30BB2C00A73C22 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		871931FE2C30C3A500A73C22 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		8744B1682C1CB9B3001B44B5 = {
 			isa = PBXGroup;
 			children = (
 				8744B1742C1CB9B3001B44B5 /* happiNESs */,
 				8744B1802C1CB9B3001B44B5 /* happiNESsTests */,
+				871931EE2C30BB2900A73C22 /* happiNESsApp */,
 				8744B1732C1CB9B3001B44B5 /* Products */,
+				871931FE2C30C3A500A73C22 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -72,6 +152,7 @@
 			children = (
 				8744B1722C1CB9B3001B44B5 /* happiNESs.framework */,
 				8744B17C2C1CB9B3001B44B5 /* happiNESsTests.xctest */,
+				871931ED2C30BB2900A73C22 /* happiNESsApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,8 +164,10 @@
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
+				871932062C30E91D00A73C22 /* NESColor.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
+				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -111,6 +194,25 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		871931EC2C30BB2900A73C22 /* happiNESsApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 871931FB2C30BB2C00A73C22 /* Build configuration list for PBXNativeTarget "happiNESsApp" */;
+			buildPhases = (
+				871931E92C30BB2900A73C22 /* Sources */,
+				871931EA2C30BB2900A73C22 /* Frameworks */,
+				871931EB2C30BB2900A73C22 /* Resources */,
+				871932032C30C3A600A73C22 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				871932022C30C3A500A73C22 /* PBXTargetDependency */,
+			);
+			name = happiNESsApp;
+			productName = happiNESsApp;
+			productReference = 871931ED2C30BB2900A73C22 /* happiNESsApp.app */;
+			productType = "com.apple.product-type.application";
+		};
 		8744B1712C1CB9B3001B44B5 /* happiNESs */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8744B1862C1CB9B3001B44B5 /* Build configuration list for PBXNativeTarget "happiNESs" */;
@@ -157,6 +259,9 @@
 				LastSwiftUpdateCheck = 1520;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
+					871931EC2C30BB2900A73C22 = {
+						CreatedOnToolsVersion = 15.2;
+					};
 					8744B1712C1CB9B3001B44B5 = {
 						CreatedOnToolsVersion = 15.2;
 					};
@@ -180,11 +285,21 @@
 			targets = (
 				8744B1712C1CB9B3001B44B5 /* happiNESs */,
 				8744B17B2C1CB9B3001B44B5 /* happiNESsTests */,
+				871931EC2C30BB2900A73C22 /* happiNESsApp */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		871931EB2C30BB2900A73C22 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				871931F72C30BB2C00A73C22 /* Preview Assets.xcassets in Resources */,
+				871931F42C30BB2C00A73C22 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8744B1702C1CB9B3001B44B5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -202,12 +317,25 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		871931E92C30BB2900A73C22 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				871932092C30F5C700A73C22 /* NESColor+SwiftUI.swift in Sources */,
+				8719320C2C3366B000A73C22 /* Console.swift in Sources */,
+				871931F22C30BB2900A73C22 /* ContentView.swift in Sources */,
+				871931F02C30BB2900A73C22 /* happiNESsApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8744B16E2C1CB9B3001B44B5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
+				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
+				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
@@ -225,6 +353,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		871932022C30C3A500A73C22 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8744B1712C1CB9B3001B44B5 /* happiNESs */;
+			targetProxy = 871932012C30C3A500A73C22 /* PBXContainerItemProxy */;
+		};
 		8744B17F2C1CB9B3001B44B5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8744B1712C1CB9B3001B44B5 /* happiNESs */;
@@ -233,6 +366,60 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		871931F92C30BB2C00A73C22 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = happiNESsApp/happiNESsApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"happiNESsApp/Preview Content\"";
+				DEVELOPMENT_TEAM = GARV9392W2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		871931FA2C30BB2C00A73C22 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = happiNESsApp/happiNESsApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"happiNESsApp/Preview Content\"";
+				DEVELOPMENT_TEAM = GARV9392W2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		8744B1842C1CB9B3001B44B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -454,6 +641,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		871931FB2C30BB2C00A73C22 /* Build configuration list for PBXNativeTarget "happiNESsApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				871931F92C30BB2C00A73C22 /* Debug */,
+				871931FA2C30BB2C00A73C22 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8744B16C2C1CB9B3001B44B5 /* Build configuration list for PBXProject "happiNESs" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
