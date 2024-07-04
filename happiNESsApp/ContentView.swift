@@ -25,34 +25,24 @@ struct ContentView: View {
 
     static let width: Int = 32
     static let height: Int = 32
-    static let scale: CGFloat = 10.0
-
-    @MainActor func updateCanvas(graphicsContext: GraphicsContext, size: CGSize) {
-        for y in 0 ..< Self.height {
-            for x in 0 ..< Self.width {
-                let leftX = CGFloat(x) * Self.scale
-                let rightX = CGFloat(x+1) * Self.scale
-                let topY = CGFloat(y) * Self.scale
-                let bottomY = CGFloat(y+1) * Self.scale
-
-                var path = Path()
-                path.move(to: CGPoint(x: leftX, y: topY))
-                path.addLine(to: CGPoint(x: rightX, y: topY))
-                path.addLine(to: CGPoint(x: rightX, y: bottomY))
-                path.addLine(to: CGPoint(x: leftX, y: bottomY))
-                path.closeSubpath()
-
-                let nesColor = console.screenBuffer[y*Self.width + x]
-                let color = Color(nesColor: nesColor)
-
-                graphicsContext.fill(path, with: .color(color))
-            }
-        }
-    }
+    static let scale: Double = 10.0
 
     var body: some View {
         Canvas {graphicsContext, size in
-            self.updateCanvas(graphicsContext: graphicsContext, size: size)
+            for y in 0 ..< Self.height {
+                for x in 0 ..< Self.width {
+                    let pixel = CGRect(
+                        x: Double(x)*Self.scale,
+                        y: Double(y)*Self.scale,
+                        width: Self.scale,
+                        height: Self.scale)
+
+                    let nesColor = console.screenBuffer[y*Self.width + x]
+                    let color = Color(nesColor: nesColor)
+
+                    graphicsContext.fill(Path(pixel), with: .color(color))
+                }
+            }
         }
         .frame(
             width: CGFloat(Self.width) * Self.scale,
