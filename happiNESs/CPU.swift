@@ -17,7 +17,7 @@ public struct CPU {
     public var yRegister: UInt8
     public var stackPointer: UInt8
     public var programCounter: UInt16
-    public var memory: [UInt8]
+    public var bus: Bus
 
     static let recentTraceCount = 16
     var recentTrace: [(Opcode, UInt16)?] = Array(repeating: nil, count: recentTraceCount)
@@ -62,7 +62,7 @@ public struct CPU {
         self.yRegister = 0x00
         self.stackPointer = Self.resetStackPointerValue
         self.programCounter = 0x0000
-        self.memory = [UInt8](repeating: 0x00, count: 65536)
+        self.bus = Bus()
     }
 
     mutating public func reset() {
@@ -71,7 +71,15 @@ public struct CPU {
         self.xRegister = 0x00;
         self.yRegister = 0x00;
         self.stackPointer = Self.resetStackPointerValue
-        self.programCounter = self.readWord(address: Self.resetVectorAddress);
+
+        // ACHTUNG: This is a temporary measure; we cannot currently access
+        // memory at locations above 0x1FFF, and so cannot properly set the
+        // program counter from the reset vector address via the bus.
+        //
+        //        self.programCounter = self.readWord(address: Self.resetVectorAddress);
+        self.programCounter = 0x0600
+
+        // TODO: Need to implement Bus.reset()
     }
 }
 
@@ -584,8 +592,10 @@ extension CPU {
     }
 
     mutating public func load(program: [UInt8]) {
-        // TODO: Why does the game code need to be loaded here?
-        self.memory.replaceSubrange(0x0600 ..< 0x0600+program.count, with: program)
+        // TODO: Why does the game code need to be loaded at the address below?
+        for (i, byte) in program.enumerated() {
+            self.writeByte(address: 0x0600 + UInt16(i), byte: byte)
+        }
         self.writeWord(address: Self.resetVectorAddress, word: 0x0600);
     }
 
@@ -799,11 +809,11 @@ extension CPU {
     }
 
     func readByte(address: UInt16) -> UInt8 {
-        self.memory[Int(address)]
+        self.bus.readByte(address: address)
     }
 
     mutating public func writeByte(address: UInt16, byte: UInt8) {
-        self.memory[Int(address)] = byte
+        self.bus.writeByte(address: address, byte: byte)
     }
 }
 
