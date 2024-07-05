@@ -28,7 +28,7 @@ extension Bus {
             let ppuAddress = Int(address & 0b0010_0000_0000_0111)
             fatalError("TODO! Implement PPU access!")
         default:
-            print("TODO: Implement memory access for this address")
+            print("TODO: Implement memory reading for this address: \(address)")
             return 0x00
         }
     }
@@ -42,7 +42,7 @@ extension Bus {
             let ppuAddress = Int(address & 0b0010_0000_0000_0111)
             fatalError("TODO! Implement PPU access!")
         default:
-            print("TODO: Implement memory access for this address")
+            print("TODO: Implement memory writing for this address: \(address)")
         }
     }
 }
