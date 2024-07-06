@@ -10,7 +10,7 @@ import SwiftUI
 @main
 @MainActor
 struct happiNESsApp: App {
-    @State var console = Console()
+    @State var console = try! Console()
 
     var body: some Scene {
         WindowGroup {
