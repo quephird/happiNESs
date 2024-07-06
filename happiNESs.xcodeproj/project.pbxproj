@@ -18,6 +18,8 @@
 		871932092C30F5C700A73C22 /* NESColor+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */; };
 		8719320C2C3366B000A73C22 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320A2C3366A900A73C22 /* Console.swift */; };
 		871932102C372F6900A73C22 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320F2C372F6900A73C22 /* Bus.swift */; };
+		871932122C37985700A73C22 /* Mirroring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932112C37985700A73C22 /* Mirroring.swift */; };
+		871932142C3798B400A73C22 /* Rom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932132C3798B400A73C22 /* Rom.swift */; };
 		8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1762C1CB9B3001B44B5 /* happiNESs.docc */; };
 		8744B17D2C1CB9B3001B44B5 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
 		8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1812C1CB9B3001B44B5 /* CPUTests.swift */; };
@@ -26,6 +28,8 @@
 		8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B18E2C1CBB46001B44B5 /* Opcode.swift */; };
 		8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1902C1CC0C4001B44B5 /* CPU.swift */; };
 		8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1922C1D6D59001B44B5 /* StatusRegister.swift */; };
+		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
+		8763D0662C386A2E006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +75,8 @@
 		871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NESColor+SwiftUI.swift"; sourceTree = "<group>"; };
 		8719320A2C3366A900A73C22 /* Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Console.swift; path = happiNESsApp/Console.swift; sourceTree = SOURCE_ROOT; };
 		8719320F2C372F6900A73C22 /* Bus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bus.swift; sourceTree = "<group>"; };
+		871932112C37985700A73C22 /* Mirroring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mirroring.swift; sourceTree = "<group>"; };
+		871932132C3798B400A73C22 /* Rom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rom.swift; sourceTree = "<group>"; };
 		8744B1722C1CB9B3001B44B5 /* happiNESs.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = happiNESs.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8744B1752C1CB9B3001B44B5 /* happiNESs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = happiNESs.h; sourceTree = "<group>"; };
 		8744B1762C1CB9B3001B44B5 /* happiNESs.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = happiNESs.docc; sourceTree = "<group>"; };
@@ -80,6 +86,7 @@
 		8744B18E2C1CBB46001B44B5 /* Opcode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opcode.swift; sourceTree = "<group>"; };
 		8744B1902C1CC0C4001B44B5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
 		8744B1922C1D6D59001B44B5 /* StatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRegister.swift; sourceTree = "<group>"; };
+		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +148,7 @@
 		8744B1682C1CB9B3001B44B5 = {
 			isa = PBXGroup;
 			children = (
+				8763D0642C386A17006C1B4F /* snake.nes */,
 				8744B1742C1CB9B3001B44B5 /* happiNESs */,
 				8744B1802C1CB9B3001B44B5 /* happiNESsTests */,
 				871931EE2C30BB2900A73C22 /* happiNESsApp */,
@@ -170,7 +178,9 @@
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
+				871932132C3798B400A73C22 /* Rom.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
+				871932112C37985700A73C22 /* Mirroring.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -299,6 +309,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				871931F72C30BB2C00A73C22 /* Preview Assets.xcassets in Resources */,
+				8763D0662C386A2E006C1B4F /* snake.nes in Resources */,
 				871931F42C30BB2C00A73C22 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -307,6 +318,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8763D0652C386A17006C1B4F /* snake.nes in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,6 +354,8 @@
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
+				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
+				871932142C3798B400A73C22 /* Rom.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

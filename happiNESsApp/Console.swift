@@ -9,6 +9,11 @@ import happiNESs
 import Observation
 import SwiftUI
 
+enum NESError: Error {
+    case romCouldNotBeFound
+    case romCouldNotBeRead
+}
+
 @Observable @MainActor class Console {
     static let frameRate = 60
     static let clockRate = 14_000
@@ -19,12 +24,26 @@ import SwiftUI
     // this class, which is the one being observed by `ContentView`, changes. We're only
     // really interested in changes to `Console`'s state such that at least of the underlying
     // pixels has changed, namely any of the elements of  `screenBuffer`.
-    @ObservationIgnored var cpu: CPU = CPU()
+    @ObservationIgnored var cpu: CPU
     var screenBuffer: [NESColor] = [NESColor](repeating: .black, count: 32*32)
 
-    internal init() {
-        cpu.load(program: CPU.gameCode)
+    internal init() throws {
+        guard let filePath = Bundle.main.url(
+            forResource: "snake.nes",
+            withExtension: nil) else {
+            throw NESError.romCouldNotBeFound
+        }
+
+        let data: Data = try Data(contentsOf: filePath)
+        let romBytes = [UInt8](data)
+        guard let rom = Rom(bytes: romBytes) else {
+            throw NESError.romCouldNotBeRead
+        }
+
+        let bus = Bus(rom: rom)
+        var cpu = CPU(bus: bus)
         cpu.reset()
+        self.cpu = cpu
 
         // This sets up a timer which will call `runForOneFrame()` every time it fires.
         self.displayTimer = Timer.scheduledTimer(
