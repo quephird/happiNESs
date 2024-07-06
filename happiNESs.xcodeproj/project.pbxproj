@@ -32,6 +32,7 @@
 		8763D0662C386A2E006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
 		8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* RomTests.swift */; };
+		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
+		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				8719320A2C3366A900A73C22 /* Console.swift */,
 				871931F12C30BB2900A73C22 /* ContentView.swift */,
 				871932082C30F5C700A73C22 /* NESColor+SwiftUI.swift */,
+				8763D06B2C39E528006C1B4F /* Screen.swift */,
 				871931F32C30BB2C00A73C22 /* Assets.xcassets */,
 				871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */,
 				871931F52C30BB2C00A73C22 /* Preview Content */,
@@ -342,6 +345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8763D06C2C39E528006C1B4F /* Screen.swift in Sources */,
 				871932092C30F5C700A73C22 /* NESColor+SwiftUI.swift in Sources */,
 				8719320C2C3366B000A73C22 /* Console.swift in Sources */,
 				871931F22C30BB2900A73C22 /* ContentView.swift in Sources */,
