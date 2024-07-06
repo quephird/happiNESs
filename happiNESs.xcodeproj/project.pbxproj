@@ -30,6 +30,7 @@
 		8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1922C1D6D59001B44B5 /* StatusRegister.swift */; };
 		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0662C386A2E006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
+		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 		8744B1902C1CC0C4001B44B5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
 		8744B1922C1D6D59001B44B5 /* StatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRegister.swift; sourceTree = "<group>"; };
 		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
+		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				8744B1812C1CB9B3001B44B5 /* CPUTests.swift */,
+				8763D0672C39B61F006C1B4F /* Helpers.swift */,
 			);
 			path = happiNESsTests;
 			sourceTree = "<group>";
@@ -365,6 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */,
+				8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
