@@ -562,18 +562,10 @@ extension CPU {
 }
 
 extension CPU {
-//    mutating func loadAndRun(program: [UInt8]) {
-//        self.load(program: program);
-//        self.reset();
-//        self.run();
-//    }
-//
-    mutating public func load(program: [UInt8]) {
-        // TODO: Why does the game code need to be loaded at the address below?
-        for (i, byte) in program.enumerated() {
-            self.writeByte(address: 0x0600 + UInt16(i), byte: byte)
+    mutating public func executeInstructions(stoppingAfter: Int) {
+        (0..<stoppingAfter).forEach { i in
+            self.executeInstruction()
         }
-        self.writeWord(address: Self.resetVectorAddress, word: 0x0600);
     }
 
     mutating func executeInstruction() {
@@ -791,14 +783,6 @@ extension CPU {
 
     mutating public func writeByte(address: UInt16, byte: UInt8) {
         self.bus.writeByte(address: address, byte: byte)
-    }
-}
-
-extension CPU {
-    mutating public func executeInstructions(stoppingAfter: Int) {
-        (0..<stoppingAfter).forEach { i in
-            self.executeInstruction()
-        }
     }
 }
 
