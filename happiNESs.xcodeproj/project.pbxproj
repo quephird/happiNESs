@@ -33,6 +33,7 @@
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
 		8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* RomTests.swift */; };
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
+		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
+		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,11 +185,12 @@
 				8719320F2C372F6900A73C22 /* Bus.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
+				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871932132C3798B400A73C22 /* Rom.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
-				871932112C37985700A73C22 /* Mirroring.swift */,
+				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -357,6 +360,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */,
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,

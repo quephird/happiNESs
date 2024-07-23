@@ -19,6 +19,9 @@ public struct CPU {
     public var programCounter: UInt16
     public var bus: Bus
 
+    public var tracingOn: Bool = false
+    public var trace: [String] = []
+
     static let recentTraceCount = 16
     var recentTrace: [(Opcode, UInt16)?] = Array(repeating: nil, count: recentTraceCount)
     var recentTraceNext: Int = 0
@@ -564,6 +567,7 @@ extension CPU {
 extension CPU {
     mutating public func executeInstructions(stoppingAfter: Int) {
         (0..<stoppingAfter).forEach { i in
+            print(happiNESs.trace(cpu: self))
             self.executeInstruction()
         }
     }

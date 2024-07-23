@@ -574,3 +574,11 @@ extension Opcode {
         }
     }
 }
+
+extension Opcode {
+    var mnemonic: String {
+        let opcodeString = String(describing: self)
+        let endIndex = opcodeString.index(opcodeString.startIndex, offsetBy: 2)
+        return opcodeString[opcodeString.startIndex ... endIndex].uppercased()
+    }
+}
