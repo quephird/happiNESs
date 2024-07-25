@@ -30,7 +30,7 @@ func trace(cpu: CPU) -> String {
 
     let absoluteAddress: UInt16 = switch opcode.addressingMode {
     case .immediate, .implicit: 0
-    default: cpu.getOperandAddress(addressingMode: opcode.addressingMode)
+    default: cpu.getAbsoluteAddress(addressingMode: opcode.addressingMode, address: cpu.programCounter + 1)
     }
     let value: UInt8 = switch opcode.addressingMode {
     case .immediate, .implicit:
@@ -43,7 +43,7 @@ func trace(cpu: CPU) -> String {
     let partialAsm = switch opcode.instructionLength {
     case 1:
         switch byte {
-        case 0x0A, 0x2A, 0x4A, 0x6A: "A"
+        case 0x0A, 0x2A, 0x4A, 0x6A: "A "
         default: ""
         }
     case 2:

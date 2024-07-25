@@ -65,7 +65,7 @@ public struct CPU {
 
 extension CPU {
     mutating func adc(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
 
@@ -79,7 +79,7 @@ extension CPU {
     }
 
     mutating func and(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         self.accumulator &= value
         self.updateZeroAndNegativeFlags(result: self.accumulator)
@@ -93,7 +93,7 @@ extension CPU {
             self.accumulator <<= 1
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
-            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let address = self.getAbsoluteAddress(addressingMode: addressingMode);
             let value = self.readByte(address: address);
 
             self.statusRegister[.carry] = value >> 7 == 1
@@ -118,7 +118,7 @@ extension CPU {
 
     mutating private func branch(condition: Bool) -> Bool {
         if condition {
-            self.programCounter = self.getOperandAddress(addressingMode: .relative)
+            self.programCounter = self.getAbsoluteAddress(addressingMode: .relative)
             return true
         }
 
@@ -126,7 +126,7 @@ extension CPU {
     }
 
     mutating func bit(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         let result = self.accumulator & value;
         self.statusRegister[.negative] = value >> 7 == 1
@@ -202,7 +202,7 @@ extension CPU {
     }
 
     mutating private func compareMemory(addressingMode: AddressingMode, to registerValue: UInt8) {
-        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let memoryValue = self.readByte(address: address)
 
         self.statusRegister[.carry] = (memoryValue <= registerValue)
@@ -228,7 +228,7 @@ extension CPU {
     }
 
     mutating func dec(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value &- 1)
         self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
@@ -252,7 +252,7 @@ extension CPU {
 
 
     mutating func eor(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.accumulator ^= value;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
@@ -261,7 +261,7 @@ extension CPU {
     }
 
     mutating func inc(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.writeByte(address: address, byte: value &+ 1)
         self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
@@ -277,14 +277,14 @@ extension CPU {
     }
 
     mutating func jmp(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         self.programCounter = address
 
         return true
     }
 
     mutating func jsr() -> Bool {
-        let subroutineAddress = self.getOperandAddress(addressingMode: .absolute);
+        let subroutineAddress = self.getAbsoluteAddress(addressingMode: .absolute);
         // ACHTUNG!!! Note that this is pointing to the last byte of the `JSR` instruction!
         let returnAddress = self.programCounter + 2 - 1
         let returnAddressHigh = UInt8(returnAddress >> 8)
@@ -304,7 +304,7 @@ extension CPU {
     }
 
     mutating func lda(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.accumulator = value;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
@@ -313,7 +313,7 @@ extension CPU {
     }
 
     mutating func ldx(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.xRegister = value;
         self.updateZeroAndNegativeFlags(result: self.xRegister)
@@ -322,7 +322,7 @@ extension CPU {
     }
 
     mutating func ldy(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.yRegister = value;
         self.updateZeroAndNegativeFlags(result: self.yRegister)
@@ -336,7 +336,7 @@ extension CPU {
             self.accumulator >>= 1
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
-            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let address = self.getAbsoluteAddress(addressingMode: addressingMode);
             let value = self.readByte(address: address);
 
             self.statusRegister[.carry] = value & 0b0000_0001 == 1
@@ -353,7 +353,7 @@ extension CPU {
     }
 
     mutating func ora(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.accumulator |= value;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
@@ -406,7 +406,7 @@ extension CPU {
             self.accumulator = (self.accumulator << 1) | carry
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
-            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let address = self.getAbsoluteAddress(addressingMode: addressingMode);
             let value = self.readByte(address: address);
             let carry = value >> 7
 
@@ -426,7 +426,7 @@ extension CPU {
             self.accumulator = (self.accumulator >> 1) | carry << 7
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
-            let address = self.getOperandAddress(addressingMode: addressingMode);
+            let address = self.getAbsoluteAddress(addressingMode: addressingMode);
             let value = self.readByte(address: address);
             let carry = value & 0b0000_0001
 
@@ -460,7 +460,7 @@ extension CPU {
     }
 
     mutating func sbc(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode)
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
 
@@ -496,21 +496,21 @@ extension CPU {
     }
 
     mutating func sta(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.accumulator);
 
         return false
     }
 
     mutating func stx(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.xRegister);
 
         return false
     }
 
     mutating func sty(addressingMode: AddressingMode) -> Bool {
-        let address = self.getOperandAddress(addressingMode: addressingMode);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.yRegister);
 
         return false
@@ -713,32 +713,36 @@ extension CPU {
         }
     }
 
-    func getOperandAddress(addressingMode: AddressingMode) -> UInt16 {
+    func getAbsoluteAddress(addressingMode: AddressingMode) -> UInt16 {
+        return getAbsoluteAddress(addressingMode: addressingMode, address: self.programCounter)
+    }
+
+    func getAbsoluteAddress(addressingMode: AddressingMode, address: UInt16) -> UInt16 {
         switch addressingMode {
         case .immediate:
-            return self.programCounter
+            return address
         case .zeroPage:
-            return UInt16(self.readByte(address: self.programCounter))
+            return UInt16(self.readByte(address: address))
         case .zeroPageX:
-            let baseAddress = self.readByte(address: self.programCounter)
+            let baseAddress = self.readByte(address: address)
             return UInt16(baseAddress &+ self.xRegister)
         case .zeroPageY:
-            let baseAddress = self.readByte(address: self.programCounter)
+            let baseAddress = self.readByte(address: address)
             return UInt16(baseAddress &+ self.yRegister)
         case .absolute:
-            return self.readWord(address: self.programCounter)
+            return self.readWord(address: address)
         case .absoluteX:
-            let baseAddress = self.readWord(address: self.programCounter)
+            let baseAddress = self.readWord(address: address)
             return baseAddress &+ UInt16(self.xRegister)
         case .absoluteY:
-            let baseAddress = self.readWord(address: self.programCounter)
+            let baseAddress = self.readWord(address: address)
             return baseAddress &+ UInt16(self.yRegister)
         case .indirect:
-            let baseAddress = self.readWord(address: self.programCounter)
+            let baseAddress = self.readWord(address: address)
             return self.readWord(address: baseAddress)
         case .indirectX:
             // operand_ptr = *(void **)(constant_byte + x_register)
-            let baseAddress = self.readByte(address: self.programCounter)
+            let baseAddress = self.readByte(address: address)
             let indirectAddress = baseAddress &+ self.xRegister
 
             let lowByte = self.readByte(address: UInt16(indirectAddress))
@@ -747,7 +751,7 @@ extension CPU {
             return UInt16(highByte) << 8 | UInt16(lowByte)
         case .indirectY:
             // operand_ptr = *((void **)constant_byte) + y_register
-            let baseAddress = self.readByte(address: self.programCounter)
+            let baseAddress = self.readByte(address: address)
 
             let lowByte = self.readByte(address: UInt16(baseAddress))
             let highByte = self.readByte(address: UInt16(baseAddress &+ 1))
@@ -755,7 +759,7 @@ extension CPU {
             let indirectAddress = UInt16(highByte) << 8 | UInt16(lowByte)
             return indirectAddress &+ UInt16(self.yRegister)
         case .relative:
-            let offset = UInt16(self.readByte(address: self.programCounter)) &+ 1
+            let offset = UInt16(self.readByte(address: address)) &+ 1
             let address = if offset >> 7 == 0 {
                 self.programCounter &+ offset
             } else {
