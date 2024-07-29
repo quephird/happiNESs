@@ -29,39 +29,40 @@ func trace(cpu: CPU) -> String {
     trace += opcode.mnemonic + " "
 
     let absoluteAddress: UInt16 = switch opcode.addressingMode {
-    case .immediate, .implicit: 0
+    case .accumulator, .immediate, .implicit: 0
     default: cpu.getAbsoluteAddress(addressingMode: opcode.addressingMode, address: cpu.programCounter + 1)
     }
     let value: UInt8 = switch opcode.addressingMode {
-    case .immediate, .implicit:
+    case .accumulator, .immediate, .implicit:
         0
     default:
         cpu.readByte(address: absoluteAddress)
     }
 
-    let address = cpu.programCounter + 1
-    let partialAsm = switch opcode.instructionLength {
-    case 1:
-        switch byte {
+    let partialAsm: String
+    if opcode.instructionLength == 1 {
+        partialAsm = switch byte {
         case 0x0A, 0x2A, 0x4A, 0x6A: "A "
         default: ""
         }
-    case 2:
-        switch opcode.addressingMode {
-        case .immediate: String(format: "$%02X", address)
+    } else if opcode.instructionLength == 2 {
+        let nextByte = cpu.readByte(address: cpu.programCounter + 1)
+
+        partialAsm = switch opcode.addressingMode {
+        case .immediate: String(format: "$%02X", nextByte)
         case .zeroPage: String(format: "$%02X = %02X", absoluteAddress, value)
-        case .zeroPageX: String(format: "$%02X,X @ %02X = %02X", address, absoluteAddress, value)
-        case .zeroPageY: String(format: "$%02X,Y @ %02X = %02X", address, absoluteAddress, value)
-        case .indirectX: String(format: "($%02X,X) @ %02X = %04X = %02X", address, address &+ UInt16(cpu.xRegister), absoluteAddress, value)
-        case .indirectY: String(format: "($%02X),Y @ %04X = %04X = %02X", address, address &- UInt16(cpu.yRegister), absoluteAddress, value)
-//        case .relative: String(format: "$%04X", (address + 1) &+ ((address as i8) as usize))
+        case .zeroPageX: String(format: "$%02X,X @ %02X = %02X", nextByte, absoluteAddress, value)
+        case .zeroPageY: String(format: "$%02X,Y @ %02X = %02X", nextByte, absoluteAddress, value)
+        case .indirectX: String(format: "($%02X,X) @ %02X = %04X = %02X", nextByte, nextByte &+ cpu.xRegister, absoluteAddress, value)
+        case .indirectY: String(format: "($%02X),Y @ %04X = %04X = %02X", nextByte, absoluteAddress &- UInt16(cpu.yRegister), absoluteAddress, value)
+        case .relative: String(format: "$%04X", (cpu.programCounter + 2) &+ UInt16(nextByte))
         default: fatalError("Unexpected addressing mode encountered while tracing!")
         }
-    default:
-        ""
+    } else {
+        partialAsm = ""
     }
 
-    trace += "                             "
+    trace += partialAsm.padding(toLength: 32, withPad: " ")
 
     trace += "A:" + String(format: "%02X", cpu.accumulator) + " "
     trace += "X:" + String(format: "%02X", cpu.xRegister) + " "
@@ -70,4 +71,14 @@ func trace(cpu: CPU) -> String {
     trace += "SP:" + String(format: "%02X", cpu.stackPointer)
 
     return trace
+}
+
+extension StringProtocol {
+    func padding(toLength length: Int, withPad pad: some StringProtocol, startingAt paddingInsertionIndex: String.Index) -> String {
+        padding(toLength: length, withPad: pad, startingAt: paddingInsertionIndex.utf16Offset(in: pad))
+    }
+
+    func padding(toLength length: Int, withPad pad: some StringProtocol) -> String {
+        padding(toLength: length, withPad: pad, startingAt: pad.startIndex)
+    }
 }
