@@ -8,7 +8,8 @@
 public struct CPU {
     static let resetVectorAddress: UInt16 = 0xFFFC;
     static let interruptVectorAddress: UInt16 = 0xFFFE
-    static let resetStackPointerValue: UInt8 = 0xFF
+    // TODO: Need to look into why the stack pointer starts here and not at 0xFF!!!
+    static let resetStackPointerValue: UInt8 = 0xFD
     static let stackBottomMemoryAddress: UInt16 = 0x0100;
 
     public var accumulator: UInt8
@@ -57,7 +58,8 @@ public struct CPU {
         // program counter from the reset vector address via the bus.
         //
         //        self.programCounter = self.readWord(address: Self.resetVectorAddress);
-        self.programCounter = 0x8600
+//        self.programCounter = 0x8600
+        self.programCounter = 0xC000
 
         // TODO: Need to implement Bus.reset()
     }
@@ -379,7 +381,10 @@ extension CPU {
     }
 
     mutating func php() -> Bool {
-        self.pushStack(byte: self.statusRegister.rawValue)
+        // NOTA BENE: We need to set the so-called B flag upon a push to the stack:
+        //
+        //    https://www.nesdev.org/wiki/Status_flags#The_B_flag
+        self.pushStack(byte: self.statusRegister.rawValue | 0b0001_0000)
 
         return false
     }
@@ -392,9 +397,9 @@ extension CPU {
     }
 
     mutating func plp() -> Bool {
-        // TODO: Come back to this and check to see if any bits
-        // in the status register need to be explicitly set
         self.statusRegister.rawValue = self.popStack()
+        self.statusRegister[.break] = false
+        self.statusRegister[.unused] = true
 
         return false
     }

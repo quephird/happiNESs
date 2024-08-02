@@ -49,20 +49,48 @@ func trace(cpu: CPU) -> String {
         let nextByte = cpu.readByte(address: cpu.programCounter + 1)
 
         partialAsm = switch opcode.addressingMode {
-        case .immediate: String(format: "$%02X", nextByte)
+        case .immediate: String(format: "#$%02X", nextByte)
         case .zeroPage: String(format: "$%02X = %02X", absoluteAddress, value)
         case .zeroPageX: String(format: "$%02X,X @ %02X = %02X", nextByte, absoluteAddress, value)
         case .zeroPageY: String(format: "$%02X,Y @ %02X = %02X", nextByte, absoluteAddress, value)
         case .indirectX: String(format: "($%02X,X) @ %02X = %04X = %02X", nextByte, nextByte &+ cpu.xRegister, absoluteAddress, value)
-        case .indirectY: String(format: "($%02X),Y @ %04X = %04X = %02X", nextByte, absoluteAddress &- UInt16(cpu.yRegister), absoluteAddress, value)
+        case .indirectY: String(format: "($%02X),Y = %04X @ %04X = %02X", nextByte, absoluteAddress &- UInt16(cpu.yRegister), absoluteAddress, value)
         case .relative: String(format: "$%04X", (cpu.programCounter + 2) &+ UInt16(nextByte))
         default: fatalError("Unexpected addressing mode encountered while tracing!")
+        }
+    } else if opcode.instructionLength == 3 {
+        let address = cpu.readWord(address: cpu.programCounter + 1)
+
+        switch opcode.addressingMode {
+        case .indirect:
+            let jumpAddress: UInt16
+            if address & 0x00FF == 0x00FF {
+                let lowByte = cpu.readByte(address: address)
+                let highByte = cpu.readByte(address: address & 0xFF00)
+                jumpAddress = UInt16(highByte) << 8 | UInt16(lowByte)
+            } else {
+                jumpAddress = cpu.readWord(address: address)
+            }
+
+            partialAsm = String(format: "($%04X) = %04X", address, jumpAddress)
+        case .absolute:
+            if [.jmpAbsolute, .jsr].contains(opcode) {
+                partialAsm = String(format: "$%04X", absoluteAddress)
+            } else {
+                partialAsm = String(format: "$%04X = $%02X", absoluteAddress, value)
+            }
+        case .absoluteX:
+            partialAsm = String(format: "$%04X,Y @ $%04X = $%02X", address, absoluteAddress, value)
+        case .absoluteY:
+            partialAsm = String(format: "$%04X,Y @ $%04X = $%02X", address, absoluteAddress, value)
+        default:
+            fatalError("Unexpected addressing mode encountered while tracing!")
         }
     } else {
         partialAsm = ""
     }
 
-    trace += partialAsm.padding(toLength: 32, withPad: " ")
+    trace += partialAsm.padding(toLength: 28, withPad: " ")
 
     trace += "A:" + String(format: "%02X", cpu.accumulator) + " "
     trace += "X:" + String(format: "%02X", cpu.xRegister) + " "
