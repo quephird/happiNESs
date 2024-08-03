@@ -425,18 +425,18 @@ extension CPU {
     }
 
     mutating func ror(addressingMode: AddressingMode) -> Bool {
+        let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
+
         if addressingMode == .accumulator {
-            let carry = self.accumulator & 0b0000_0001
-            self.statusRegister[.carry] = carry == 1
-            self.accumulator = (self.accumulator >> 1) | carry << 7
+            self.statusRegister[.carry] = self.accumulator & 0b0000_0001 == 1
+            self.accumulator = (self.accumulator >> 1) | (oldCarry << 7)
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
             let address = self.getAbsoluteAddress(addressingMode: addressingMode);
-            let value = self.readByte(address: address);
-            let carry = value & 0b0000_0001
+            let value = self.readByte(address: address)
 
-            self.statusRegister[.carry] = carry == 1
-            let newValue = value >> 1 | carry << 7
+            self.statusRegister[.carry] = value & 0b0000_0001 == 1
+            let newValue = (value >> 1) | (oldCarry << 7)
             self.writeByte(address: address, byte: newValue)
             self.updateZeroAndNegativeFlags(result: newValue)
         }
@@ -446,6 +446,9 @@ extension CPU {
 
     mutating func rti() -> Bool {
         self.statusRegister.rawValue = self.popStack()
+        self.statusRegister[.break] = false
+        self.statusRegister[.unused] = true
+
         let addressLow = self.popStack()
         let addressHigh = self.popStack()
         let address = UInt16(addressHigh) << 8 | UInt16(addressLow)
