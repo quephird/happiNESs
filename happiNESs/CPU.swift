@@ -471,11 +471,11 @@ extension CPU {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
+        let oldAccumulator = self.accumulator
 
-        let sum = UInt16(self.accumulator) + UInt16(~value) + UInt16(carry)
-        self.statusRegister[.carry] = sum > 0xFF
-        self.statusRegister[.overflow] = ((UInt8(sum & 0xFF) ^ self.accumulator) & (UInt8(sum & 0xFF) ^ value) & 0x80) == 0x80
-        self.accumulator = UInt8(sum & 0xFF)
+        self.accumulator = oldAccumulator &- value &- (1 - carry)
+        self.statusRegister[.carry] = Int16(oldAccumulator) - Int16(value) - Int16(1 - carry) >= 0
+        self.statusRegister[.overflow] = (oldAccumulator ^ value) & 0x80 != 0 && (oldAccumulator ^ self.accumulator) & 0x80 != 0
         self.updateZeroAndNegativeFlags(result: self.accumulator)
 
         return false
@@ -554,7 +554,6 @@ extension CPU {
 
     mutating func txs() -> Bool {
         self.stackPointer = self.xRegister;
-        self.updateZeroAndNegativeFlags(result: self.stackPointer)
 
         return false
     }
@@ -747,6 +746,12 @@ extension CPU {
             return baseAddress &+ UInt16(self.yRegister)
         case .indirect:
             let baseAddress = self.readWord(address: address)
+            if baseAddress & 0x00FF == 0x00FF {
+                let lowByte = self.readByte(address: baseAddress)
+                let highByte = self.readByte(address: baseAddress & 0xFF00)
+                return UInt16(highByte) << 8 | UInt16(lowByte)
+            }
+
             return self.readWord(address: baseAddress)
         case .indirectX:
             // operand_ptr = *(void **)(constant_byte + x_register)

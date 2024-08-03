@@ -77,12 +77,12 @@ func trace(cpu: CPU) -> String {
             if [.jmpAbsolute, .jsr].contains(opcode) {
                 partialAsm = String(format: "$%04X", absoluteAddress)
             } else {
-                partialAsm = String(format: "$%04X = $%02X", absoluteAddress, value)
+                partialAsm = String(format: "$%04X = %02X", absoluteAddress, value)
             }
         case .absoluteX:
-            partialAsm = String(format: "$%04X,Y @ $%04X = $%02X", address, absoluteAddress, value)
+            partialAsm = String(format: "$%04X,X @ %04X = %02X", address, absoluteAddress, value)
         case .absoluteY:
-            partialAsm = String(format: "$%04X,Y @ $%04X = $%02X", address, absoluteAddress, value)
+            partialAsm = String(format: "$%04X,Y @ %04X = %02X", address, absoluteAddress, value)
         default:
             fatalError("Unexpected addressing mode encountered while tracing!")
         }
