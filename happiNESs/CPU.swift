@@ -745,6 +745,8 @@ extension CPU {
             let baseAddress = self.readWord(address: address)
             return baseAddress &+ UInt16(self.yRegister)
         case .indirect:
+            // See http://www.6502.org/tutorials/6502opcodes.html#JMP for more details
+            // on this implementation, which only applies to the 0x6C opcode.
             let baseAddress = self.readWord(address: address)
             if baseAddress & 0x00FF == 0x00FF {
                 let lowByte = self.readByte(address: baseAddress)
