@@ -23,19 +23,6 @@ public struct CPU {
     public var tracingOn: Bool = false
     public var trace: [String] = []
 
-    static let recentTraceCount = 16
-    var recentTrace: [(Opcode, UInt16)?] = Array(repeating: nil, count: recentTraceCount)
-    var recentTraceNext: Int = 0
-
-    mutating func addToRecentTrace(opcode: Opcode, at pc: UInt16) {
-        recentTrace[recentTraceNext] = (opcode, pc)
-        recentTraceNext = (recentTraceNext + 1) % Self.recentTraceCount
-    }
-
-    func makeRecentTrace() -> [(Opcode, UInt16)] {
-        (recentTrace[recentTraceNext...] + recentTrace[0..<recentTraceNext]).compactMap { $0 }
-    }
-
     public init(bus: Bus) {
         self.accumulator = 0x00
         self.statusRegister = StatusRegister(rawValue: 0x00)
@@ -582,8 +569,6 @@ extension CPU {
     mutating func executeInstruction() {
         let byte = self.readByte(address: self.programCounter);
         if let opcode = Opcode(rawValue: byte) {
-            addToRecentTrace(opcode: opcode, at: self.programCounter)
-
             self.programCounter += 1;
 
             let alreadyMutatedProgramCounter = switch opcode {
@@ -705,13 +690,8 @@ extension CPU {
                 self.programCounter += UInt16(opcode.instructionLength - 1)
             }
         } else {
-            print("Recent trace:")
-            for (opcode, pc) in makeRecentTrace() {
-                print("- \(opcode) at \(pc)")
-            }
             fatalError("Whoops! Instruction \(byte) at \(programCounter) not recognized!!!")
         }
-
     }
 
     mutating func run() {
