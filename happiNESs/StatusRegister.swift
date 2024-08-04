@@ -13,12 +13,13 @@ public struct StatusRegister: OptionSet {
     }
     
     //  7 6 5 4 3 2 1 0
-    //  N V _ B D I Z C
-    //  | |   | | | | +--- Carry Flag
-    //  | |   | | | +----- Zero Flag
-    //  | |   | | +------- Interrupt Disable
-    //  | |   | +--------- Decimal Mode (not used on NES)
-    //  | |   +----------- Break Command
+    //  N V U B D I Z C
+    //  | | | | | | | +--- Carry Flag
+    //  | | | | | | +----- Zero Flag
+    //  | | | | | +------- Interrupt Disable
+    //  | | | | +--------- Decimal Mode (not used on NES)
+    //  | | | +----------- Break Command
+    //  | | +------------- Unused (but always 1)
     //  | +--------------- Overflow Flag
     //  +----------------- Negative Flag
     public static let carry = Self(rawValue: 1 << 0)
@@ -26,6 +27,7 @@ public struct StatusRegister: OptionSet {
     public static let interrupt = Self(rawValue: 1 << 2)
     public static let decimalMode = Self(rawValue: 1 << 3)
     public static let `break` = Self(rawValue: 1 << 4)
+    public static let unused = Self(rawValue: 1 << 5)
     public static let overflow = Self(rawValue: 1 << 6)
     public static let negative = Self(rawValue: 1 << 7)
 
@@ -43,6 +45,7 @@ public struct StatusRegister: OptionSet {
     }
 
     mutating func reset() {
-        self.rawValue = 0
+        // TODO: Need to document why this is the case!
+        self.rawValue = 0x24
     }
 }
