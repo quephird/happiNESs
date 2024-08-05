@@ -196,7 +196,8 @@ enum Opcode: UInt8 {
     case saxZeroPageY = 0x97
     case saxIndirectX = 0x83
 
-    case sbcImmediate = 0xE9
+    case sbcImmediate1 = 0xE9
+    case sbcImmediate2 = 0xEB
     case sbcZeroPage = 0xE5
     case sbcZeroPageX = 0xF5
     case sbcAbsolute = 0xED
@@ -426,7 +427,8 @@ extension Opcode {
         case .saxZeroPageY: .zeroPageY
         case .saxIndirectX: .indirectX
 
-        case .sbcImmediate: .immediate
+        case .sbcImmediate1: .immediate
+        case .sbcImmediate2: .immediate
         case .sbcZeroPage: .zeroPage
         case .sbcZeroPageX: .zeroPageX
         case .sbcAbsolute: .absolute
@@ -656,7 +658,8 @@ extension Opcode {
         case .saxAbsolute: 3
         case .saxIndirectX: 2
 
-        case .sbcImmediate: 2
+        case .sbcImmediate1: 2
+        case .sbcImmediate2: 2
         case .sbcZeroPage: 2
         case .sbcZeroPageX: 2
         case .sbcAbsolute: 3
@@ -706,14 +709,15 @@ extension Opcode {
 extension Opcode {
     var isDocumented: Bool {
         switch self {
-        case .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
+        case .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
+                .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
                 .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
                 .nopAbsolute,
                 .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
                 .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
                 .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
-                .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
-                .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX:
+                .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
+                .sbcImmediate2:
             return false
         default:
             return true

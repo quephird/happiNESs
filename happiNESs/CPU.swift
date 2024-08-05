@@ -687,7 +687,7 @@ extension CPU {
                 self.rts()
             case .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX:
                 self.sax(addressingMode: opcode.addressingMode)
-            case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
+            case .sbcImmediate1, .sbcImmediate2, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
                 self.sbc(addressingMode: opcode.addressingMode)
             case .sec:
                 self.sec()
