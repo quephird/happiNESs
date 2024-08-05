@@ -465,6 +465,15 @@ extension CPU {
         return true
     }
 
+    mutating func sax(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+
+        self.writeByte(address: address, byte: self.accumulator & self.xRegister)
+
+        return false
+    }
+
     mutating func sbc(addressingMode: AddressingMode) -> Bool {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
@@ -676,6 +685,8 @@ extension CPU {
                 self.rti()
             case .rts:
                 self.rts()
+            case .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX:
+                self.sax(addressingMode: opcode.addressingMode)
             case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
                 self.sbc(addressingMode: opcode.addressingMode)
             case .sec:

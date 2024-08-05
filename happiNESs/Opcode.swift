@@ -191,6 +191,11 @@ enum Opcode: UInt8 {
     case rti = 0x40
     case rts = 0x60
 
+    case saxAbsolute = 0x8F
+    case saxZeroPage = 0x87
+    case saxZeroPageY = 0x97
+    case saxIndirectX = 0x83
+
     case sbcImmediate = 0xE9
     case sbcZeroPage = 0xE5
     case sbcZeroPageX = 0xF5
@@ -415,6 +420,11 @@ extension Opcode {
 
         case .rti: .implicit
         case .rts: .implicit
+
+        case .saxAbsolute: .absolute
+        case .saxZeroPage: .zeroPage
+        case .saxZeroPageY: .zeroPageY
+        case .saxIndirectX: .indirectX
 
         case .sbcImmediate: .immediate
         case .sbcZeroPage: .zeroPage
@@ -641,6 +651,11 @@ extension Opcode {
         case .rti: 1
         case .rts: 1
 
+        case .saxZeroPage: 2
+        case .saxZeroPageY: 2
+        case .saxAbsolute: 3
+        case .saxIndirectX: 2
+
         case .sbcImmediate: 2
         case .sbcZeroPage: 2
         case .sbcZeroPageX: 2
@@ -697,7 +712,8 @@ extension Opcode {
                 .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
                 .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
                 .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
-                .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY:
+                .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
+                .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX:
             return false
         default:
             return true
