@@ -98,6 +98,14 @@ enum Opcode: UInt8 {
 
     case jsr = 0x20
 
+    case laxImmediate = 0xAB
+    case laxZeroPage = 0xA7
+    case laxZeroPageY = 0xB7
+    case laxAbsolute = 0xAF
+    case laxAbsoluteY = 0xBF
+    case laxIndirectX = 0xA3
+    case laxIndirectY = 0xB3
+
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
     case ldaZeroPageX = 0xB5
@@ -314,6 +322,14 @@ extension Opcode {
         case .jmpIndirect: .indirect
 
         case .jsr: .absolute
+
+        case .laxImmediate: .immediate
+        case .laxZeroPage: .zeroPage
+        case .laxZeroPageY: .zeroPageY
+        case .laxAbsolute: .absolute
+        case .laxAbsoluteY: .absoluteY
+        case .laxIndirectX: .indirectX
+        case .laxIndirectY: .indirectY
 
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
@@ -532,6 +548,14 @@ extension Opcode {
 
         case .jsr: 3
 
+        case .laxImmediate: 2
+        case .laxZeroPage: 2
+        case .laxZeroPageY: 2
+        case .laxAbsolute: 3
+        case .laxAbsoluteY: 3
+        case .laxIndirectX: 2
+        case .laxIndirectY: 2
+
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
         case .ldaZeroPageX: 2
@@ -672,7 +696,8 @@ extension Opcode {
                 .nopAbsolute,
                 .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
                 .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
-                .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6:
+                .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
+                .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY:
             return false
         default:
             return true

@@ -292,6 +292,17 @@ extension CPU {
         return false
     }
 
+    mutating func lax(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+
+        self.accumulator = value
+        self.xRegister = value
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+
+        return false
+    }
+
     mutating func lda(addressingMode: AddressingMode) -> Bool {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
@@ -630,6 +641,8 @@ extension CPU {
                 self.jmp(addressingMode: opcode.addressingMode)
             case .jsr:
                 self.jsr()
+            case .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY:
+                self.lax(addressingMode: opcode.addressingMode)
             case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
                 self.lda(addressingMode: opcode.addressingMode)
             case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
