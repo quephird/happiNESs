@@ -68,6 +68,14 @@ enum Opcode: UInt8 {
     case cpyZeroPage = 0xC4
     case cpyAbsolute = 0xCC
 
+    case dcpAbsolute = 0xCF
+    case dcpAbsoluteX = 0xDF
+    case dcpAbsoluteY = 0xDB
+    case dcpZeroPage = 0xC7
+    case dcpZeroPageX = 0xD7
+    case dcpIndirectX = 0xC3
+    case dcpIndirectY = 0xD3
+
     case decZeroPage = 0xC6
     case decZeroPageX = 0xD6
     case decAbsolute = 0xCE
@@ -298,6 +306,14 @@ extension Opcode {
         case .cpyImmediate: .immediate
         case .cpyZeroPage: .zeroPage
         case .cpyAbsolute: .absolute
+
+        case .dcpAbsolute: .absolute
+        case .dcpAbsoluteX: .absoluteX
+        case .dcpAbsoluteY: .absoluteY
+        case .dcpZeroPage: .zeroPage
+        case .dcpZeroPageX: .zeroPageX
+        case .dcpIndirectX: .indirectX
+        case .dcpIndirectY: .indirectY
 
         case .decZeroPage: .zeroPage
         case .decZeroPageX: .zeroPageX
@@ -530,6 +546,14 @@ extension Opcode {
         case .cpyZeroPage: 2
         case .cpyAbsolute: 3
 
+        case .dcpAbsolute: 3
+        case .dcpAbsoluteX: 3
+        case .dcpAbsoluteY: 3
+        case .dcpZeroPage: 2
+        case .dcpZeroPageX: 2
+        case .dcpIndirectX: 2
+        case .dcpIndirectY: 2
+
         case .decZeroPage: 2
         case .decZeroPageX: 2
         case .decAbsolute: 3
@@ -709,7 +733,8 @@ extension Opcode {
 extension Opcode {
     var isDocumented: Bool {
         switch self {
-        case .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
+        case .dcpAbsolute, .dcpAbsoluteX, .dcpAbsoluteY, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectY,
+                .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
                 .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
                 .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
                 .nopAbsolute,

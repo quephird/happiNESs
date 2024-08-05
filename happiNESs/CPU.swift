@@ -216,6 +216,18 @@ extension CPU {
         return false
     }
 
+    mutating func dcp(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+
+        let newValue = value &- 1
+        self.writeByte(address: address, byte: newValue)
+        self.statusRegister[.carry] = newValue <= self.accumulator
+        self.updateZeroAndNegativeFlags(result: self.accumulator &- newValue)
+
+        return false
+    }
+
     mutating func dec(addressingMode: AddressingMode) -> Bool {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
@@ -632,6 +644,8 @@ extension CPU {
                 self.cpx(addressingMode: opcode.addressingMode)
             case .cpyImmediate, .cpyZeroPage, .cpyAbsolute:
                 self.cpy(addressingMode: opcode.addressingMode)
+            case .dcpAbsolute, .dcpAbsoluteX, .dcpAbsoluteY, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectY:
+                self.dcp(addressingMode: opcode.addressingMode)
             case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
                 self.dec(addressingMode: opcode.addressingMode)
             case .dex:
