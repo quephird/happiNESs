@@ -262,8 +262,8 @@ extension CPU {
     }
 
     mutating func inc(addressingMode: AddressingMode) -> Bool {
-        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
-        let value = self.readByte(address: address);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value &+ 1)
         self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
 
@@ -275,6 +275,13 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return false
+    }
+
+    mutating func isb(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        self.writeByte(address: address, byte: self.readByte(address: address) &+ 1)
+
+        return self.sbc(addressingMode: addressingMode)
     }
 
     mutating func jmp(addressingMode: AddressingMode) -> Bool {
@@ -660,6 +667,8 @@ extension CPU {
                 self.inx()
             case .iny:
                 self.iny()
+            case .isbAbsolute, .isbAbsoluteX, .isbAbsoluteY, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectY:
+                self.isb(addressingMode: opcode.addressingMode)
             case .jmpAbsolute, .jmpIndirect:
                 self.jmp(addressingMode: opcode.addressingMode)
             case .jsr:

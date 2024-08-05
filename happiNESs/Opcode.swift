@@ -101,6 +101,14 @@ enum Opcode: UInt8 {
     case inx = 0xE8
     case iny = 0xC8
 
+    case isbAbsolute = 0xEF
+    case isbAbsoluteX = 0xFF
+    case isbAbsoluteY = 0xFB
+    case isbZeroPage = 0xE7
+    case isbZeroPageX = 0xF7
+    case isbIndirectX = 0xE3
+    case isbIndirectY = 0xF3
+
     case jmpAbsolute = 0x4C
     case jmpIndirect = 0x6C
 
@@ -339,6 +347,14 @@ extension Opcode {
 
         case .inx: .implicit
         case .iny: .implicit
+
+        case .isbAbsolute: .absolute
+        case .isbAbsoluteX: .absoluteX
+        case .isbAbsoluteY: .absoluteY
+        case .isbZeroPage: .zeroPage
+        case .isbZeroPageX: .zeroPageX
+        case .isbIndirectX: .indirectX
+        case .isbIndirectY: .indirectY
 
         case .jmpAbsolute: .absolute
         case .jmpIndirect: .indirect
@@ -579,6 +595,14 @@ extension Opcode {
         case .inx: 1
         case .iny: 1
 
+        case .isbAbsolute: 3
+        case .isbAbsoluteX: 3
+        case .isbAbsoluteY: 3
+        case .isbZeroPage: 2
+        case .isbZeroPageX: 2
+        case .isbIndirectX: 2
+        case .isbIndirectY: 2
+
         case .jmpAbsolute: 3
         case .jmpIndirect: 3
 
@@ -734,6 +758,7 @@ extension Opcode {
     var isDocumented: Bool {
         switch self {
         case .dcpAbsolute, .dcpAbsoluteX, .dcpAbsoluteY, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectY,
+                .isbAbsolute, .isbAbsoluteX, .isbAbsoluteY, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectY,
                 .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
                 .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
                 .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
