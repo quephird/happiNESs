@@ -14,17 +14,19 @@ func trace(cpu: CPU) -> String {
     let opcode = Opcode(rawValue: byte)!
     switch opcode.instructionLength {
     case 1:
-        trace += "       "
+        trace += "      "
     case 2:
         trace += String(format: "%02X", cpu.readByte(address: cpu.programCounter + 1))
-        trace += "     "
+        trace += "    "
     case 3:
         trace += String(format: "%02X", cpu.readByte(address: cpu.programCounter + 1)) + " "
         trace += String(format: "%02X", cpu.readByte(address: cpu.programCounter + 2))
-        trace += "  "
+        trace += " "
     default:
         fatalError("Tracing halted; opcode with unexpected length encountered!")
     }
+
+    trace += opcode.isDocumented ? " " : "*"
 
     trace += opcode.mnemonic + " "
 
@@ -48,14 +50,27 @@ func trace(cpu: CPU) -> String {
     } else if opcode.instructionLength == 2 {
         let nextByte = cpu.readByte(address: cpu.programCounter + 1)
 
-        partialAsm = switch opcode.addressingMode {
-        case .immediate: String(format: "#$%02X", nextByte)
-        case .zeroPage: String(format: "$%02X = %02X", absoluteAddress, value)
-        case .zeroPageX: String(format: "$%02X,X @ %02X = %02X", nextByte, absoluteAddress, value)
-        case .zeroPageY: String(format: "$%02X,Y @ %02X = %02X", nextByte, absoluteAddress, value)
-        case .indirectX: String(format: "($%02X,X) @ %02X = %04X = %02X", nextByte, nextByte &+ cpu.xRegister, absoluteAddress, value)
-        case .indirectY: String(format: "($%02X),Y = %04X @ %04X = %02X", nextByte, absoluteAddress &- UInt16(cpu.yRegister), absoluteAddress, value)
-        case .relative: String(format: "$%04X", (cpu.programCounter + 2) &+ UInt16(nextByte))
+        switch opcode.addressingMode {
+        case .immediate:
+            partialAsm = String(format: "#$%02X", nextByte)
+        case .zeroPage:
+            partialAsm = String(format: "$%02X = %02X", absoluteAddress, value)
+        case .zeroPageX:
+            partialAsm = String(format: "$%02X,X @ %02X = %02X", nextByte, absoluteAddress, value)
+        case .zeroPageY:
+            partialAsm = String(format: "$%02X,Y @ %02X = %02X", nextByte, absoluteAddress, value)
+        case .indirectX:
+            partialAsm = String(format: "($%02X,X) @ %02X = %04X = %02X", nextByte, nextByte &+ cpu.xRegister, absoluteAddress, value)
+        case .indirectY:
+            partialAsm = String(format: "($%02X),Y = %04X @ %04X = %02X", nextByte, absoluteAddress &- UInt16(cpu.yRegister), absoluteAddress, value)
+        case .relative:
+            let address = if nextByte >> 7 == 0 {
+                (cpu.programCounter + 2) &+ UInt16(nextByte)
+            } else {
+                (cpu.programCounter + 2) &+ UInt16(nextByte) &- 0x0100
+            }
+
+            partialAsm = String(format: "$%04X", address)
         default: fatalError("Unexpected addressing mode encountered while tracing!")
         }
     } else if opcode.instructionLength == 3 {

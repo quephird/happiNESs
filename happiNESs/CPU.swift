@@ -638,7 +638,12 @@ extension CPU {
                 self.ldy(addressingMode: opcode.addressingMode)
             case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
                 self.lsr(addressingMode: opcode.addressingMode)
-            case .nop:
+            case .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit6, .nopImplicit7,
+                    .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
+                    .nopAbsolute,
+                    .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
+                    .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
+                    .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6:
                 self.nop()
             case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                 self.ora(addressingMode: opcode.addressingMode)

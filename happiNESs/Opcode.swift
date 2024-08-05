@@ -125,7 +125,34 @@ enum Opcode: UInt8 {
     case lsrAbsolute = 0x4E
     case lsrAbsoluteX = 0x5E
 
-    case nop = 0xEA
+    case nopImplicit1 = 0x1A
+    case nopImplicit2 = 0x3A
+    case nopImplicit3 = 0x5A
+    case nopImplicit4 = 0x7A
+    case nopImplicit5 = 0xDA
+    case nopImplicit6 = 0xEA
+    case nopImplicit7 = 0xFA
+    case nopImmediate1 = 0x80
+    case nopImmediate2 = 0x82
+    case nopImmediate3 = 0x89
+    case nopImmediate4 = 0xC2
+    case nopImmediate5 = 0xE2
+    case nopAbsolute = 0x0C
+    case nopAbsoluteX1 = 0x1C
+    case nopAbsoluteX2 = 0x3C
+    case nopAbsoluteX3 = 0x5C
+    case nopAbsoluteX4 = 0x7C
+    case nopAbsoluteX5 = 0xDC
+    case nopAbsoluteX6 = 0xFC
+    case nopZeroPage1 = 0x04
+    case nopZeroPage2 = 0x44
+    case nopZeroPage3 = 0x64
+    case nopZeroPageX1 = 0x14
+    case nopZeroPageX2 = 0x34
+    case nopZeroPageX3 = 0x54
+    case nopZeroPageX4 = 0x74
+    case nopZeroPageX5 = 0xD4
+    case nopZeroPageX6 = 0xF4
 
     case oraImmediate = 0x09
     case oraZeroPage = 0x05
@@ -315,7 +342,34 @@ extension Opcode {
         case .lsrAbsolute: .absolute
         case .lsrAbsoluteX: .absoluteX
 
-        case .nop: .implicit
+        case .nopImplicit1: .implicit
+        case .nopImplicit2: .implicit
+        case .nopImplicit3: .implicit
+        case .nopImplicit4: .implicit
+        case .nopImplicit5: .implicit
+        case .nopImplicit6: .implicit
+        case .nopImplicit7: .implicit
+        case .nopImmediate1: .immediate
+        case .nopImmediate2: .immediate
+        case .nopImmediate3: .immediate
+        case .nopImmediate4: .immediate
+        case .nopImmediate5: .immediate
+        case .nopAbsolute: .absolute
+        case .nopAbsoluteX1: .absoluteX
+        case .nopAbsoluteX2: .absoluteX
+        case .nopAbsoluteX3: .absoluteX
+        case .nopAbsoluteX4: .absoluteX
+        case .nopAbsoluteX5: .absoluteX
+        case .nopAbsoluteX6: .absoluteX
+        case .nopZeroPage1: .zeroPage
+        case .nopZeroPage2: .zeroPage
+        case .nopZeroPage3: .zeroPage
+        case .nopZeroPageX1: .zeroPageX
+        case .nopZeroPageX2: .zeroPageX
+        case .nopZeroPageX3: .zeroPageX
+        case .nopZeroPageX4: .zeroPageX
+        case .nopZeroPageX5: .zeroPageX
+        case .nopZeroPageX6: .zeroPageX
 
         case .oraImmediate: .immediate
         case .oraZeroPage: .zeroPage
@@ -505,7 +559,34 @@ extension Opcode {
         case .lsrAbsolute: 3
         case .lsrAbsoluteX: 3
 
-        case .nop: 1
+        case .nopImplicit1: 1
+        case .nopImplicit2: 1
+        case .nopImplicit3: 1
+        case .nopImplicit4: 1
+        case .nopImplicit5: 1
+        case .nopImplicit6: 1
+        case .nopImplicit7: 1
+        case .nopImmediate1: 2
+        case .nopImmediate2: 2
+        case .nopImmediate3: 2
+        case .nopImmediate4: 2
+        case .nopImmediate5: 2
+        case .nopAbsolute: 3
+        case .nopAbsoluteX1: 3
+        case .nopAbsoluteX2: 3
+        case .nopAbsoluteX3: 3
+        case .nopAbsoluteX4: 3
+        case .nopAbsoluteX5: 3
+        case .nopAbsoluteX6: 3
+        case .nopZeroPage1: 2
+        case .nopZeroPage2: 2
+        case .nopZeroPage3: 2
+        case .nopZeroPageX1: 2
+        case .nopZeroPageX2: 2
+        case .nopZeroPageX3: 2
+        case .nopZeroPageX4: 2
+        case .nopZeroPageX5: 2
+        case .nopZeroPageX6: 2
 
         case .oraImmediate: 2
         case .oraZeroPage: 2
@@ -580,5 +661,21 @@ extension Opcode {
         let opcodeString = String(describing: self)
         let endIndex = opcodeString.index(opcodeString.startIndex, offsetBy: 2)
         return opcodeString[opcodeString.startIndex ... endIndex].uppercased()
+    }
+}
+
+extension Opcode {
+    var isDocumented: Bool {
+        switch self {
+        case .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
+                .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
+                .nopAbsolute,
+                .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
+                .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
+                .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6:
+            return false
+        default:
+            return true
+        }
     }
 }
