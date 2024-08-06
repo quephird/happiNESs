@@ -192,6 +192,14 @@ enum Opcode: UInt8 {
     case pla = 0x68
     case plp = 0x28
 
+    case rlaAbsolute = 0x2F
+    case rlaAbsoluteX = 0x3F
+    case rlaAbsoluteY = 0x3B
+    case rlaZeroPage = 0x27
+    case rlaZeroPageX = 0x37
+    case rlaIndirectX = 0x23
+    case rlaIndirectY = 0x33
+
     case rolAccumulator = 0x2A
     case rolZeroPage = 0x26
     case rolZeroPageX = 0x36
@@ -446,6 +454,14 @@ extension Opcode {
         case .php: .implicit
         case .pla: .implicit
         case .plp: .implicit
+
+        case .rlaAbsolute: .absolute
+        case .rlaAbsoluteX: .absoluteX
+        case .rlaAbsoluteY: .absoluteY
+        case .rlaZeroPage: .zeroPage
+        case .rlaZeroPageX: .zeroPageX
+        case .rlaIndirectX: .indirectX
+        case .rlaIndirectY: .indirectY
 
         case .rolAccumulator: .accumulator
         case .rolZeroPage: .zeroPage
@@ -702,6 +718,14 @@ extension Opcode {
         case .pla: 1
         case .plp: 1
 
+        case .rlaAbsolute: 3
+        case .rlaAbsoluteX: 3
+        case .rlaAbsoluteY: 3
+        case .rlaZeroPage: 2
+        case .rlaZeroPageX: 2
+        case .rlaIndirectX: 2
+        case .rlaIndirectY: 2
+
         case .rolAccumulator: 1
         case .rolZeroPage: 2
         case .rolZeroPageX: 2
@@ -790,6 +814,7 @@ extension Opcode {
                 .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
                 .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
                 .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
+                .rlaAbsolute, .rlaAbsoluteX, .rlaAbsoluteY, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectY,
                 .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
                 .sbcImmediate2,
                 .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY:

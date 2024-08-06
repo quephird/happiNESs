@@ -421,6 +421,16 @@ extension CPU {
         return false
     }
 
+    mutating func rla(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
+        self.writeByte(address: address, byte: (value << 1) | oldCarry)
+        self.statusRegister[.carry] = (value >> 7) == 1
+
+        return self.and(addressingMode: addressingMode)
+    }
+
     mutating func rol(addressingMode: AddressingMode) -> Bool {
         if addressingMode == .accumulator {
             let carry = self.accumulator >> 7
@@ -486,8 +496,6 @@ extension CPU {
 
     mutating func sax(addressingMode: AddressingMode) -> Bool {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode)
-        let value = self.readByte(address: address)
-
         self.writeByte(address: address, byte: self.accumulator & self.xRegister)
 
         return false
@@ -709,6 +717,8 @@ extension CPU {
                 self.pla()
             case .plp:
                 self.plp()
+            case .rlaAbsolute, .rlaAbsoluteX, .rlaAbsoluteY, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectY:
+                self.rla(addressingMode: opcode.addressingMode)
             case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
                 self.rol(addressingMode: opcode.addressingMode)
             case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
