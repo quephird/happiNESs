@@ -226,6 +226,14 @@ enum Opcode: UInt8 {
     case sed = 0xF8
     case sei = 0x78
 
+    case sloAbsolute = 0x0F
+    case sloAbsoluteX = 0x1F
+    case sloAbsoluteY = 0x1B
+    case sloZeroPage = 0x07
+    case sloZeroPageX = 0x17
+    case sloIndirectX = 0x03
+    case sloIndirectY = 0x13
+
     case staZeroPage = 0x85
     case staZeroPageX = 0x95
     case staAbsolute = 0x8D
@@ -472,6 +480,14 @@ extension Opcode {
         case .sec: .implicit
         case .sed: .implicit
         case .sei: .implicit
+
+        case .sloAbsolute: .absolute
+        case .sloAbsoluteX: .absoluteX
+        case .sloAbsoluteY: .absoluteY
+        case .sloZeroPage: .zeroPage
+        case .sloZeroPageX: .zeroPageX
+        case .sloIndirectX: .indirectX
+        case .sloIndirectY: .indirectY
 
         case .staZeroPage: .zeroPage
         case .staZeroPageX: .zeroPageX
@@ -720,6 +736,14 @@ extension Opcode {
         case .sed: 1
         case .sei: 1
 
+        case .sloAbsolute: 3
+        case .sloAbsoluteX: 3
+        case .sloAbsoluteY: 3
+        case .sloZeroPage: 2
+        case .sloZeroPageX: 2
+        case .sloIndirectX: 2
+        case .sloIndirectY: 2
+
         case .staZeroPage: 2
         case .staZeroPageX: 2
         case .staAbsolute: 3
@@ -767,7 +791,8 @@ extension Opcode {
                 .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
                 .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
                 .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
-                .sbcImmediate2:
+                .sbcImmediate2,
+                .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY:
             return false
         default:
             return true
