@@ -216,6 +216,18 @@ extension CPU {
         return false
     }
 
+    mutating func dcp(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+
+        let newValue = value &- 1
+        self.writeByte(address: address, byte: newValue)
+        self.statusRegister[.carry] = newValue <= self.accumulator
+        self.updateZeroAndNegativeFlags(result: self.accumulator &- newValue)
+
+        return false
+    }
+
     mutating func dec(addressingMode: AddressingMode) -> Bool {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
@@ -250,8 +262,8 @@ extension CPU {
     }
 
     mutating func inc(addressingMode: AddressingMode) -> Bool {
-        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
-        let value = self.readByte(address: address);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value &+ 1)
         self.updateZeroAndNegativeFlags(result: self.readByte(address: address))
 
@@ -263,6 +275,13 @@ extension CPU {
         self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return false
+    }
+
+    mutating func isb(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        self.writeByte(address: address, byte: self.readByte(address: address) &+ 1)
+
+        return self.sbc(addressingMode: addressingMode)
     }
 
     mutating func jmp(addressingMode: AddressingMode) -> Bool {
@@ -288,6 +307,17 @@ extension CPU {
     mutating func iny() -> Bool {
         self.yRegister = self.yRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.yRegister)
+
+        return false
+    }
+
+    mutating func lax(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+
+        self.accumulator = value
+        self.xRegister = value
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
 
         return false
     }
@@ -391,6 +421,16 @@ extension CPU {
         return false
     }
 
+    mutating func rla(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
+        self.writeByte(address: address, byte: (value << 1) | oldCarry)
+        self.statusRegister[.carry] = (value >> 7) == 1
+
+        return self.and(addressingMode: addressingMode)
+    }
+
     mutating func rol(addressingMode: AddressingMode) -> Bool {
         if addressingMode == .accumulator {
             let carry = self.accumulator >> 7
@@ -431,6 +471,16 @@ extension CPU {
         return false
     }
 
+    mutating func rra(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
+        self.writeByte(address: address, byte: (value >> 1) | oldCarry << 7)
+        self.statusRegister[.carry] = (value & 0b0000_0001) == 1
+
+        return self.adc(addressingMode: addressingMode)
+    }
+
     mutating func rti() -> Bool {
         self.statusRegister.rawValue = self.popStack()
         self.statusRegister[.break] = false
@@ -452,6 +502,13 @@ extension CPU {
         self.programCounter = address
 
         return true
+    }
+
+    mutating func sax(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        self.writeByte(address: address, byte: self.accumulator & self.xRegister)
+
+        return false
     }
 
     mutating func sbc(addressingMode: AddressingMode) -> Bool {
@@ -490,9 +547,27 @@ extension CPU {
         return false
     }
 
+    mutating func slo(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let oldValue = self.readByte(address: address)
+        self.writeByte(address: address, byte: oldValue << 1)
+        self.statusRegister[.carry] = (oldValue >> 7) == 1
+
+        return self.ora(addressingMode: addressingMode)
+    }
+
+    mutating func sre(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        self.writeByte(address: address, byte: value >> 1)
+        self.statusRegister[.carry] = (value & 0b0000_0001) == 1
+
+        return self.eor(addressingMode: addressingMode)
+    }
+
     mutating func sta(addressingMode: AddressingMode) -> Bool {
-        let address = self.getAbsoluteAddress(addressingMode: addressingMode);
-        self.writeByte(address: address, byte: self.accumulator);
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        self.writeByte(address: address, byte: self.accumulator)
 
         return false
     }
@@ -612,6 +687,8 @@ extension CPU {
                 self.cpx(addressingMode: opcode.addressingMode)
             case .cpyImmediate, .cpyZeroPage, .cpyAbsolute:
                 self.cpy(addressingMode: opcode.addressingMode)
+            case .dcpAbsolute, .dcpAbsoluteX, .dcpAbsoluteY, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectY:
+                self.dcp(addressingMode: opcode.addressingMode)
             case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
                 self.dec(addressingMode: opcode.addressingMode)
             case .dex:
@@ -626,10 +703,14 @@ extension CPU {
                 self.inx()
             case .iny:
                 self.iny()
+            case .isbAbsolute, .isbAbsoluteX, .isbAbsoluteY, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectY:
+                self.isb(addressingMode: opcode.addressingMode)
             case .jmpAbsolute, .jmpIndirect:
                 self.jmp(addressingMode: opcode.addressingMode)
             case .jsr:
                 self.jsr()
+            case .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY:
+                self.lax(addressingMode: opcode.addressingMode)
             case .ldaImmediate, .ldaZeroPage, .ldaZeroPageX, .ldaAbsolute, .ldaAbsoluteX, .ldaAbsoluteY, .ldaIndirectX, .ldaIndirectY:
                 self.lda(addressingMode: opcode.addressingMode)
             case .ldxImmediate, .ldxZeroPage, .ldxZeroPageY, .ldxAbsolute, .ldxAbsoluteY:
@@ -638,7 +719,12 @@ extension CPU {
                 self.ldy(addressingMode: opcode.addressingMode)
             case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
                 self.lsr(addressingMode: opcode.addressingMode)
-            case .nop:
+            case .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit6, .nopImplicit7,
+                    .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
+                    .nopAbsolute,
+                    .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
+                    .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
+                    .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6:
                 self.nop()
             case .oraImmediate, .oraZeroPage, .oraZeroPageX, .oraAbsolute, .oraAbsoluteX, .oraAbsoluteY, .oraIndirectX, .oraIndirectY:
                 self.ora(addressingMode: opcode.addressingMode)
@@ -650,15 +736,21 @@ extension CPU {
                 self.pla()
             case .plp:
                 self.plp()
+            case .rlaAbsolute, .rlaAbsoluteX, .rlaAbsoluteY, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectY:
+                self.rla(addressingMode: opcode.addressingMode)
             case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
                 self.rol(addressingMode: opcode.addressingMode)
             case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
                 self.ror(addressingMode: opcode.addressingMode)
+            case .rraAbsolute, .rraAbsoluteX, .rraAbsoluteY, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectY:
+                self.rra(addressingMode: opcode.addressingMode)
             case .rti:
                 self.rti()
             case .rts:
                 self.rts()
-            case .sbcImmediate, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
+            case .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX:
+                self.sax(addressingMode: opcode.addressingMode)
+            case .sbcImmediate1, .sbcImmediate2, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
                 self.sbc(addressingMode: opcode.addressingMode)
             case .sec:
                 self.sec()
@@ -666,6 +758,10 @@ extension CPU {
                 self.sed()
             case .sei:
                 self.sei()
+            case .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY:
+                self.slo(addressingMode: opcode.addressingMode)
+            case .sreAbsolute, .sreAbsoluteX, .sreAbsoluteY, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectY:
+                self.sre(addressingMode: opcode.addressingMode)
             case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
                 self.sta(addressingMode: opcode.addressingMode)
             case .stxZeroPage, .stxZeroPageY, .stxAbsolute:

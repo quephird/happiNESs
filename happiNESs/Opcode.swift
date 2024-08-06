@@ -68,6 +68,14 @@ enum Opcode: UInt8 {
     case cpyZeroPage = 0xC4
     case cpyAbsolute = 0xCC
 
+    case dcpAbsolute = 0xCF
+    case dcpAbsoluteX = 0xDF
+    case dcpAbsoluteY = 0xDB
+    case dcpZeroPage = 0xC7
+    case dcpZeroPageX = 0xD7
+    case dcpIndirectX = 0xC3
+    case dcpIndirectY = 0xD3
+
     case decZeroPage = 0xC6
     case decZeroPageX = 0xD6
     case decAbsolute = 0xCE
@@ -93,10 +101,26 @@ enum Opcode: UInt8 {
     case inx = 0xE8
     case iny = 0xC8
 
+    case isbAbsolute = 0xEF
+    case isbAbsoluteX = 0xFF
+    case isbAbsoluteY = 0xFB
+    case isbZeroPage = 0xE7
+    case isbZeroPageX = 0xF7
+    case isbIndirectX = 0xE3
+    case isbIndirectY = 0xF3
+
     case jmpAbsolute = 0x4C
     case jmpIndirect = 0x6C
 
     case jsr = 0x20
+
+    case laxImmediate = 0xAB
+    case laxZeroPage = 0xA7
+    case laxZeroPageY = 0xB7
+    case laxAbsolute = 0xAF
+    case laxAbsoluteY = 0xBF
+    case laxIndirectX = 0xA3
+    case laxIndirectY = 0xB3
 
     case ldaImmediate = 0xA9
     case ldaZeroPage = 0xA5
@@ -125,7 +149,34 @@ enum Opcode: UInt8 {
     case lsrAbsolute = 0x4E
     case lsrAbsoluteX = 0x5E
 
-    case nop = 0xEA
+    case nopImplicit1 = 0x1A
+    case nopImplicit2 = 0x3A
+    case nopImplicit3 = 0x5A
+    case nopImplicit4 = 0x7A
+    case nopImplicit5 = 0xDA
+    case nopImplicit6 = 0xEA
+    case nopImplicit7 = 0xFA
+    case nopImmediate1 = 0x80
+    case nopImmediate2 = 0x82
+    case nopImmediate3 = 0x89
+    case nopImmediate4 = 0xC2
+    case nopImmediate5 = 0xE2
+    case nopAbsolute = 0x0C
+    case nopAbsoluteX1 = 0x1C
+    case nopAbsoluteX2 = 0x3C
+    case nopAbsoluteX3 = 0x5C
+    case nopAbsoluteX4 = 0x7C
+    case nopAbsoluteX5 = 0xDC
+    case nopAbsoluteX6 = 0xFC
+    case nopZeroPage1 = 0x04
+    case nopZeroPage2 = 0x44
+    case nopZeroPage3 = 0x64
+    case nopZeroPageX1 = 0x14
+    case nopZeroPageX2 = 0x34
+    case nopZeroPageX3 = 0x54
+    case nopZeroPageX4 = 0x74
+    case nopZeroPageX5 = 0xD4
+    case nopZeroPageX6 = 0xF4
 
     case oraImmediate = 0x09
     case oraZeroPage = 0x05
@@ -141,6 +192,14 @@ enum Opcode: UInt8 {
     case pla = 0x68
     case plp = 0x28
 
+    case rlaAbsolute = 0x2F
+    case rlaAbsoluteX = 0x3F
+    case rlaAbsoluteY = 0x3B
+    case rlaZeroPage = 0x27
+    case rlaZeroPageX = 0x37
+    case rlaIndirectX = 0x23
+    case rlaIndirectY = 0x33
+
     case rolAccumulator = 0x2A
     case rolZeroPage = 0x26
     case rolZeroPageX = 0x36
@@ -153,10 +212,24 @@ enum Opcode: UInt8 {
     case rorAbsolute = 0x6E
     case rorAbsoluteX = 0x7E
 
+    case rraAbsolute = 0x6F
+    case rraAbsoluteX = 0x7F
+    case rraAbsoluteY = 0x7B
+    case rraZeroPage = 0x67
+    case rraZeroPageX = 0x77
+    case rraIndirectX = 0x63
+    case rraIndirectY = 0x73
+
     case rti = 0x40
     case rts = 0x60
 
-    case sbcImmediate = 0xE9
+    case saxAbsolute = 0x8F
+    case saxZeroPage = 0x87
+    case saxZeroPageY = 0x97
+    case saxIndirectX = 0x83
+
+    case sbcImmediate1 = 0xE9
+    case sbcImmediate2 = 0xEB
     case sbcZeroPage = 0xE5
     case sbcZeroPageX = 0xF5
     case sbcAbsolute = 0xED
@@ -168,6 +241,22 @@ enum Opcode: UInt8 {
     case sec = 0x38
     case sed = 0xF8
     case sei = 0x78
+
+    case sloAbsolute = 0x0F
+    case sloAbsoluteX = 0x1F
+    case sloAbsoluteY = 0x1B
+    case sloZeroPage = 0x07
+    case sloZeroPageX = 0x17
+    case sloIndirectX = 0x03
+    case sloIndirectY = 0x13
+
+    case sreAbsolute = 0x4F
+    case sreAbsoluteX = 0x5F
+    case sreAbsoluteY = 0x5B
+    case sreZeroPage = 0x47
+    case sreZeroPageX = 0x57
+    case sreIndirectX = 0x43
+    case sreIndirectY = 0x53
 
     case staZeroPage = 0x85
     case staZeroPageX = 0x95
@@ -258,6 +347,14 @@ extension Opcode {
         case .cpyZeroPage: .zeroPage
         case .cpyAbsolute: .absolute
 
+        case .dcpAbsolute: .absolute
+        case .dcpAbsoluteX: .absoluteX
+        case .dcpAbsoluteY: .absoluteY
+        case .dcpZeroPage: .zeroPage
+        case .dcpZeroPageX: .zeroPageX
+        case .dcpIndirectX: .indirectX
+        case .dcpIndirectY: .indirectY
+
         case .decZeroPage: .zeroPage
         case .decZeroPageX: .zeroPageX
         case .decAbsolute: .absolute
@@ -283,10 +380,26 @@ extension Opcode {
         case .inx: .implicit
         case .iny: .implicit
 
+        case .isbAbsolute: .absolute
+        case .isbAbsoluteX: .absoluteX
+        case .isbAbsoluteY: .absoluteY
+        case .isbZeroPage: .zeroPage
+        case .isbZeroPageX: .zeroPageX
+        case .isbIndirectX: .indirectX
+        case .isbIndirectY: .indirectY
+
         case .jmpAbsolute: .absolute
         case .jmpIndirect: .indirect
 
         case .jsr: .absolute
+
+        case .laxImmediate: .immediate
+        case .laxZeroPage: .zeroPage
+        case .laxZeroPageY: .zeroPageY
+        case .laxAbsolute: .absolute
+        case .laxAbsoluteY: .absoluteY
+        case .laxIndirectX: .indirectX
+        case .laxIndirectY: .indirectY
 
         case .ldaImmediate: .immediate
         case .ldaZeroPage: .zeroPage
@@ -315,7 +428,34 @@ extension Opcode {
         case .lsrAbsolute: .absolute
         case .lsrAbsoluteX: .absoluteX
 
-        case .nop: .implicit
+        case .nopImplicit1: .implicit
+        case .nopImplicit2: .implicit
+        case .nopImplicit3: .implicit
+        case .nopImplicit4: .implicit
+        case .nopImplicit5: .implicit
+        case .nopImplicit6: .implicit
+        case .nopImplicit7: .implicit
+        case .nopImmediate1: .immediate
+        case .nopImmediate2: .immediate
+        case .nopImmediate3: .immediate
+        case .nopImmediate4: .immediate
+        case .nopImmediate5: .immediate
+        case .nopAbsolute: .absolute
+        case .nopAbsoluteX1: .absoluteX
+        case .nopAbsoluteX2: .absoluteX
+        case .nopAbsoluteX3: .absoluteX
+        case .nopAbsoluteX4: .absoluteX
+        case .nopAbsoluteX5: .absoluteX
+        case .nopAbsoluteX6: .absoluteX
+        case .nopZeroPage1: .zeroPage
+        case .nopZeroPage2: .zeroPage
+        case .nopZeroPage3: .zeroPage
+        case .nopZeroPageX1: .zeroPageX
+        case .nopZeroPageX2: .zeroPageX
+        case .nopZeroPageX3: .zeroPageX
+        case .nopZeroPageX4: .zeroPageX
+        case .nopZeroPageX5: .zeroPageX
+        case .nopZeroPageX6: .zeroPageX
 
         case .oraImmediate: .immediate
         case .oraZeroPage: .zeroPage
@@ -331,6 +471,14 @@ extension Opcode {
         case .pla: .implicit
         case .plp: .implicit
 
+        case .rlaAbsolute: .absolute
+        case .rlaAbsoluteX: .absoluteX
+        case .rlaAbsoluteY: .absoluteY
+        case .rlaZeroPage: .zeroPage
+        case .rlaZeroPageX: .zeroPageX
+        case .rlaIndirectX: .indirectX
+        case .rlaIndirectY: .indirectY
+
         case .rolAccumulator: .accumulator
         case .rolZeroPage: .zeroPage
         case .rolZeroPageX: .zeroPageX
@@ -343,10 +491,24 @@ extension Opcode {
         case .rorAbsolute: .absolute
         case .rorAbsoluteX: .absoluteX
 
+        case .rraAbsolute: .absolute
+        case .rraAbsoluteX: .absoluteX
+        case .rraAbsoluteY: .absoluteY
+        case .rraZeroPage: .zeroPage
+        case .rraZeroPageX: .zeroPageX
+        case .rraIndirectX: .indirectX
+        case .rraIndirectY: .indirectY
+
         case .rti: .implicit
         case .rts: .implicit
 
-        case .sbcImmediate: .immediate
+        case .saxAbsolute: .absolute
+        case .saxZeroPage: .zeroPage
+        case .saxZeroPageY: .zeroPageY
+        case .saxIndirectX: .indirectX
+
+        case .sbcImmediate1: .immediate
+        case .sbcImmediate2: .immediate
         case .sbcZeroPage: .zeroPage
         case .sbcZeroPageX: .zeroPageX
         case .sbcAbsolute: .absolute
@@ -358,6 +520,22 @@ extension Opcode {
         case .sec: .implicit
         case .sed: .implicit
         case .sei: .implicit
+
+        case .sloAbsolute: .absolute
+        case .sloAbsoluteX: .absoluteX
+        case .sloAbsoluteY: .absoluteY
+        case .sloZeroPage: .zeroPage
+        case .sloZeroPageX: .zeroPageX
+        case .sloIndirectX: .indirectX
+        case .sloIndirectY: .indirectY
+
+        case .sreAbsolute: .absolute
+        case .sreAbsoluteX: .absoluteX
+        case .sreAbsoluteY: .absoluteY
+        case .sreZeroPage: .zeroPage
+        case .sreZeroPageX: .zeroPageX
+        case .sreIndirectX: .indirectX
+        case .sreIndirectY: .indirectY
 
         case .staZeroPage: .zeroPage
         case .staZeroPageX: .zeroPageX
@@ -448,6 +626,14 @@ extension Opcode {
         case .cpyZeroPage: 2
         case .cpyAbsolute: 3
 
+        case .dcpAbsolute: 3
+        case .dcpAbsoluteX: 3
+        case .dcpAbsoluteY: 3
+        case .dcpZeroPage: 2
+        case .dcpZeroPageX: 2
+        case .dcpIndirectX: 2
+        case .dcpIndirectY: 2
+
         case .decZeroPage: 2
         case .decZeroPageX: 2
         case .decAbsolute: 3
@@ -473,10 +659,26 @@ extension Opcode {
         case .inx: 1
         case .iny: 1
 
+        case .isbAbsolute: 3
+        case .isbAbsoluteX: 3
+        case .isbAbsoluteY: 3
+        case .isbZeroPage: 2
+        case .isbZeroPageX: 2
+        case .isbIndirectX: 2
+        case .isbIndirectY: 2
+
         case .jmpAbsolute: 3
         case .jmpIndirect: 3
 
         case .jsr: 3
+
+        case .laxImmediate: 2
+        case .laxZeroPage: 2
+        case .laxZeroPageY: 2
+        case .laxAbsolute: 3
+        case .laxAbsoluteY: 3
+        case .laxIndirectX: 2
+        case .laxIndirectY: 2
 
         case .ldaImmediate: 2
         case .ldaZeroPage: 2
@@ -505,7 +707,34 @@ extension Opcode {
         case .lsrAbsolute: 3
         case .lsrAbsoluteX: 3
 
-        case .nop: 1
+        case .nopImplicit1: 1
+        case .nopImplicit2: 1
+        case .nopImplicit3: 1
+        case .nopImplicit4: 1
+        case .nopImplicit5: 1
+        case .nopImplicit6: 1
+        case .nopImplicit7: 1
+        case .nopImmediate1: 2
+        case .nopImmediate2: 2
+        case .nopImmediate3: 2
+        case .nopImmediate4: 2
+        case .nopImmediate5: 2
+        case .nopAbsolute: 3
+        case .nopAbsoluteX1: 3
+        case .nopAbsoluteX2: 3
+        case .nopAbsoluteX3: 3
+        case .nopAbsoluteX4: 3
+        case .nopAbsoluteX5: 3
+        case .nopAbsoluteX6: 3
+        case .nopZeroPage1: 2
+        case .nopZeroPage2: 2
+        case .nopZeroPage3: 2
+        case .nopZeroPageX1: 2
+        case .nopZeroPageX2: 2
+        case .nopZeroPageX3: 2
+        case .nopZeroPageX4: 2
+        case .nopZeroPageX5: 2
+        case .nopZeroPageX6: 2
 
         case .oraImmediate: 2
         case .oraZeroPage: 2
@@ -521,6 +750,14 @@ extension Opcode {
         case .pla: 1
         case .plp: 1
 
+        case .rlaAbsolute: 3
+        case .rlaAbsoluteX: 3
+        case .rlaAbsoluteY: 3
+        case .rlaZeroPage: 2
+        case .rlaZeroPageX: 2
+        case .rlaIndirectX: 2
+        case .rlaIndirectY: 2
+
         case .rolAccumulator: 1
         case .rolZeroPage: 2
         case .rolZeroPageX: 2
@@ -533,10 +770,24 @@ extension Opcode {
         case .rorAbsolute: 3
         case .rorAbsoluteX: 3
 
+        case .rraAbsolute: 3
+        case .rraAbsoluteX: 3
+        case .rraAbsoluteY: 3
+        case .rraZeroPage: 2
+        case .rraZeroPageX: 2
+        case .rraIndirectX: 2
+        case .rraIndirectY: 2
+
         case .rti: 1
         case .rts: 1
 
-        case .sbcImmediate: 2
+        case .saxZeroPage: 2
+        case .saxZeroPageY: 2
+        case .saxAbsolute: 3
+        case .saxIndirectX: 2
+
+        case .sbcImmediate1: 2
+        case .sbcImmediate2: 2
         case .sbcZeroPage: 2
         case .sbcZeroPageX: 2
         case .sbcAbsolute: 3
@@ -548,6 +799,22 @@ extension Opcode {
         case .sec: 1
         case .sed: 1
         case .sei: 1
+
+        case .sloAbsolute: 3
+        case .sloAbsoluteX: 3
+        case .sloAbsoluteY: 3
+        case .sloZeroPage: 2
+        case .sloZeroPageX: 2
+        case .sloIndirectX: 2
+        case .sloIndirectY: 2
+
+        case .sreAbsolute: 3
+        case .sreAbsoluteX: 3
+        case .sreAbsoluteY: 3
+        case .sreZeroPage: 2
+        case .sreZeroPageX: 2
+        case .sreIndirectX: 2
+        case .sreIndirectY: 2
 
         case .staZeroPage: 2
         case .staZeroPageX: 2
@@ -580,5 +847,30 @@ extension Opcode {
         let opcodeString = String(describing: self)
         let endIndex = opcodeString.index(opcodeString.startIndex, offsetBy: 2)
         return opcodeString[opcodeString.startIndex ... endIndex].uppercased()
+    }
+}
+
+extension Opcode {
+    var isDocumented: Bool {
+        switch self {
+        case .dcpAbsolute, .dcpAbsoluteX, .dcpAbsoluteY, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectY,
+                .isbAbsolute, .isbAbsoluteX, .isbAbsoluteY, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectY,
+                .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
+                .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
+                .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
+                .nopAbsolute,
+                .nopAbsoluteX1, .nopAbsoluteX2, .nopAbsoluteX3, .nopAbsoluteX4, .nopAbsoluteX5, .nopAbsoluteX6,
+                .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
+                .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
+                .rlaAbsolute, .rlaAbsoluteX, .rlaAbsoluteY, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectY,
+                .rraAbsolute, .rraAbsoluteX, .rraAbsoluteY, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectY,
+                .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
+                .sbcImmediate2,
+                .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY,
+                .sreAbsolute, .sreAbsoluteX, .sreAbsoluteY, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectY:
+            return false
+        default:
+            return true
+        }
     }
 }
