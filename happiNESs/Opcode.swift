@@ -212,6 +212,14 @@ enum Opcode: UInt8 {
     case rorAbsolute = 0x6E
     case rorAbsoluteX = 0x7E
 
+    case rraAbsolute = 0x6F
+    case rraAbsoluteX = 0x7F
+    case rraAbsoluteY = 0x7B
+    case rraZeroPage = 0x67
+    case rraZeroPageX = 0x77
+    case rraIndirectX = 0x63
+    case rraIndirectY = 0x73
+
     case rti = 0x40
     case rts = 0x60
 
@@ -482,6 +490,14 @@ extension Opcode {
         case .rorZeroPageX: .zeroPageX
         case .rorAbsolute: .absolute
         case .rorAbsoluteX: .absoluteX
+
+        case .rraAbsolute: .absolute
+        case .rraAbsoluteX: .absoluteX
+        case .rraAbsoluteY: .absoluteY
+        case .rraZeroPage: .zeroPage
+        case .rraZeroPageX: .zeroPageX
+        case .rraIndirectX: .indirectX
+        case .rraIndirectY: .indirectY
 
         case .rti: .implicit
         case .rts: .implicit
@@ -754,6 +770,14 @@ extension Opcode {
         case .rorAbsolute: 3
         case .rorAbsoluteX: 3
 
+        case .rraAbsolute: 3
+        case .rraAbsoluteX: 3
+        case .rraAbsoluteY: 3
+        case .rraZeroPage: 2
+        case .rraZeroPageX: 2
+        case .rraIndirectX: 2
+        case .rraIndirectY: 2
+
         case .rti: 1
         case .rts: 1
 
@@ -839,6 +863,7 @@ extension Opcode {
                 .nopZeroPage1, .nopZeroPage2, .nopZeroPage3,
                 .nopZeroPageX1, .nopZeroPageX2, .nopZeroPageX3, .nopZeroPageX4, .nopZeroPageX5, .nopZeroPageX6,
                 .rlaAbsolute, .rlaAbsoluteX, .rlaAbsoluteY, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectY,
+                .rraAbsolute, .rraAbsoluteX, .rraAbsoluteY, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectY,
                 .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
                 .sbcImmediate2,
                 .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY,

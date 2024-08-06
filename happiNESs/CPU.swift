@@ -471,6 +471,16 @@ extension CPU {
         return false
     }
 
+    mutating func rra(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
+        self.writeByte(address: address, byte: (value >> 1) | oldCarry << 7)
+        self.statusRegister[.carry] = (value & 0b0000_0001) == 1
+
+        return self.adc(addressingMode: addressingMode)
+    }
+
     mutating func rti() -> Bool {
         self.statusRegister.rawValue = self.popStack()
         self.statusRegister[.break] = false
@@ -732,6 +742,8 @@ extension CPU {
                 self.rol(addressingMode: opcode.addressingMode)
             case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
                 self.ror(addressingMode: opcode.addressingMode)
+            case .rraAbsolute, .rraAbsoluteX, .rraAbsoluteY, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectY:
+                self.rra(addressingMode: opcode.addressingMode)
             case .rti:
                 self.rti()
             case .rts:
