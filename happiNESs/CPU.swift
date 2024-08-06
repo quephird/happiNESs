@@ -546,6 +546,15 @@ extension CPU {
         return self.ora(addressingMode: addressingMode)
     }
 
+    mutating func sre(addressingMode: AddressingMode) -> Bool {
+        let address = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+        self.writeByte(address: address, byte: value >> 1)
+        self.statusRegister[.carry] = (value & 0b0000_0001) == 1
+
+        return self.eor(addressingMode: addressingMode)
+    }
+
     mutating func sta(addressingMode: AddressingMode) -> Bool {
         let address = self.getAbsoluteAddress(addressingMode: addressingMode)
         self.writeByte(address: address, byte: self.accumulator)
@@ -739,6 +748,8 @@ extension CPU {
                 self.sei()
             case .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY:
                 self.slo(addressingMode: opcode.addressingMode)
+            case .sreAbsolute, .sreAbsoluteX, .sreAbsoluteY, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectY:
+                self.sre(addressingMode: opcode.addressingMode)
             case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
                 self.sta(addressingMode: opcode.addressingMode)
             case .stxZeroPage, .stxZeroPageY, .stxAbsolute:
