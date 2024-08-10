@@ -796,11 +796,9 @@ extension CPU {
         }
     }
 
-    func getAbsoluteAddress(addressingMode: AddressingMode) -> UInt16 {
-        return getAbsoluteAddress(addressingMode: addressingMode, address: self.programCounter)
-    }
+    mutating func getAbsoluteAddress(addressingMode: AddressingMode) -> UInt16 {
+        let address = self.programCounter
 
-    func getAbsoluteAddress(addressingMode: AddressingMode, address: UInt16) -> UInt16 {
         switch addressingMode {
         case .immediate:
             return address
@@ -863,10 +861,10 @@ extension CPU {
         }
     }
 
-    func readWord(address: UInt16) -> UInt16 {
+    mutating func readWord(address: UInt16) -> UInt16 {
         let lowByte = self.readByte(address: address)
         let highByte = self.readByte(address: address + 1)
-        return UInt16(highByte) << 8 | UInt16(lowByte)
+        return UInt16(lowByte: lowByte, highByte: highByte)
     }
 
     mutating func writeWord(address: UInt16, word: UInt16) {
@@ -876,7 +874,7 @@ extension CPU {
         self.writeByte(address: address + 1, byte: highByte);
     }
 
-    func readByte(address: UInt16) -> UInt8 {
+    mutating func readByte(address: UInt16) -> UInt8 {
         self.bus.readByte(address: address)
     }
 
@@ -892,7 +890,7 @@ extension CPU {
 }
 
 extension CPU {
-    public func makeScreenBuffer() -> [NESColor] {
+    mutating public func makeScreenBuffer() -> [NESColor] {
         (0x0200 ..< 0x0600).map({ address in
             NESColor(byte: self.readByte(address: address))
         })

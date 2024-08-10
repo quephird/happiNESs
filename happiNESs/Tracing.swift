@@ -9,18 +9,18 @@ func trace(cpu: CPU) -> String {
     var trace = ""
     trace += String(format: "%04X", cpu.programCounter) + "  "
 
-    let byte = cpu.readByte(address: cpu.programCounter)
+    let byte = cpu.readByteWithoutMutating(address: cpu.programCounter)
     trace += String(format: "%02X", byte) + " "
     let opcode = Opcode(rawValue: byte)!
     switch opcode.instructionLength {
     case 1:
         trace += "      "
     case 2:
-        trace += String(format: "%02X", cpu.readByte(address: cpu.programCounter + 1))
+        trace += String(format: "%02X", cpu.readByteWithoutMutating(address: cpu.programCounter + 1))
         trace += "    "
     case 3:
-        trace += String(format: "%02X", cpu.readByte(address: cpu.programCounter + 1)) + " "
-        trace += String(format: "%02X", cpu.readByte(address: cpu.programCounter + 2))
+        trace += String(format: "%02X", cpu.readByteWithoutMutating(address: cpu.programCounter + 1)) + " "
+        trace += String(format: "%02X", cpu.readByteWithoutMutating(address: cpu.programCounter + 2))
         trace += " "
     default:
         fatalError("Tracing halted; opcode with unexpected length encountered!")
@@ -32,13 +32,13 @@ func trace(cpu: CPU) -> String {
 
     let absoluteAddress: UInt16 = switch opcode.addressingMode {
     case .accumulator, .immediate, .implicit: 0
-    default: cpu.getAbsoluteAddress(addressingMode: opcode.addressingMode, address: cpu.programCounter + 1)
+    default: cpu.getAbsoluteAddressWithoutMutating(addressingMode: opcode.addressingMode, address: cpu.programCounter + 1)
     }
     let value: UInt8 = switch opcode.addressingMode {
     case .accumulator, .immediate, .implicit:
         0
     default:
-        cpu.readByte(address: absoluteAddress)
+        cpu.readByteWithoutMutating(address: absoluteAddress)
     }
 
     let partialAsm: String
@@ -48,7 +48,7 @@ func trace(cpu: CPU) -> String {
         default: ""
         }
     } else if opcode.instructionLength == 2 {
-        let nextByte = cpu.readByte(address: cpu.programCounter + 1)
+        let nextByte = cpu.readByteWithoutMutating(address: cpu.programCounter + 1)
 
         switch opcode.addressingMode {
         case .immediate:
@@ -74,17 +74,17 @@ func trace(cpu: CPU) -> String {
         default: fatalError("Unexpected addressing mode encountered while tracing!")
         }
     } else if opcode.instructionLength == 3 {
-        let address = cpu.readWord(address: cpu.programCounter + 1)
+        let address = cpu.readWordWithoutMutating(address: cpu.programCounter + 1)
 
         switch opcode.addressingMode {
         case .indirect:
             let jumpAddress: UInt16
             if address & 0x00FF == 0x00FF {
-                let lowByte = cpu.readByte(address: address)
-                let highByte = cpu.readByte(address: address & 0xFF00)
+                let lowByte = cpu.readByteWithoutMutating(address: address)
+                let highByte = cpu.readByteWithoutMutating(address: address & 0xFF00)
                 jumpAddress = UInt16(highByte) << 8 | UInt16(lowByte)
             } else {
-                jumpAddress = cpu.readWord(address: address)
+                jumpAddress = cpu.readWordWithoutMutating(address: address)
             }
 
             partialAsm = String(format: "($%04X) = %04X", address, jumpAddress)

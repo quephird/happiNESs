@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		87184D032C67D9DD0003D090 /* CPU+withoutMutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D022C67D9DD0003D090 /* CPU+withoutMutation.swift */; };
 		871931F02C30BB2900A73C22 /* happiNESsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871931EF2C30BB2900A73C22 /* happiNESsApp.swift */; };
 		871931F22C30BB2900A73C22 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871931F12C30BB2900A73C22 /* ContentView.swift */; };
 		871931F42C30BB2C00A73C22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 871931F32C30BB2C00A73C22 /* Assets.xcassets */; };
@@ -22,6 +23,10 @@
 		871932142C3798B400A73C22 /* Rom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932132C3798B400A73C22 /* Rom.swift */; };
 		871F622D2C5C3C8A00132962 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 871F622C2C5C3C8900132962 /* nestest.nes */; };
 		871F622E2C5C3C8A00132962 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 871F622C2C5C3C8900132962 /* nestest.nes */; };
+		871F62302C62FE9E00132962 /* PPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F622F2C62FE9E00132962 /* PPU.swift */; };
+		871F62322C6314C900132962 /* AddressRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62312C6314C900132962 /* AddressRegister.swift */; };
+		871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62332C6541D300132962 /* UInt16+bytes.swift */; };
+		871F62362C65631F00132962 /* ControllerRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62352C65631F00132962 /* ControllerRegister.swift */; };
 		8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1762C1CB9B3001B44B5 /* happiNESs.docc */; };
 		8744B17D2C1CB9B3001B44B5 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
 		8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1812C1CB9B3001B44B5 /* CPUTests.swift */; };
@@ -70,6 +75,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		87184D022C67D9DD0003D090 /* CPU+withoutMutation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CPU+withoutMutation.swift"; sourceTree = "<group>"; };
 		871931ED2C30BB2900A73C22 /* happiNESsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = happiNESsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		871931EF2C30BB2900A73C22 /* happiNESsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = happiNESsApp.swift; sourceTree = "<group>"; };
 		871931F12C30BB2900A73C22 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -84,6 +90,10 @@
 		871932112C37985700A73C22 /* Mirroring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mirroring.swift; sourceTree = "<group>"; };
 		871932132C3798B400A73C22 /* Rom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rom.swift; sourceTree = "<group>"; };
 		871F622C2C5C3C8900132962 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
+		871F622F2C62FE9E00132962 /* PPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPU.swift; sourceTree = "<group>"; };
+		871F62312C6314C900132962 /* AddressRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressRegister.swift; sourceTree = "<group>"; };
+		871F62332C6541D300132962 /* UInt16+bytes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt16+bytes.swift"; sourceTree = "<group>"; };
+		871F62352C65631F00132962 /* ControllerRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerRegister.swift; sourceTree = "<group>"; };
 		8744B1722C1CB9B3001B44B5 /* happiNESs.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = happiNESs.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8744B1752C1CB9B3001B44B5 /* happiNESs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = happiNESs.h; sourceTree = "<group>"; };
 		8744B1762C1CB9B3001B44B5 /* happiNESs.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = happiNESs.docc; sourceTree = "<group>"; };
@@ -186,15 +196,20 @@
 				8744B1752C1CB9B3001B44B5 /* happiNESs.h */,
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
+				871F62312C6314C900132962 /* AddressRegister.swift */,
 				8719320F2C372F6900A73C22 /* Bus.swift */,
+				871F62352C65631F00132962 /* ControllerRegister.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
+				87184D022C67D9DD0003D090 /* CPU+withoutMutation.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
+				871F622F2C62FE9E00132962 /* PPU.swift */,
 				871932132C3798B400A73C22 /* Rom.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
+				871F62332C6541D300132962 /* UInt16+bytes.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -367,7 +382,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */,
+				871F62322C6314C900132962 /* AddressRegister.swift in Sources */,
+				871F62302C62FE9E00132962 /* PPU.swift in Sources */,
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
+				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
@@ -375,7 +393,9 @@
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
+				87184D032C67D9DD0003D090 /* CPU+withoutMutation.swift in Sources */,
 				871932142C3798B400A73C22 /* Rom.swift in Sources */,
+				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

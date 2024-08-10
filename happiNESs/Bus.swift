@@ -11,12 +11,16 @@ public struct Bus {
     static let ppuRegistersMirrorsBegin: UInt16 = 0x2000;
     static let ppuRegistersMirrorsEnd: UInt16 = 0x3FFF;
 
+    var ppu: PPU
     var vram: [UInt8]
-    var rom: Rom
+    var prgRom: [UInt8]
 
     public init(rom: Rom) {
+        let ppu = PPU(chrRom: rom.chrRom, mirroring: rom.mirroring)
+
+        self.ppu = ppu
         self.vram = [UInt8](repeating: 0x00, count: 2048)
-        self.rom = rom
+        self.prgRom = rom.prgRom
     }
 }
 
@@ -25,26 +29,43 @@ extension Bus {
         var addressOffset = address - 0x8000
 
         // Mirror if needed
-        if self.rom.prgRom.count == 0x4000 && addressOffset >= 0x4000 {
+        if self.prgRom.count == 0x4000 && addressOffset >= 0x4000 {
             addressOffset = addressOffset % 0x4000
         }
 
-        return self.rom.prgRom[Int(addressOffset)]
+        return self.prgRom[Int(addressOffset)]
     }
 
-    func readByte(address: UInt16) -> UInt8 {
+    func readByteWithoutMutating(address: UInt16) -> UInt8 {
         switch address {
         case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
             return self.vram[vramAddress]
-        case Self.ppuRegistersMirrorsBegin ... Self.ppuRegistersMirrorsEnd:
-            let ppuAddress = Int(address & 0b0010_0000_0000_0111)
-            fatalError("TODO! Implement PPU access!")
+        case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006, 0x4014:
+            let message = String(format: "Attempt to read from write-only PPU address: %04X", address)
+            fatalError(message)
+        case 0x2007:
+            return self.ppu.readByteWithoutMutating().result
+        case 0x2008...Self.ppuRegistersMirrorsEnd:
+            let mirrorDownAddress = address & 0b0010_0000_0000_0111
+            return self.readByteWithoutMutating(address: mirrorDownAddress)
         case 0x8000 ... 0xFFFF:
             return self.readPrgRom(address: address)
         default:
             print("TODO: Implement memory reading for this address: \(address)")
             return 0x00
+        }
+    }
+
+    mutating func readByte(address: UInt16) -> UInt8 {
+        switch address {
+        case 0x2007:
+            return self.ppu.readByte()
+        case 0x2008...Self.ppuRegistersMirrorsEnd:
+            let mirrorDownAddress = address & 0b0010_0000_0000_0111
+            return self.readByte(address: mirrorDownAddress)
+        default:
+            return self.readByteWithoutMutating(address: address)
         }
     }
 
@@ -56,6 +77,15 @@ extension Bus {
         case Self.ppuRegistersMirrorsBegin ... Self.ppuRegistersMirrorsEnd:
             let ppuAddress = Int(address & 0b0010_0000_0000_0111)
             fatalError("TODO! Implement PPU access!")
+        case 0x2000:
+            self.ppu.updateController(byte: byte)
+        case 0x2006:
+            self.ppu.updateAddress(byte: byte)
+        case 0x2007:
+            self.ppu.writeByte(byte: byte)
+        case 0x2008...Self.ppuRegistersMirrorsEnd:
+            let mirrorDownAddr = address & 0b0010_0000_0000_0111
+            self.writeByte(address: mirrorDownAddr, byte: byte)
         case 0x8000 ... 0xFFFF:
             fatalError("Attempt to write to cartridge ROM space")
         default:
