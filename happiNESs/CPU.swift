@@ -295,10 +295,8 @@ extension CPU {
         let subroutineAddress = self.getAbsoluteAddress(addressingMode: .absolute);
         // ACHTUNG!!! Note that this is pointing to the last byte of the `JSR` instruction!
         let returnAddress = self.programCounter + 2 - 1
-        let returnAddressHigh = UInt8(returnAddress >> 8)
-        let returnAddressLow = UInt8(returnAddress & 0xFF)
-        self.pushStack(byte: returnAddressHigh)
-        self.pushStack(byte: returnAddressLow)
+        self.pushStack(byte: returnAddress.highByte)
+        self.pushStack(byte: returnAddress.lowByte)
         self.programCounter = subroutineAddress
 
         return true
@@ -488,7 +486,7 @@ extension CPU {
 
         let addressLow = self.popStack()
         let addressHigh = self.popStack()
-        let address = UInt16(addressHigh) << 8 | UInt16(addressLow)
+        let address = UInt16(lowByte: addressLow, highByte: addressHigh)
         self.programCounter = address
 
         return true
@@ -498,7 +496,7 @@ extension CPU {
         let addressLow = self.popStack()
         let addressHigh = self.popStack()
         // ACHTUNG!!! Note that this only works in conjunction with the `JSR` instruction!
-        let address = UInt16(addressHigh) << 8 | UInt16(addressLow) + 1
+        let address = UInt16(lowByte: addressLow, highByte: addressHigh) + 1
         self.programCounter = address
 
         return true
@@ -825,7 +823,7 @@ extension CPU {
             if baseAddress & 0x00FF == 0x00FF {
                 let lowByte = self.readByte(address: baseAddress)
                 let highByte = self.readByte(address: baseAddress & 0xFF00)
-                return UInt16(highByte) << 8 | UInt16(lowByte)
+                return UInt16(lowByte: lowByte, highByte: highByte)
             }
 
             return self.readWord(address: baseAddress)
@@ -837,7 +835,7 @@ extension CPU {
             let lowByte = self.readByte(address: UInt16(indirectAddress))
             let highByte = self.readByte(address: UInt16(indirectAddress &+ 1))
 
-            return UInt16(highByte) << 8 | UInt16(lowByte)
+            return UInt16(lowByte: lowByte, highByte: highByte)
         case .indirectY:
             // operand_ptr = *((void **)constant_byte) + y_register
             let baseAddress = self.readByte(address: address)
@@ -845,7 +843,7 @@ extension CPU {
             let lowByte = self.readByte(address: UInt16(baseAddress))
             let highByte = self.readByte(address: UInt16(baseAddress &+ 1))
 
-            let indirectAddress = UInt16(highByte) << 8 | UInt16(lowByte)
+            let indirectAddress = UInt16(lowByte: lowByte, highByte: highByte)
             return indirectAddress &+ UInt16(self.yRegister)
         case .relative:
             let offset = UInt16(self.readByte(address: address)) &+ 1
@@ -868,10 +866,8 @@ extension CPU {
     }
 
     mutating func writeWord(address: UInt16, word: UInt16) {
-        let lowByte = UInt8(word & 0xFF)
-        let highByte = UInt8(word >> 8)
-        self.writeByte(address: address, byte: lowByte);
-        self.writeByte(address: address + 1, byte: highByte);
+        self.writeByte(address: address, byte: word.lowByte);
+        self.writeByte(address: address + 1, byte: word.highByte);
     }
 
     mutating func readByte(address: UInt16) -> UInt8 {
