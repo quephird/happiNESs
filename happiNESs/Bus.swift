@@ -14,6 +14,7 @@ public struct Bus {
     var ppu: PPU
     var vram: [UInt8]
     var prgRom: [UInt8]
+    var cycles: Int
 
     public init(rom: Rom) {
         let ppu = PPU(chrRom: rom.chrRom, mirroring: rom.mirroring)
@@ -21,6 +22,7 @@ public struct Bus {
         self.ppu = ppu
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.prgRom = rom.prgRom
+        self.cycles = 0
     }
 }
 
@@ -91,5 +93,16 @@ extension Bus {
         default:
             print("TODO: Implement memory writing for this address: \(address)")
         }
+    }
+}
+
+extension Bus {
+    mutating func tick(cycles: Int) {
+        self.cycles += cycles
+        let _ = self.ppu.tick(cpuCycles: cycles)
+    }
+
+    func pollNmiStatus() -> UInt8? {
+        return self.ppu.nmiInterrupt
     }
 }

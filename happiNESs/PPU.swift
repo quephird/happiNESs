@@ -6,6 +6,10 @@
 //
 
 public struct PPU {
+    public static let scanlinesPerFrame = 262
+    public static let ppuCyclesPerScanline = 341
+    public static let nmiInterruptScanline = 241
+
     public var internalDataBuffer: UInt8
     public var chrRom: [UInt8]
     public var paletteTable: [UInt8]
@@ -14,6 +18,11 @@ public struct PPU {
     public var mirroring: Mirroring
     public var addressRegister: AddressRegister
     public var controllerRegister: ControllerRegister
+    public var statusRegister: PPUStatusRegister
+    public var nmiInterrupt: UInt8?
+
+    private var cycles: Int
+    private var scanline: UInt16
 
     public init(chrRom: [UInt8], mirroring: Mirroring) {
         self.internalDataBuffer = 0x00
@@ -24,6 +33,11 @@ public struct PPU {
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
         self.addressRegister = AddressRegister()
         self.controllerRegister = ControllerRegister()
+        self.statusRegister = PPUStatusRegister()
+
+        self.cycles = 0
+        self.scanline = 0
+        self.nmiInterrupt = nil
     }
 }
 
@@ -132,5 +146,32 @@ extension PPU {
         }
 
         self.incrementVramAddress()
+    }
+}
+
+extension PPU {
+    mutating func tick(cpuCycles: Int) -> Bool {
+        self.cycles += cpuCycles * 3
+
+        if self.cycles >= Self.ppuCyclesPerScanline {
+            self.cycles -= Self.ppuCyclesPerScanline
+            self.scanline += 1
+
+            if self.scanline == Self.nmiInterruptScanline {
+                if self.controllerRegister[.generateNmi] {
+                    self.statusRegister[.verticalBlankStarted] = true
+                    // TODO: Need to trigger NMI interrupt!
+                }
+            }
+
+            if self.scanline >= Self.scanlinesPerFrame {
+                self.scanline = 0
+                self.statusRegister[.verticalBlankStarted] = false
+
+                return true
+            }
+        }
+
+        return false
     }
 }

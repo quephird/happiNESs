@@ -874,3 +874,284 @@ extension Opcode {
         }
     }
 }
+
+extension Opcode {
+    var cycles: Int {
+        switch self {
+        case .adcImmediate: 2
+        case .adcZeroPage: 3
+        case .adcZeroPageX: 4
+        case .adcAbsolute: 4
+        case .adcAbsoluteX: 4
+        case .adcAbsoluteY: 4
+        case .adcIndirectX: 6
+        case .adcIndirectY: 5
+
+        case .andImmediate: 2
+        case .andZeroPage: 3
+        case .andZeroPageX: 4
+        case .andAbsolute: 4
+        case .andAbsoluteX: 4
+        case .andAbsoluteY: 4
+        case .andIndirectX: 6
+        case .andIndirectY: 5
+
+        case .aslAccumulator: 2
+        case .aslZeroPage: 5
+        case .aslZeroPageX: 6
+        case .aslAbsolute: 6
+        case .aslAbsoluteX: 7
+
+        case .bcc: 2
+        case .bcs: 2
+        case .beq: 2
+
+        case .bitZeroPage: 3
+        case .bitAbsolute: 4
+
+        case .bmi: 2
+        case .bne: 2
+        case .bpl: 2
+
+        case .brk: 7
+
+        case .bvc: 2
+        case .bvs: 2
+
+        case .clc: 2
+        case .cld: 2
+        case .cli: 2
+        case .clv: 2
+
+        case .cmpImmediate: 2
+        case .cmpZeroPage: 3
+        case .cmpZeroPageX: 4
+        case .cmpAbsolute: 4
+        case .cmpAbsoluteX: 4
+        case .cmpAbsoluteY: 4
+        case .cmpIndirectX: 6
+        case .cmpIndirectY: 5
+
+        case .cpxImmediate: 2
+        case .cpxZeroPage: 3
+        case .cpxAbsolute: 4
+
+        case .cpyImmediate: 2
+        case .cpyZeroPage: 3
+        case .cpyAbsolute: 4
+
+        case .dcpAbsolute: 6
+        case .dcpAbsoluteX: 7
+        case .dcpAbsoluteY: 7
+        case .dcpZeroPage: 5
+        case .dcpZeroPageX: 6
+        case .dcpIndirectX: 8
+        case .dcpIndirectY: 8
+
+        case .decZeroPage: 5
+        case .decZeroPageX: 6
+        case .decAbsolute: 6
+        case .decAbsoluteX: 7
+
+        case .dex: 2
+        case .dey: 2
+
+        case .eorImmediate: 2
+        case .eorZeroPage: 3
+        case .eorZeroPageX: 4
+        case .eorAbsolute: 4
+        case .eorAbsoluteX: 4
+        case .eorAbsoluteY: 4
+        case .eorIndirectX: 6
+        case .eorIndirectY: 5
+
+        case .incZeroPage: 5
+        case .incZeroPageX: 6
+        case .incAbsolute: 6
+        case .incAbsoluteX: 7
+
+        case .inx: 2
+        case .iny: 2
+
+        case .isbAbsolute: 6
+        case .isbAbsoluteX: 7
+        case .isbAbsoluteY: 7
+        case .isbZeroPage: 5
+        case .isbZeroPageX: 6
+        case .isbIndirectX: 8
+        case .isbIndirectY: 8
+
+        case .jmpAbsolute: 3
+        case .jmpIndirect: 5
+
+        case .jsr: 6
+
+        case .laxImmediate: 2
+        case .laxZeroPage: 3
+        case .laxZeroPageY: 4
+        case .laxAbsolute: 4
+        case .laxAbsoluteY: 4
+        case .laxIndirectX: 6
+        case .laxIndirectY: 5
+
+        case .ldaImmediate: 2
+        case .ldaZeroPage: 3
+        case .ldaZeroPageX: 4
+        case .ldaAbsolute: 4
+        case .ldaAbsoluteX: 4
+        case .ldaAbsoluteY: 4
+        case .ldaIndirectX: 6
+        case .ldaIndirectY: 5
+
+        case .ldxImmediate: 2
+        case .ldxZeroPage: 3
+        case .ldxZeroPageY: 4
+        case .ldxAbsolute: 4
+        case .ldxAbsoluteY: 4
+
+        case .ldyImmediate: 2
+        case .ldyZeroPage: 3
+        case .ldyZeroPageX: 4
+        case .ldyAbsolute: 4
+        case .ldyAbsoluteX: 4
+
+        case .lsrAccumulator: 2
+        case .lsrZeroPage: 5
+        case .lsrZeroPageX: 6
+        case .lsrAbsolute: 6
+        case .lsrAbsoluteX: 7
+
+        case .nopImplicit1: 2
+        case .nopImplicit2: 2
+        case .nopImplicit3: 2
+        case .nopImplicit4: 2
+        case .nopImplicit5: 2
+        case .nopImplicit6: 2
+        case .nopImplicit7: 2
+        case .nopImmediate1: 2
+        case .nopImmediate2: 2
+        case .nopImmediate3: 2
+        case .nopImmediate4: 2
+        case .nopImmediate5: 2
+        case .nopAbsolute: 4
+        case .nopAbsoluteX1: 4
+        case .nopAbsoluteX2: 4
+        case .nopAbsoluteX3: 4
+        case .nopAbsoluteX4: 4
+        case .nopAbsoluteX5: 4
+        case .nopAbsoluteX6: 4
+        case .nopZeroPage1: 3
+        case .nopZeroPage2: 3
+        case .nopZeroPage3: 3
+        case .nopZeroPageX1: 4
+        case .nopZeroPageX2: 4
+        case .nopZeroPageX3: 4
+        case .nopZeroPageX4: 4
+        case .nopZeroPageX5: 4
+        case .nopZeroPageX6: 4
+
+        case .oraImmediate: 2
+        case .oraZeroPage: 3
+        case .oraZeroPageX: 4
+        case .oraAbsolute: 4
+        case .oraAbsoluteX: 4
+        case .oraAbsoluteY: 4
+        case .oraIndirectX: 6
+        case .oraIndirectY: 5
+
+        case .pha: 3
+        case .php: 3
+        case .pla: 4
+        case .plp: 4
+
+        case .rlaAbsolute: 6
+        case .rlaAbsoluteX: 7
+        case .rlaAbsoluteY: 7
+        case .rlaZeroPage: 5
+        case .rlaZeroPageX: 6
+        case .rlaIndirectX: 8
+        case .rlaIndirectY: 8
+
+        case .rolAccumulator: 2
+        case .rolZeroPage: 5
+        case .rolZeroPageX: 6
+        case .rolAbsolute: 6
+        case .rolAbsoluteX: 7
+
+        case .rorAccumulator: 2
+        case .rorZeroPage: 5
+        case .rorZeroPageX: 6
+        case .rorAbsolute: 6
+        case .rorAbsoluteX: 7
+
+        case .rraAbsolute: 6
+        case .rraAbsoluteX: 7
+        case .rraAbsoluteY: 7
+        case .rraZeroPage: 5
+        case .rraZeroPageX: 6
+        case .rraIndirectX: 8
+        case .rraIndirectY: 8
+
+        case .rti: 6
+        case .rts: 6
+
+        case .saxZeroPage: 3
+        case .saxZeroPageY: 4
+        case .saxAbsolute: 4
+        case .saxIndirectX: 6
+
+        case .sbcImmediate1: 2
+        case .sbcImmediate2: 2
+        case .sbcZeroPage: 3
+        case .sbcZeroPageX: 4
+        case .sbcAbsolute: 4
+        case .sbcAbsoluteX: 4
+        case .sbcAbsoluteY: 4
+        case .sbcIndirectX: 6
+        case .sbcIndirectY: 5
+
+        case .sec: 2
+        case .sed: 2
+        case .sei: 2
+
+        case .sloAbsolute: 6
+        case .sloAbsoluteX: 7
+        case .sloAbsoluteY: 7
+        case .sloZeroPage: 5
+        case .sloZeroPageX: 6
+        case .sloIndirectX: 8
+        case .sloIndirectY: 8
+
+        case .sreAbsolute: 6
+        case .sreAbsoluteX: 7
+        case .sreAbsoluteY: 7
+        case .sreZeroPage: 5
+        case .sreZeroPageX: 6
+        case .sreIndirectX: 8
+        case .sreIndirectY: 8
+
+        case .staZeroPage: 3
+        case .staZeroPageX: 4
+        case .staAbsolute: 4
+        case .staAbsoluteX: 5
+        case .staAbsoluteY: 5
+        case .staIndirectX: 6
+        case .staIndirectY: 6
+
+        case .stxZeroPage: 3
+        case .stxZeroPageY: 4
+        case .stxAbsolute: 4
+
+        case .styZeroPage: 3
+        case .styZeroPageY: 4
+        case .styAbsolute: 4
+
+        case .tax: 2
+        case .tay: 2
+        case .tsx: 2
+        case .txa: 2
+        case .txs: 2
+        case .tya: 2
+        }
+    }
+}
