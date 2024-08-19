@@ -25,11 +25,11 @@ enum NESError: Error {
     // really interested in changes to `Console`'s state such that at least of the underlying
     // pixels has changed, namely any of the elements of  `screenBuffer`.
     @ObservationIgnored var cpu: CPU
-    var screenBuffer: [NESColor] = [NESColor](repeating: .black, count: 32*32)
+    var screenBuffer: [NESColor] = PPU.makeEmptyScreenBuffer()
 
     internal init() throws {
         guard let filePath = Bundle.main.url(
-            forResource: "nestest.nes",
+            forResource: "pacman.nes",
             withExtension: nil) else {
             throw NESError.romCouldNotBeFound
         }

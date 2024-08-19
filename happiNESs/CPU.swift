@@ -920,9 +920,7 @@ extension CPU {
 
 extension CPU {
     mutating public func makeScreenBuffer() -> [NESColor] {
-        (0x0200 ..< 0x0600).map({ address in
-            NESColor(byte: self.readByte(address: address))
-        })
+        self.bus.ppu.makeScreenBuffer()
     }
 }
 

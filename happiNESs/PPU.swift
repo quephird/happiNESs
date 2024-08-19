@@ -6,6 +6,9 @@
 //
 
 public struct PPU {
+    public static let width = 256
+    public static let height = 240
+
     public static let scanlinesPerFrame = 262
     public static let ppuCyclesPerScanline = 341
     public static let nmiInterruptScanline = 241
@@ -173,5 +176,54 @@ extension PPU {
         }
 
         return false
+    }
+}
+
+extension PPU {
+    func bytesForTileAt(bank: Int, tileNumber: Int) -> ArraySlice<UInt8> {
+        let startIndex = (bank * 0x1000) + tileNumber * 16
+        return self.chrRom[startIndex..<startIndex + 16]
+    }
+
+    static public func makeEmptyScreenBuffer() -> [NESColor] {
+        [NESColor](repeating: .black, count: Self.width * Self.height)
+    }
+
+    public func makeScreenBuffer() -> [NESColor] {
+        var screenBuffer = Self.makeEmptyScreenBuffer()
+
+        for tileNumber in 0..<256 {
+            let screenY = (tileNumber / 20) * 10 + 2
+            let screenX = (tileNumber % 20) * 10 + 2
+            self.drawTile(to: &screenBuffer, bank: 0, tileNumber: tileNumber, screenX: screenX, screenY: screenY)
+        }
+
+        return screenBuffer
+    }
+
+    public func drawTile(to screenBuffer: inout [NESColor],
+                         bank: Int,
+                         tileNumber: Int,
+                         screenX: Int,
+                         screenY: Int) {
+        let tileBytes = bytesForTileAt(bank: bank, tileNumber: tileNumber)
+
+        for (tileY, var (upperByte, lowerByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
+            for tileX in (0 ... 7).reversed() {
+                let colorIndex = (upperByte & 0x01) << 1 | (lowerByte & 0x01)
+                upperByte >>= 1
+                lowerByte >>= 1
+
+                let color = switch colorIndex {
+                case 0: NESColor.systemPalette[0x01]
+                case 1: NESColor.systemPalette[0x23]
+                case 2: NESColor.systemPalette[0x27]
+                case 3: NESColor.systemPalette[0x30]
+                default: fatalError("can't be")
+                }
+
+                screenBuffer[Self.width * (screenY + tileY) + (screenX + tileX)] = color
+            }
+        }
     }
 }
