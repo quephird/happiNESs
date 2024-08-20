@@ -24,8 +24,8 @@ public struct PPU {
     public var statusRegister: PPUStatusRegister
     public var nmiInterrupt: UInt8?
 
-    private var cycles: Int
-    private var scanline: UInt16
+    public var cycles: Int
+    public var scanline: UInt16
 
     public init(chrRom: [UInt8], mirroring: Mirroring) {
         self.internalDataBuffer = 0x00

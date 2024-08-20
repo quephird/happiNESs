@@ -49,7 +49,9 @@ public struct CPU {
 //        self.programCounter = 0x8600
         self.programCounter = 0xC000
 
-        // TODO: Need to implement Bus.reset()
+        // TODO: Look more deeply into whether or not this is the best strategy
+        // for simulating the initial number of CPU cycles when resetting the CPU
+        self.bus.tick(cycles: 7)
     }
 }
 
@@ -844,11 +846,13 @@ extension CPU {
         case .absolute:
             return (self.readWord(address: address), false)
         case .absoluteX:
-            let newAddress = self.readWord(address: address) &+ UInt16(self.xRegister)
-            return (newAddress, wasPageCrossed(fromAddress: address, toAddress: newAddress))
+            let baseAddress = self.readWord(address: address)
+            let newAddress = baseAddress &+ UInt16(self.xRegister)
+            return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .absoluteY:
-            let newAddress = self.readWord(address: address) &+ UInt16(self.yRegister)
-            return (newAddress, wasPageCrossed(fromAddress: address, toAddress: newAddress))
+            let baseAddress = self.readWord(address: address)
+            let newAddress = baseAddress &+ UInt16(self.yRegister)
+            return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .indirect:
             // See http://www.6502.org/tutorials/6502opcodes.html#JMP for more details
             // on this implementation, which only applies to the 0x6C opcode.
@@ -871,13 +875,14 @@ extension CPU {
             return (UInt16(lowByte: lowByte, highByte: highByte), false)
         case .indirectY:
             // operand_ptr = *((void **)constant_byte) + y_register
-            let baseAddress = self.readByte(address: address)
+            let zeroPageAddress = self.readByte(address: address)
 
-            let lowByte = self.readByte(address: UInt16(baseAddress))
-            let highByte = self.readByte(address: UInt16(baseAddress &+ 1))
+            let lowByte = self.readByte(address: UInt16(zeroPageAddress))
+            let highByte = self.readByte(address: UInt16(zeroPageAddress &+ 1))
 
-            let newAddress = UInt16(lowByte: lowByte, highByte: highByte) &+ UInt16(self.yRegister)
-            return (newAddress, wasPageCrossed(fromAddress: address, toAddress: newAddress))
+            let baseAddress = UInt16(lowByte: lowByte, highByte: highByte)
+            let newAddress = baseAddress &+ UInt16(self.yRegister)
+            return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .relative:
             let offset = UInt16(self.readByte(address: address)) &+ 1
             let newAddress = if offset >> 7 == 0 {
@@ -886,7 +891,7 @@ extension CPU {
                 self.programCounter &+ offset &- 0x0100
             }
 
-            return (newAddress, wasPageCrossed(fromAddress: address, toAddress: newAddress))
+            return (newAddress, wasPageCrossed(fromAddress: address + 1, toAddress: newAddress))
         default:
             fatalError("Addressing mode not supported!")
         }

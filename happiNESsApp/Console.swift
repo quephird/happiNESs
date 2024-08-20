@@ -29,7 +29,7 @@ enum NESError: Error {
 
     internal init() throws {
         guard let filePath = Bundle.main.url(
-            forResource: "pacman.nes",
+            forResource: "nestest.nes",
             withExtension: nil) else {
             throw NESError.romCouldNotBeFound
         }
