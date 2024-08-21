@@ -17,25 +17,30 @@ public struct PPU {
     public var chrRom: [UInt8]
     public var paletteTable: [UInt8]
     public var vram: [UInt8]
-    public var oamData: [UInt8]
     public var mirroring: Mirroring
+
     public var addressRegister: AddressRegister
     public var controllerRegister: ControllerRegister
+    public var maskRegister: MaskRegister
+    public var oamRegister: OAMRegister
+    public var scrollRegister: ScrollRegister
     public var statusRegister: PPUStatusRegister
-    public var nmiInterrupt: UInt8?
 
     public var cycles: Int
     public var scanline: UInt16
+    public var nmiInterrupt: UInt8?
 
     public init(chrRom: [UInt8], mirroring: Mirroring) {
         self.internalDataBuffer = 0x00
         self.chrRom = chrRom
         self.mirroring = mirroring
         self.vram = [UInt8](repeating: 0x00, count: 2048)
-        self.oamData = [UInt8](repeating: 0x00, count: 64*4)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
         self.addressRegister = AddressRegister()
         self.controllerRegister = ControllerRegister()
+        self.maskRegister = MaskRegister()
+        self.oamRegister = OAMRegister()
+        self.scrollRegister = ScrollRegister()
         self.statusRegister = PPUStatusRegister()
 
         self.cycles = 0
@@ -45,12 +50,45 @@ public struct PPU {
 }
 
 extension PPU {
+    public func readStatusWithoutMutating() -> UInt8 {
+        self.statusRegister.rawValue
+    }
+
+    mutating public func readStatus() -> UInt8 {
+        let result = self.readStatusWithoutMutating()
+        self.statusRegister[.verticalBlankStarted] = false
+        self.addressRegister.resetLatch()
+        self.scrollRegister.resetLatch()
+
+        return result
+    }
+
     mutating public func updateAddress(byte: UInt8) {
         self.addressRegister.updateAddress(byte: byte)
     }
 
     mutating public func updateController(byte: UInt8) {
         self.controllerRegister.update(byte: byte)
+    }
+
+    mutating public func updateMask(byte: UInt8) {
+        self.maskRegister.update(byte: byte)
+    }
+
+    mutating public func updateOAMAddress(byte: UInt8) {
+        self.oamRegister.updateAddress(byte: byte)
+    }
+
+    public func readOAMData() -> UInt8 {
+        self.oamRegister.readByte()
+    }
+
+    mutating public func writeOAMData(byte: UInt8) {
+        self.oamRegister.writeByte(byte: byte)
+    }
+
+    mutating public func writeScrollByte(byte: UInt8) {
+        self.scrollRegister.writeByte(byte: byte)
     }
 }
 

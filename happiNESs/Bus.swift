@@ -46,6 +46,8 @@ extension Bus {
         case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006, 0x4014:
             let message = String(format: "Attempt to read from write-only PPU address: %04X", address)
             fatalError(message)
+        case 0x2002:
+            return self.ppu.readStatusWithoutMutating()
         case 0x2007:
             return self.ppu.readByteWithoutMutating().result
         case 0x2008...Self.ppuRegistersMirrorsEnd:
@@ -61,6 +63,10 @@ extension Bus {
 
     mutating func readByte(address: UInt16) -> UInt8 {
         switch address {
+        case 0x2002:
+            return self.ppu.readStatus()
+        case 0x2004:
+            return self.ppu.readOAMData()
         case 0x2007:
             return self.ppu.readByte()
         case 0x2008...Self.ppuRegistersMirrorsEnd:
@@ -76,11 +82,16 @@ extension Bus {
         case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
             self.vram[vramAddress] = byte
-        case Self.ppuRegistersMirrorsBegin ... Self.ppuRegistersMirrorsEnd:
-            let ppuAddress = Int(address & 0b0010_0000_0000_0111)
-            fatalError("TODO! Implement PPU access!")
         case 0x2000:
             self.ppu.updateController(byte: byte)
+        case 0x2001:
+            self.ppu.updateMask(byte: byte)
+        case 0x2003:
+            self.ppu.updateOAMAddress(byte: byte)
+        case 0x2004:
+            self.ppu.writeOAMData(byte: byte)
+        case 0x2005:
+            self.ppu.writeScrollByte(byte: byte)
         case 0x2006:
             self.ppu.updateAddress(byte: byte)
         case 0x2007:
