@@ -45,7 +45,7 @@ extension Bus {
             return self.vram[vramAddress]
         case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006, 0x4014:
             let message = String(format: "Attempt to read from write-only PPU address: %04X", address)
-            fatalError(message)
+            return 0x00
         case 0x2002:
             return self.ppu.readStatusWithoutMutating()
         case 0x2007:
@@ -56,7 +56,7 @@ extension Bus {
         case 0x8000 ... 0xFFFF:
             return self.readPrgRom(address: address)
         default:
-            print("TODO: Implement memory reading for this address: \(address)")
+            // TODO: Implement memory reading from these addresses?
             return 0x00
         }
     }
@@ -99,10 +99,19 @@ extension Bus {
         case 0x2008...Self.ppuRegistersMirrorsEnd:
             let mirrorDownAddr = address & 0b0010_0000_0000_0111
             self.writeByte(address: mirrorDownAddr, byte: byte)
+        case 0x4014:
+            var buffer: [UInt8] = [UInt8](repeating: 0, count: 256)
+            let baseAddress: UInt16 = UInt16(byte) << 8
+
+            for index in 0 ..< 256 {
+                buffer[index] = self.readByte(address: baseAddress + UInt16(index))
+            }
+            self.ppu.writeOamBuffer(buffer: buffer)
         case 0x8000 ... 0xFFFF:
             fatalError("Attempt to write to cartridge ROM space")
         default:
-            print("TODO: Implement memory writing for this address: \(address)")
+            // TODO: Implement memory writing to these addresses?
+            break
         }
     }
 }
@@ -110,10 +119,19 @@ extension Bus {
 extension Bus {
     mutating func tick(cycles: Int) {
         self.cycles += cycles
+
+        let nmiBefore = self.ppu.nmiInterrupt
         let _ = self.ppu.tick(cpuCycles: cycles)
+        let nmiAfter = self.ppu.nmiInterrupt
+
+        // TODO: Need to figure out how to accomplish this that is compatible
+        // with the way that we've implemented the game loop with SwiftUI.
+//        if nmiBefore == nil, let nmiAfter {
+//            self.gameloopCallback(&self.ppu)
+//        }
     }
 
-    func pollNmiStatus() -> UInt8? {
-        return self.ppu.nmiInterrupt
+    mutating func pollNmiStatus() -> UInt8? {
+        return self.ppu.pollNMIInterrupt()
     }
 }

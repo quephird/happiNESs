@@ -13,6 +13,8 @@ public struct PPU {
     public static let ppuCyclesPerScanline = 341
     public static let nmiInterruptScanline = 241
 
+    public static let attributeTableOffset = 0x03C0
+
     public var internalDataBuffer: UInt8
     public var chrRom: [UInt8]
     public var paletteTable: [UInt8]
@@ -68,7 +70,13 @@ extension PPU {
     }
 
     mutating public func updateController(byte: UInt8) {
+        let nmiBefore = self.controllerRegister[.generateNmi]
         self.controllerRegister.update(byte: byte)
+        let nmiAfter = self.controllerRegister[.generateNmi]
+
+        if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
+            self.nmiInterrupt = 1
+        }
     }
 
     mutating public func updateMask(byte: UInt8) {
@@ -85,6 +93,12 @@ extension PPU {
 
     mutating public func writeOAMData(byte: UInt8) {
         self.oamRegister.writeByte(byte: byte)
+    }
+
+    mutating public func writeOamBuffer(buffer: [UInt8]) {
+        for byte in buffer {
+            self.oamRegister.writeByte(byte: byte)
+        }
     }
 
     mutating public func writeScrollByte(byte: UInt8) {
@@ -155,8 +169,8 @@ extension PPU {
     mutating public func readByte() -> UInt8 {
         let (result, newInternalDataBuffer) = self.readByteWithoutMutating()
 
-        self.incrementVramAddress()
         if let newInternalDataBuffer {
+            self.incrementVramAddress()
             self.internalDataBuffer = newInternalDataBuffer
         }
 
@@ -179,10 +193,10 @@ extension PPU {
         case 0x3F10, 0x3F14, 0x3F18, 0x3F1C:
             let mirroredAddress = address - 0x0010
             self.paletteTable[Int(mirroredAddress - 0x3F00)] = byte
-        case 0x3f00 ... 0x3FFF:
+        case 0x3F00 ... 0x3FFF:
             self.paletteTable[Int(address - 0x3F00)] = byte
         default:
-            let message = String(format: "unexpected access to mirrored spacU: %04X", address)
+            let message = String(format: "Unexpected access to mirrored space: %04X", address)
             fatalError(message)
         }
 
@@ -191,6 +205,12 @@ extension PPU {
 }
 
 extension PPU {
+    mutating func pollNMIInterrupt() -> UInt8? {
+        let result = self.nmiInterrupt
+        self.nmiInterrupt = nil
+        return result
+    }
+
     mutating func tick(cpuCycles: Int) -> Bool {
         self.cycles += cpuCycles * 3
 
@@ -199,15 +219,18 @@ extension PPU {
             self.scanline += 1
 
             if self.scanline == Self.nmiInterruptScanline {
+                self.statusRegister[.verticalBlankStarted] = true
+                self.statusRegister[.spriteZeroHit] = false
                 if self.controllerRegister[.generateNmi] {
-                    self.statusRegister[.verticalBlankStarted] = true
-                    // TODO: Need to trigger NMI interrupt!
+                    self.nmiInterrupt = 1
                 }
             }
 
             if self.scanline >= Self.scanlinesPerFrame {
                 self.scanline = 0
+                self.nmiInterrupt = nil
                 self.statusRegister[.verticalBlankStarted] = false
+                self.statusRegister[.spriteZeroHit] = false
 
                 return true
             }
@@ -218,50 +241,134 @@ extension PPU {
 }
 
 extension PPU {
-    func bytesForTileAt(bank: Int, tileNumber: Int) -> ArraySlice<UInt8> {
-        let startIndex = (bank * 0x1000) + tileNumber * 16
-        return self.chrRom[startIndex..<startIndex + 16]
+    private func bytesForTileAt(bankIndex: Int, tileIndex: Int) -> ArraySlice<UInt8> {
+        let startIndex = (bankIndex * 0x1000) + tileIndex * 16
+        return self.chrRom[startIndex ..< startIndex + 16]
     }
 
-    static public func makeEmptyScreenBuffer() -> [NESColor] {
-        [NESColor](repeating: .black, count: Self.width * Self.height)
+    private func getBackgroundPalette(tileX: Int, tileY: Int) -> [NESColor] {
+        let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
+        let attributeByte = self.vram[Self.attributeTableOffset + attributeTableIndex]
+
+        let paletteIndex = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
+        case (0, 0):
+            attributeByte & 0b0000_0011
+        case (1, 0):
+            (attributeByte >> 2) & 0b0000_0011
+        case (0, 1):
+            (attributeByte >> 4) & 0b0000_0011
+        case (1, 1):
+            (attributeByte >> 6) & 0b0000_0011
+        default:
+            fatalError("Whoops! We should never get here!")
+        }
+
+        // TODO: Why the offset by one below?
+        let paletteStartIndex = Int((paletteIndex * 4) + 1)
+        return [
+            NESColor.systemPalette[Int(self.paletteTable[0])],
+            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex])],
+            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 1])],
+            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 2])],
+        ]
+    }
+
+    private func drawTile(to screenBuffer: inout [NESColor],
+                          bankIndex: Int,
+                          tileIndex: Int,
+                          tileX: Int,
+                          tileY: Int) {
+        let tileBytes = bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
+        let backgroundPalette = self.getBackgroundPalette(tileX: tileX, tileY: tileY)
+
+        for (y, var (firstByte, secondByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
+            for x in (0 ... 7).reversed() {
+                let backgroundColorIndex = Int((secondByte & 0x01) << 1 | (firstByte & 0x01))
+                firstByte >>= 1
+                secondByte >>= 1
+
+                let backgroundColor = backgroundPalette[backgroundColorIndex]
+                screenBuffer[Self.width * (tileY * 8 + y) + (tileX * 8 + x)] = backgroundColor
+            }
+        }
+    }
+
+    public func drawBackground(to screenBuffer: inout [NESColor]) {
+        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+        for i in 0 ..< Self.attributeTableOffset {
+            let tileIndex = Int(self.vram[i])
+            let tileX = (i % 32)
+            let tileY = (i / 32)
+
+            self.drawTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
+        }
+    }
+
+    private func getSpritePalette(paletteIndex: Int) -> [NESColor] {
+        // TODO: Where does the 0x11 offset come from?
+        let paletteStartIndex = Int(0x11 + (paletteIndex * 4))
+        return [
+            NESColor.systemPalette[0],
+            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex])],
+            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 1])],
+            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 2])],
+        ]
+    }
+
+    private func drawSprites(to screenBuffer: inout [NESColor]) {
+        for oamDataIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4).reversed() {
+            let tileY = Int(self.oamRegister.data[oamDataIndex])
+            let tileIndex = Int(self.oamRegister.data[oamDataIndex + 1])
+            let tileAttributes = self.oamRegister.data[oamDataIndex + 2]
+            let tileX = Int(self.oamRegister.data[oamDataIndex + 3])
+
+            let flipVertical = tileAttributes >> 7 & 1 == 1
+            let flipHorizontal = tileAttributes >> 6 & 1 == 1
+            let paletteIndex = Int(tileAttributes & 0b11)
+
+            let spritePalette = self.getSpritePalette(paletteIndex: paletteIndex)
+            let bankIndex = self.controllerRegister[.spritePatternBankIndex] ? 1 : 0
+            let tileBytes = self.bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
+
+            for (y, var (firstByte, secondByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
+                for x in (0 ... 7).reversed() {
+                    let spriteColorIndex = Int((secondByte & 0x01) << 1 | (firstByte & 0x01))
+                    firstByte >>= 1
+                    secondByte >>= 1
+
+                    if spriteColorIndex == 0 {
+                        // Transparent pixel!
+                        continue
+                    }
+
+                    let spriteColor = spritePalette[spriteColorIndex]
+                    let (screenX, screenY) = switch (flipHorizontal, flipVertical) {
+                    case (false, false):
+                        (tileX + x, tileY + y)
+                    case (true, false):
+                        (tileX + 7 - x, tileY + y)
+                    case (false, true):
+                        (tileX + x, tileY + 7 - y)
+                    case (true, true):
+                        (tileX + 7 - x, tileY + 7 - y)
+                    }
+
+                    screenBuffer[Self.width * screenY + screenX] = spriteColor
+                }
+            }
+        }
     }
 
     public func makeScreenBuffer() -> [NESColor] {
         var screenBuffer = Self.makeEmptyScreenBuffer()
 
-        for tileNumber in 0..<256 {
-            let screenY = (tileNumber / 20) * 10 + 2
-            let screenX = (tileNumber % 20) * 10 + 2
-            self.drawTile(to: &screenBuffer, bank: 0, tileNumber: tileNumber, screenX: screenX, screenY: screenY)
-        }
+        self.drawBackground(to: &screenBuffer)
+        self.drawSprites(to: &screenBuffer)
 
         return screenBuffer
     }
 
-    public func drawTile(to screenBuffer: inout [NESColor],
-                         bank: Int,
-                         tileNumber: Int,
-                         screenX: Int,
-                         screenY: Int) {
-        let tileBytes = bytesForTileAt(bank: bank, tileNumber: tileNumber)
-
-        for (tileY, var (upperByte, lowerByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
-            for tileX in (0 ... 7).reversed() {
-                let colorIndex = (upperByte & 0x01) << 1 | (lowerByte & 0x01)
-                upperByte >>= 1
-                lowerByte >>= 1
-
-                let color = switch colorIndex {
-                case 0: NESColor.systemPalette[0x01]
-                case 1: NESColor.systemPalette[0x23]
-                case 2: NESColor.systemPalette[0x27]
-                case 3: NESColor.systemPalette[0x30]
-                default: fatalError("can't be")
-                }
-
-                screenBuffer[Self.width * (screenY + tileY) + (screenX + tileX)] = color
-            }
-        }
+    static public func makeEmptyScreenBuffer() -> [NESColor] {
+        [NESColor](repeating: .black, count: Self.width * Self.height)
     }
 }

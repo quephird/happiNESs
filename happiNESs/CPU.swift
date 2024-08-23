@@ -658,13 +658,13 @@ extension CPU {
 extension CPU {
     mutating public func executeInstructions(stoppingAfter: Int) {
         (0..<stoppingAfter).forEach { i in
-            print(happiNESs.trace(cpu: self))
+//            print(happiNESs.trace(cpu: self))
             self.executeInstruction()
         }
     }
 
     mutating func executeInstruction() {
-        if let nmi = self.bus.pollNmiStatus() {
+        if let _ = self.bus.pollNmiStatus() {
             self.interruptNmi()
         }
 
