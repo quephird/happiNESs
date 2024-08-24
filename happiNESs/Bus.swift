@@ -44,7 +44,8 @@ extension Bus {
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
             return self.vram[vramAddress]
         case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006, 0x4014:
-            let message = String(format: "Attempt to read from write-only PPU address: %04X", address)
+            // Reads from these addresses should not happen as they are write-only,
+            // but we return 0x00 nonetheless.
             return 0x00
         case 0x2002:
             return self.ppu.readStatusWithoutMutating()
@@ -117,18 +118,10 @@ extension Bus {
 }
 
 extension Bus {
-    mutating func tick(cycles: Int) {
+    mutating func tick(cycles: Int) -> Bool {
         self.cycles += cycles
 
-        let nmiBefore = self.ppu.nmiInterrupt
-        let _ = self.ppu.tick(cpuCycles: cycles)
-        let nmiAfter = self.ppu.nmiInterrupt
-
-        // TODO: Need to figure out how to accomplish this that is compatible
-        // with the way that we've implemented the game loop with SwiftUI.
-//        if nmiBefore == nil, let nmiAfter {
-//            self.gameloopCallback(&self.ppu)
-//        }
+        return self.ppu.tick(cpuCycles: cycles)
     }
 
     mutating func pollNmiStatus() -> UInt8? {

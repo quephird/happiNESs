@@ -40,18 +40,11 @@ public struct CPU {
         self.xRegister = 0x00;
         self.yRegister = 0x00;
         self.stackPointer = Self.resetStackPointerValue
-
-        // ACHTUNG: This is a temporary measure; we cannot currently access
-        // memory at locations above 0x1FFF, and so cannot properly set the
-        // program counter from the reset vector address via the bus.
-        //
-        //        self.programCounter = self.readWord(address: Self.resetVectorAddress);
-//        self.programCounter = 0x8600
-        self.programCounter = 0xC000
+        self.programCounter = self.readWord(address: Self.resetVectorAddress)
 
         // TODO: Look more deeply into whether or not this is the best strategy
         // for simulating the initial number of CPU cycles when resetting the CPU
-        self.bus.tick(cycles: 7)
+        let _ = self.bus.tick(cycles: 7)
     }
 }
 
@@ -448,10 +441,12 @@ extension CPU {
     }
 
     mutating func rol(addressingMode: AddressingMode) -> (Bool, Int) {
+        let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
+
         if addressingMode == .accumulator {
             let carry = self.accumulator >> 7
             self.statusRegister[.carry] = carry == 1
-            self.accumulator = (self.accumulator << 1) | carry
+            self.accumulator = (self.accumulator << 1) | oldCarry
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
             let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode);
@@ -459,7 +454,7 @@ extension CPU {
             let carry = value >> 7
 
             self.statusRegister[.carry] = carry == 1
-            let newValue = value << 1 | carry
+            let newValue = value << 1 | oldCarry
             self.writeByte(address: address, byte: newValue)
             self.updateZeroAndNegativeFlags(result: newValue)
         }
@@ -475,12 +470,17 @@ extension CPU {
             self.accumulator = (self.accumulator >> 1) | (oldCarry << 7)
             self.updateZeroAndNegativeFlags(result: self.accumulator)
         } else {
+            // Intentionally drop the page-crossed flag on the floor rather than take
+            // an extra cycle like most instructions. This seems super-weird and I'm
+            // not sure it's correct, but all the docs and other implementations are
+            // consistent.
             let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode);
             let value = self.readByte(address: address)
 
             self.statusRegister[.carry] = value & 0b0000_0001 == 1
             let newValue = (value >> 1) | (oldCarry << 7)
             self.writeByte(address: address, byte: newValue)
+
             self.updateZeroAndNegativeFlags(result: newValue)
         }
 
@@ -655,18 +655,36 @@ extension CPU {
     }
 }
 
+public enum StopCondition {
+    case instructions(Int)
+    case nextFrame
+}
+
 extension CPU {
     mutating public func executeInstructions(stoppingAfter: Int) {
-        (0..<stoppingAfter).forEach { i in
-//            print(happiNESs.trace(cpu: self))
-            self.executeInstruction()
+        executeInstructions(stoppingAfter: .instructions(stoppingAfter))
+    }
+    mutating public func executeInstructions(stoppingAfter: StopCondition) {
+        switch stoppingAfter {
+        case .instructions(let count):
+            (0..<count).forEach { i in
+                self.executeInstruction()
+            }
+
+        case .nextFrame:
+            while !executeInstruction() {
+                // loop condition is the body
+            }
         }
     }
 
-    mutating func executeInstruction() {
+    @discardableResult
+    mutating func executeInstruction() -> Bool {
         if let _ = self.bus.pollNmiStatus() {
             self.interruptNmi()
         }
+
+//        print(happiNESs.trace(cpu: self))
 
         let byte = self.readByte(address: self.programCounter);
         if let opcode = Opcode(rawValue: byte) {
@@ -809,11 +827,13 @@ extension CPU {
             }
 
             let totalCycles = opcode.cycles + extraCycles
-            self.bus.tick(cycles: totalCycles)
+            let result = self.bus.tick(cycles: totalCycles)
 
             if !programCounterMutated {
                 self.programCounter += UInt16(opcode.instructionLength - 1)
             }
+
+            return result
         } else {
             fatalError("Whoops! Instruction \(byte) at \(programCounter) not recognized!!!")
         }
@@ -926,6 +946,10 @@ extension CPU {
 extension CPU {
     mutating public func makeScreenBuffer() -> [NESColor] {
         self.bus.ppu.makeScreenBuffer()
+    }
+
+    mutating public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
+        self.bus.ppu.updateScreenBuffer(&screenBuffer)
     }
 }
 

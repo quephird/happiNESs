@@ -30,7 +30,7 @@ enum NESError: Error {
 
     internal init() throws {
         guard let filePath = Bundle.main.url(
-            forResource: "nestest.nes",
+            forResource: "pacman.nes",
             withExtension: nil) else {
             throw NESError.romCouldNotBeFound
         }
@@ -56,10 +56,8 @@ enum NESError: Error {
     }
 
     @objc func runForOneFrame() {
-        // TODO: Why do we execute the following statement???
-        cpu.writeByte(address: 0x00FE, byte: UInt8.random(in: 1..<16))
-        cpu.executeInstructions(stoppingAfter: Self.clockRate / Self.frameRate)
-        self.screenBuffer = cpu.makeScreenBuffer()
+        cpu.executeInstructions(stoppingAfter: .nextFrame)
+        cpu.updateScreenBuffer(&self.screenBuffer)
     }
 
     func keyDown(_ press: KeyPress) -> Bool {

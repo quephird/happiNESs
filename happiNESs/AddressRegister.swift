@@ -22,16 +22,11 @@ extension AddressRegister {
     }
 
     mutating public func incrementAddress(value: UInt8) {
-        let oldLowByte = self.address.lowByte
-        self.address.lowByte = self.address.lowByte &+ value
-
-        if oldLowByte > self.address.lowByte {
-            self.address.highByte = self.address.highByte &+ 1
-        }
+        self.address = self.address &+ UInt16(value)
 
         if self.getAddress() > 0x3FFF {
             // Mirror down addresses above 0x3FFF
-            self.setAddress(address: self.getAddress() & 0b0001_1111_1111_1111)
+            self.setAddress(address: self.getAddress() & 0b0011_1111_1111_1111)
         }
     }
 
@@ -44,7 +39,7 @@ extension AddressRegister {
 
         if self.getAddress() > 0x3FFF {
             // Mirror down addresses above 0x3FFF
-            self.setAddress(address: self.getAddress() & 0b0001_1111_1111_1111)
+            self.setAddress(address: self.getAddress() & 0b0011_1111_1111_1111)
         }
 
         self.highPointer = !self.highPointer

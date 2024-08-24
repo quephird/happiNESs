@@ -156,6 +156,9 @@ extension PPU {
         case 0x3000...0x3EFF:
             let message = String(format: "address space 0x3000..0x3eff is not expected to be used, requested = %04X", address)
             fatalError(message)
+        case 0x3F10, 0x3F14, 0x3F18, 0x3F1C:
+            let mirroredAddress = address - 0x10
+            return (self.paletteTable[Int(mirroredAddress - 0x3F00)], nil)
         case 0x3F00...0x3FFF:
             // TODO: The range of the index below is 0-127; isn't it possible for this to cause a crash
             // since the palette table is only 32 bytes long?!
@@ -169,8 +172,8 @@ extension PPU {
     mutating public func readByte() -> UInt8 {
         let (result, newInternalDataBuffer) = self.readByteWithoutMutating()
 
+        self.incrementVramAddress()
         if let newInternalDataBuffer {
-            self.incrementVramAddress()
             self.internalDataBuffer = newInternalDataBuffer
         }
 
@@ -353,7 +356,10 @@ extension PPU {
                         (tileX + 7 - x, tileY + 7 - y)
                     }
 
-                    screenBuffer[Self.width * screenY + screenX] = spriteColor
+                    let bufferIndex = Self.width * screenY + screenX
+                    if screenX >= 0 && screenX < Self.width && screenY >= 0 && screenY < Self.height {
+                        screenBuffer[bufferIndex] = spriteColor
+                    }
                 }
             }
         }
@@ -366,6 +372,11 @@ extension PPU {
         self.drawSprites(to: &screenBuffer)
 
         return screenBuffer
+    }
+
+    public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
+        self.drawBackground(to: &screenBuffer)
+        self.drawSprites(to: &screenBuffer)
     }
 
     static public func makeEmptyScreenBuffer() -> [NESColor] {
