@@ -6,7 +6,6 @@
 //
 
 public struct AddressRegister {
-    // NOTA BENE: high byte is first, low byte is second
     private var address: UInt16
     private var highPointer: Bool
 }

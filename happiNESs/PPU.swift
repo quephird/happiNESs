@@ -17,6 +17,42 @@ public struct PPU {
 
     public var internalDataBuffer: UInt8
     public var chrRom: [UInt8]
+
+    // The palette table is mapped to addresses in the following manner:
+    //
+    // +-----------------+--------------------------------------+
+    // | 0x3F00          | Universal background color           |
+    // +-----------------+--------------------------------------+
+    // | 0x3F01 – 0x3F03 | Background palette 0                 |
+    // +-----------------+--------------------------------------+
+    // | 0x3F04          | Unused color 1                       |
+    // +-----------------+--------------------------------------+
+    // | 0x3F05 – 0x3F07 | Background palette 1                 |
+    // +-----------------+--------------------------------------+
+    // | 0x3F08          | Unused color 2                       |
+    // +-----------------+--------------------------------------+
+    // | 0x3F09 – 0x3F0B | Background palette 2                 |
+    // +-----------------+--------------------------------------+
+    // | 0x3F0C          | Unused color 3                       |
+    // +-----------------+--------------------------------------+
+    // | 0x3F0D – 0x3F0F | Background palette 3                 |
+    // +-----------------+--------------------------------------+
+    // | 0x3F10          | Mirror of universal background color |
+    // +-----------------+--------------------------------------+
+    // | 0x3F11 – 0x3F13 | Sprite palette 0                     |
+    // +-----------------+--------------------------------------+
+    // | 0x3F14          | Mirror of unused color 1             |
+    // +-----------------+--------------------------------------+
+    // | 0x3F15 – 0x3F17 | Sprite palette 1                     |
+    // +-----------------+--------------------------------------+
+    // | 0x3F18          | Mirror of unused color 2             |
+    // +-----------------+--------------------------------------+
+    // | 0x3F19 – 0x3F1B | Sprite palette 2                     |
+    // +-----------------+--------------------------------------+
+    // | 0x3F1C          | Mirror of unused color 3             |
+    // +-----------------+--------------------------------------+
+    // | 0x3F1D – 0x3F1F | Sprite palette 3                     |
+    // +-----------------+--------------------------------------+
     public var paletteTable: [UInt8]
     public var vram: [UInt8]
     public var mirroring: Mirroring
@@ -270,17 +306,18 @@ extension PPU {
             fatalError("Whoops! We should never get here!")
         }
 
-        // TODO: Why the offset by one below?
         let paletteStartIndex = Int((paletteIndex * 4) + 1)
         return [
-            NESColor.systemPalette[Int(self.paletteTable[0])],
-            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex])],
-            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 1])],
-            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 2])],
-        ]
+            0,
+            paletteStartIndex,
+            paletteStartIndex + 1,
+            paletteStartIndex + 2,
+        ].map { index in
+            NESColor.systemPalette[Int(self.paletteTable[index])]
+        }
     }
 
-    private func drawTile(to screenBuffer: inout [NESColor],
+    private func drawBackgroundTile(to screenBuffer: inout [NESColor],
                           bankIndex: Int,
                           tileIndex: Int,
                           tileX: Int,
@@ -307,19 +344,23 @@ extension PPU {
             let tileX = (i % 32)
             let tileY = (i / 32)
 
-            self.drawTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
+            self.drawBackgroundTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
         }
     }
 
     private func getSpritePalette(paletteIndex: Int) -> [NESColor] {
-        // TODO: Where does the 0x11 offset come from?
+        // NOTA BENE: The sprite palettes occupy the _upper_ 16 bytes
+        // of the palette table, which is why the offset below is 0x11
+        // and not 0x01.
         let paletteStartIndex = Int(0x11 + (paletteIndex * 4))
         return [
-            NESColor.systemPalette[0],
-            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex])],
-            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 1])],
-            NESColor.systemPalette[Int(self.paletteTable[paletteStartIndex + 2])],
-        ]
+            0,
+            paletteStartIndex,
+            paletteStartIndex + 1,
+            paletteStartIndex + 2,
+        ].map { index in
+            NESColor.systemPalette[Int(self.paletteTable[index])]
+        }
     }
 
     private func drawSprites(to screenBuffer: inout [NESColor]) {
@@ -370,7 +411,7 @@ extension PPU {
     }
 
     // We pass screenBuffer as a mutable parameter to avoid copying
-    // and maximize performance.
+    // and to maximize performance.
     public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
         self.drawBackground(to: &screenBuffer)
         self.drawSprites(to: &screenBuffer)

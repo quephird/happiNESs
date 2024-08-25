@@ -561,7 +561,9 @@ extension Opcode {
         case .tya: .implicit
         }
     }
+}
 
+extension Opcode {
     var instructionLength: Int {
         switch self {
         case .adcImmediate: 2

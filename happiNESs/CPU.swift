@@ -661,6 +661,7 @@ public enum StopCondition {
 }
 
 extension CPU {
+    // NOTA BENE: This method is only ever called from unit tests.
     mutating public func executeInstructions(stoppingAfter: Int) {
         executeInstructions(stoppingAfter: .instructions(stoppingAfter))
     }
@@ -673,12 +674,15 @@ extension CPU {
             }
 
         case .nextFrame:
+            // We keep calling executeInstruction() until it returns
+            // `true`, in which case the screen needs redrawing.
             while !executeInstruction() {
-                // loop condition is the body
             }
         }
     }
 
+    // This method returns the value from the call to Bus.tick()
+    // which represents whether or not the screen needs to be redrawn
     mutating func executeInstruction() -> Bool {
         if let _ = self.bus.pollNmiStatus() {
             self.interruptNmi()
