@@ -27,9 +27,7 @@ enum NESError: Error {
     var screenBuffer: [NESColor] = PPU.makeEmptyScreenBuffer()
 
     internal init() throws {
-        guard let filePath = Bundle.main.url(
-            forResource: "pacman.nes",
-            withExtension: nil) else {
+        guard let filePath = Bundle.main.url(forResource: "pacman.nes", withExtension: nil) else {
             throw NESError.romCouldNotBeFound
         }
 
