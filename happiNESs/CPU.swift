@@ -21,10 +21,9 @@ public struct CPU {
     public var programCounter: UInt16
     public var bus: Bus
 
-    public var tracingOn: Bool = false
-    public var trace: [String] = []
+    public var tracingOn: Bool
 
-    public init(bus: Bus) {
+    public init(bus: Bus, tracingOn: Bool = false) {
         self.accumulator = 0x00
         self.statusRegister = StatusRegister(rawValue: 0x00)
         self.xRegister = 0x00
@@ -32,6 +31,7 @@ public struct CPU {
         self.stackPointer = Self.resetStackPointerValue
         self.programCounter = 0x0000
         self.bus = bus
+        self.tracingOn = tracingOn
     }
 
     mutating public func reset() {
@@ -664,6 +664,7 @@ extension CPU {
     mutating public func executeInstructions(stoppingAfter: Int) {
         executeInstructions(stoppingAfter: .instructions(stoppingAfter))
     }
+
     mutating public func executeInstructions(stoppingAfter: StopCondition) {
         switch stoppingAfter {
         case .instructions(let count):
@@ -678,13 +679,14 @@ extension CPU {
         }
     }
 
-    @discardableResult
     mutating func executeInstruction() -> Bool {
         if let _ = self.bus.pollNmiStatus() {
             self.interruptNmi()
         }
 
-//        print(happiNESs.trace(cpu: self))
+        if self.tracingOn {
+            print(happiNESs.trace(cpu: self))
+        }
 
         let byte = self.readByte(address: self.programCounter);
         if let opcode = Opcode(rawValue: byte) {
@@ -917,23 +919,99 @@ extension CPU {
         }
     }
 
+    // NOTA BENE: Called directly by the tracer
+    func getAbsoluteAddressWithoutMutating(addressingMode: AddressingMode, address: UInt16) -> UInt16 {
+        switch addressingMode {
+        case .immediate:
+            return address
+        case .zeroPage:
+            return UInt16(self.readByteWithoutMutating(address: address))
+        case .zeroPageX:
+            let baseAddress = self.readByteWithoutMutating(address: address)
+            return UInt16(baseAddress &+ self.xRegister)
+        case .zeroPageY:
+            let baseAddress = self.readByteWithoutMutating(address: address)
+            return UInt16(baseAddress &+ self.yRegister)
+        case .absolute:
+            return self.readWordWithoutMutating(address: address)
+        case .absoluteX:
+            let baseAddress = self.readWordWithoutMutating(address: address)
+            return baseAddress &+ UInt16(self.xRegister)
+        case .absoluteY:
+            let baseAddress = self.readWordWithoutMutating(address: address)
+            return baseAddress &+ UInt16(self.yRegister)
+        case .indirect:
+            // See http://www.6502.org/tutorials/6502opcodes.html#JMP for more details
+            // on this implementation, which only applies to the 0x6C opcode.
+            let baseAddress = self.readWordWithoutMutating(address: address)
+            if baseAddress & 0x00FF == 0x00FF {
+                let lowByte = self.readByteWithoutMutating(address: baseAddress)
+                let highByte = self.readByteWithoutMutating(address: baseAddress & 0xFF00)
+                return UInt16(highByte) << 8 | UInt16(lowByte)
+            }
+
+            return self.readWordWithoutMutating(address: baseAddress)
+        case .indirectX:
+            // operand_ptr = *(void **)(constant_byte + x_register)
+            let baseAddress = self.readByteWithoutMutating(address: address)
+            let indirectAddress = baseAddress &+ self.xRegister
+
+            let lowByte = self.readByteWithoutMutating(address: UInt16(indirectAddress))
+            let highByte = self.readByteWithoutMutating(address: UInt16(indirectAddress &+ 1))
+
+            return UInt16(highByte) << 8 | UInt16(lowByte)
+        case .indirectY:
+            // operand_ptr = *((void **)constant_byte) + y_register
+            let baseAddress = self.readByteWithoutMutating(address: address)
+
+            let lowByte = self.readByteWithoutMutating(address: UInt16(baseAddress))
+            let highByte = self.readByteWithoutMutating(address: UInt16(baseAddress &+ 1))
+
+            let indirectAddress = UInt16(highByte) << 8 | UInt16(lowByte)
+            return indirectAddress &+ UInt16(self.yRegister)
+        case .relative:
+            let offset = UInt16(self.readByteWithoutMutating(address: address)) &+ 1
+            let address = if offset >> 7 == 0 {
+                self.programCounter &+ offset
+            } else {
+                self.programCounter &+ offset &- 0x0100
+            }
+
+            return address
+        default:
+            fatalError("Addressing mode not supported!")
+        }
+    }
+
     mutating func readWord(address: UInt16) -> UInt16 {
         let lowByte = self.readByte(address: address)
         let highByte = self.readByte(address: address + 1)
         return UInt16(lowByte: lowByte, highByte: highByte)
     }
 
-    mutating func writeWord(address: UInt16, word: UInt16) {
-        self.writeByte(address: address, byte: word.lowByte);
-        self.writeByte(address: address + 1, byte: word.highByte);
-    }
-
     mutating func readByte(address: UInt16) -> UInt8 {
         self.bus.readByte(address: address)
     }
 
+    // NOTA BENE: Called directly by the tracer, as well as by readByte()
+    func readByteWithoutMutating(address: UInt16) -> UInt8 {
+        self.bus.readByteWithoutMutating(address: address)
+    }
+
+    // NOTA BENE: Called directly by the tracer, as well as by readWord()
+    func readWordWithoutMutating(address: UInt16) -> UInt16 {
+        let lowByte = self.readByteWithoutMutating(address: address)
+        let highByte = self.readByteWithoutMutating(address: address + 1)
+        return UInt16(lowByte: lowByte, highByte: highByte)
+    }
+
     mutating public func writeByte(address: UInt16, byte: UInt8) {
         self.bus.writeByte(address: address, byte: byte)
+    }
+
+    mutating func writeWord(address: UInt16, word: UInt16) {
+        self.writeByte(address: address, byte: word.lowByte);
+        self.writeByte(address: address + 1, byte: word.highByte);
     }
 }
 
@@ -944,10 +1022,6 @@ extension CPU {
 }
 
 extension CPU {
-    mutating public func makeScreenBuffer() -> [NESColor] {
-        self.bus.ppu.makeScreenBuffer()
-    }
-
     mutating public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
         self.bus.ppu.updateScreenBuffer(&screenBuffer)
     }
@@ -964,7 +1038,7 @@ extension CPU {
         self.pushStack(byte: copy.rawValue)
         self.statusRegister[.interrupt] = true
 
-        self.bus.tick(cycles: 2)
+        let _ = self.bus.tick(cycles: 2)
         self.programCounter = self.readWord(address: Self.nmiVectorAddress)
     }
 }

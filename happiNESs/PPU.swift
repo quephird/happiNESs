@@ -52,6 +52,7 @@ public struct PPU {
 }
 
 extension PPU {
+    // NOTA BENE: Called directly by the tracer, as well as by readStatus()
     public func readStatusWithoutMutating() -> UInt8 {
         self.statusRegister.rawValue
     }
@@ -143,6 +144,7 @@ extension PPU {
         }
     }
 
+    // NOTA BENE: Called directly by the tracer, as well as by readByte()
     public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
         let address = self.addressRegister.getAddress()
 
@@ -214,6 +216,8 @@ extension PPU {
         return result
     }
 
+    // The return value below ultimately reflects whether or not
+    // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
         self.cycles += cpuCycles * 3
 
@@ -365,15 +369,8 @@ extension PPU {
         }
     }
 
-    public func makeScreenBuffer() -> [NESColor] {
-        var screenBuffer = Self.makeEmptyScreenBuffer()
-
-        self.drawBackground(to: &screenBuffer)
-        self.drawSprites(to: &screenBuffer)
-
-        return screenBuffer
-    }
-
+    // We pass screenBuffer as a mutable parameter to avoid copying
+    // and maximize performance.
     public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
         self.drawBackground(to: &screenBuffer)
         self.drawSprites(to: &screenBuffer)

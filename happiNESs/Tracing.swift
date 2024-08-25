@@ -105,27 +105,19 @@ func trace(cpu: CPU) -> String {
         partialAsm = ""
     }
 
-    trace += partialAsm.padding(toLength: 28, withPad: " ")
+    partialAsm.withCString { cString in
+        trace += String(format: "%-28s", cString)
+    }
 
-    trace += "A:" + String(format: "%02X", cpu.accumulator) + " "
-    trace += "X:" + String(format: "%02X", cpu.xRegister) + " "
-    trace += "Y:" + String(format: "%02X", cpu.yRegister) + " "
-    trace += "P:" + String(format: "%02X", cpu.statusRegister.rawValue) + " "
-    trace += "SP:" + String(format: "%02X", cpu.stackPointer) + " "
+    trace += "A:" + String(format: "%02X ", cpu.accumulator)
+    trace += "X:" + String(format: "%02X ", cpu.xRegister)
+    trace += "Y:" + String(format: "%02X ", cpu.yRegister)
+    trace += "P:" + String(format: "%02X ", cpu.statusRegister.rawValue)
+    trace += "SP:" + String(format: "%02X ", cpu.stackPointer)
 
-    trace += "PPU:" + String(format: "%3d,%3d", cpu.bus.ppu.scanline, cpu.bus.ppu.cycles) + " "
+    trace += "PPU:" + String(format: "%3d,%3d ", cpu.bus.ppu.scanline, cpu.bus.ppu.cycles)
 
     trace += "CYC:" + String(cpu.bus.cycles)
 
     return trace
-}
-
-extension StringProtocol {
-    func padding(toLength length: Int, withPad pad: some StringProtocol, startingAt paddingInsertionIndex: String.Index) -> String {
-        padding(toLength: length, withPad: pad, startingAt: paddingInsertionIndex.utf16Offset(in: pad))
-    }
-
-    func padding(toLength length: Int, withPad pad: some StringProtocol) -> String {
-        padding(toLength: length, withPad: pad, startingAt: pad.startIndex)
-    }
 }

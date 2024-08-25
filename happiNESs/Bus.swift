@@ -38,6 +38,7 @@ extension Bus {
         return self.prgRom[Int(addressOffset)]
     }
 
+    // NOTA BENE: Called directly by the tracer, as well as by readByte()
     func readByteWithoutMutating(address: UInt16) -> UInt8 {
         switch address {
         case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:

@@ -16,13 +16,11 @@ enum NESError: Error {
 
 @Observable @MainActor class Console {
     static let frameRate = 60
-    // TODO: Need to revisit this! This is a hack to get a decent frame rate!
-    static let clockRate = 14_000_000
 
     var displayTimer: Timer!
 
     // NOTA BENE: We don't want the screen updated every single time something inside
-    // this class, which is the one being observed by `ContentView`, changes. We're only
+    // this class changes, which is the one being observed by `ContentView`. We're only
     // really interested in changes to `Console`'s state such that at least of the underlying
     // pixels has changed, namely any of the elements of  `screenBuffer`.
     @ObservationIgnored var cpu: CPU
@@ -42,7 +40,7 @@ enum NESError: Error {
         }
 
         let bus = Bus(rom: rom)
-        var cpu = CPU(bus: bus)
+        var cpu = CPU(bus: bus, tracingOn: false)
         cpu.reset()
         self.cpu = cpu
 
