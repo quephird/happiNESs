@@ -53,6 +53,8 @@ public struct PPU {
     // +-----------------+--------------------------------------+
     // | 0x3F1D – 0x3F1F | Sprite palette 3                     |
     // +-----------------+--------------------------------------+
+    // | 0x3F20 – 0x3FFF | Mirrors of first 32 bytes            |
+    // +-----------------+--------------------------------------+
     public var paletteTable: [UInt8]
     public var vram: [UInt8]
     public var mirroring: Mirroring
@@ -185,22 +187,23 @@ extension PPU {
         let address = self.addressRegister.getAddress()
 
         switch address {
-        case 0...0x1FFF:
+        case 0 ... 0x1FFF:
             // TODO: Again... I'm concerned about the magnitude of `address` here and how large `chrRom` is
             return (self.internalDataBuffer, self.chrRom[Int(address)])
-        case 0x2000...0x2FFF:
+        case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
             return (internalDataBuffer, self.vram[Int(self.mirrorVramAddress(address: address))])
-        case 0x3000...0x3EFF:
+        case 0x3000 ... 0x3EFF:
             let message = String(format: "address space 0x3000..0x3eff is not expected to be used, requested = %04X", address)
             fatalError(message)
-        case 0x3F10, 0x3F14, 0x3F18, 0x3F1C:
-            let mirroredAddress = address - 0x10
-            return (self.paletteTable[Int(mirroredAddress - 0x3F00)], nil)
-        case 0x3F00...0x3FFF:
-            // TODO: The range of the index below is 0-127; isn't it possible for this to cause a crash
-            // since the palette table is only 32 bytes long?!
-            return (self.paletteTable[Int(address - 0x3F00)], nil)
+        case 0x3F00 ... 0x3FFF:
+            let basePaletteIndex = Int((address & 0xFF) % 0x20)
+            switch basePaletteIndex {
+            case 0x10, 0x14, 0x18, 0x1C:
+                return (self.paletteTable[basePaletteIndex - 0x10], nil)
+            default:
+                return (self.paletteTable[basePaletteIndex], nil)
+            }
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
@@ -230,12 +233,14 @@ extension PPU {
         case 0x3000 ... 0x3EFF:
             let message = String(format: "Address shouldn't be used in reality: %04X", address)
             fatalError(message)
-        // Addresses $3F10/$3F14/$3F18/$3F1C are mirrors of $3F00/$3F04/$3F08/$3F0C
-        case 0x3F10, 0x3F14, 0x3F18, 0x3F1C:
-            let mirroredAddress = address - 0x0010
-            self.paletteTable[Int(mirroredAddress - 0x3F00)] = byte
         case 0x3F00 ... 0x3FFF:
-            self.paletteTable[Int(address - 0x3F00)] = byte
+            let basePaletteIndex = Int((address & 0xFF) % 0x20)
+            switch basePaletteIndex {
+            case 0x10, 0x14, 0x18, 0x1C:
+                self.paletteTable[basePaletteIndex - 0x10] = byte
+            default:
+                self.paletteTable[basePaletteIndex] = byte
+            }
         default:
             let message = String(format: "Unexpected access to mirrored space: %04X", address)
             fatalError(message)
