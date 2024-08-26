@@ -845,12 +845,6 @@ extension CPU {
         }
     }
 
-//    mutating func run() {
-//        while true {
-//            self.executeInstruction()
-//        }
-//    }
-
     func wasPageCrossed(fromAddress: UInt16, toAddress: UInt16) -> Bool {
         return (fromAddress & 0xFF00) != (toAddress & 0xFF00)
     }
