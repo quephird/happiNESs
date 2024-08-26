@@ -362,9 +362,9 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.readByte(address: 0x01FF), 0x86)
-        XCTAssertEqual(cpu.readByte(address: 0x01FE), 0x04)
-        XCTAssertEqual(cpu.readByte(address: 0x01FD), 0b0000_1001)
+        XCTAssertEqual(cpu.readByte(address: 0x01FD), 0x86)
+        XCTAssertEqual(cpu.readByte(address: 0x01FC), 0x04)
+        XCTAssertEqual(cpu.readByte(address: 0x01FB), 0b0010_1101)
         XCTAssertEqual(cpu.programCounter, 0x0000)
     }
 
@@ -1131,8 +1131,8 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.readByte(address: 0x01FF), 0x42)
-        XCTAssertEqual(cpu.stackPointer, 0xFE)
+        XCTAssertEqual(cpu.readByte(address: 0x01FD), 0x42)
+        XCTAssertEqual(cpu.stackPointer, 0xFC)
     }
 
     func testPhp() {
@@ -1143,8 +1143,8 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertEqual(0b1000_0000, cpu.readByte(address: 0x01FF))
-        XCTAssertEqual(cpu.stackPointer, 0xFE)
+        XCTAssertEqual(0b1011_0100, cpu.readByte(address: 0x01FD))
+        XCTAssertEqual(cpu.stackPointer, 0xFC)
     }
 
     func testPla() {
@@ -1160,8 +1160,8 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.accumulator, 0b1000_0000)
-        XCTAssertEqual(cpu.stackPointer, 0xFF)
+        XCTAssertEqual(cpu.accumulator, 0b1011_0100)
+        XCTAssertEqual(cpu.stackPointer, 0xFD)
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.negative])
         XCTAssertTrue(!cpu.statusRegister[.carry])
@@ -1172,10 +1172,10 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertEqual(cpu.stackPointer, 0xFF)
+        XCTAssertEqual(cpu.stackPointer, 0xFD)
         XCTAssertTrue(cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.overflow])
-        XCTAssertTrue(cpu.statusRegister[.break])
+        XCTAssertTrue(!cpu.statusRegister[.break])
         XCTAssertTrue(cpu.statusRegister[.interrupt])
         XCTAssertTrue(cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.carry])
@@ -1186,7 +1186,7 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0b1111_1111)
+        XCTAssertEqual(cpu.accumulator, 0b1111_1110)
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.carry])
@@ -1222,7 +1222,7 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 1)
 
-        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101)
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0100)
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(!cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.carry])
@@ -1234,7 +1234,7 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101)
+        XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0100)
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(!cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.carry])
@@ -1245,21 +1245,21 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertEqual(cpu.accumulator, 0b1111_1111)
+        XCTAssertEqual(cpu.accumulator, 0b0111_1111)
         XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.carry])
     }
 
     func testRorZeroPage() {
         let program: [UInt8] = [0x66, 0x42]
         var cpu = makeCpu(programBytes: program)
-        cpu.writeByte(address: 0x0042, byte: 0b0000_0001)
+        cpu.writeByte(address: 0x0042, byte: 0b1000_0001)
         cpu.executeInstructions(stoppingAfter: 1)
 
-        XCTAssertEqual(cpu.readByte(address: 0x0042), 0b1000_0000)
+        XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0100_0000)
         XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.carry])
     }
 
@@ -1348,7 +1348,7 @@ final class CPUTests: XCTestCase {
 
         XCTAssertEqual(cpu.accumulator, 0xE1)
         XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.negative])
     }
@@ -1601,12 +1601,12 @@ final class CPUTests: XCTestCase {
     }
 
     func testTsx() {
-        // NOTA BENE: the stack pointer upon initialization is set to 0xFF
+        // NOTA BENE: the stack pointer upon initialization is set to 0xFD
         let program: [UInt8] = [0xBA]
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 1)
 
-        XCTAssertEqual(cpu.xRegister, 0xFF)
+        XCTAssertEqual(cpu.xRegister, 0xFD)
         XCTAssertTrue(!cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.negative])
     }

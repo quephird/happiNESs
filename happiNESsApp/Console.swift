@@ -16,21 +16,18 @@ enum NESError: Error {
 
 @Observable @MainActor class Console {
     static let frameRate = 60
-    static let clockRate = 14_000
 
     var displayTimer: Timer!
 
     // NOTA BENE: We don't want the screen updated every single time something inside
-    // this class, which is the one being observed by `ContentView`, changes. We're only
+    // this class changes, which is the one being observed by `ContentView`. We're only
     // really interested in changes to `Console`'s state such that at least of the underlying
     // pixels has changed, namely any of the elements of  `screenBuffer`.
     @ObservationIgnored var cpu: CPU
-    var screenBuffer: [NESColor] = [NESColor](repeating: .black, count: 32*32)
+    var screenBuffer: [NESColor] = PPU.makeEmptyScreenBuffer()
 
     internal init() throws {
-        guard let filePath = Bundle.main.url(
-            forResource: "nestest.nes",
-            withExtension: nil) else {
+        guard let filePath = Bundle.main.url(forResource: "pacman.nes", withExtension: nil) else {
             throw NESError.romCouldNotBeFound
         }
 
@@ -41,7 +38,7 @@ enum NESError: Error {
         }
 
         let bus = Bus(rom: rom)
-        var cpu = CPU(bus: bus)
+        var cpu = CPU(bus: bus, tracingOn: false)
         cpu.reset()
         self.cpu = cpu
 
@@ -55,9 +52,8 @@ enum NESError: Error {
     }
 
     @objc func runForOneFrame() {
-        cpu.writeByte(address: 0x00FE, byte: UInt8.random(in: 1..<16))
-        cpu.executeInstructions(stoppingAfter: Self.clockRate / Self.frameRate)
-        self.screenBuffer = cpu.makeScreenBuffer()
+        cpu.executeInstructions(stoppingAfter: .nextFrame)
+        cpu.updateScreenBuffer(&self.screenBuffer)
     }
 
     func keyDown(_ press: KeyPress) -> Bool {

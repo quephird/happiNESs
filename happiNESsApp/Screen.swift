@@ -10,9 +10,9 @@ import SwiftUI
 import happiNESs
 
 struct Screen: View {
-    static let width: Int = 32
-    static let height: Int = 32
-    static let scale: Double = 10.0
+    static let width: Int = PPU.width
+    static let height: Int = PPU.height
+    static let scale: Double = 2.0
 
     var screenBuffer: [NESColor]
 

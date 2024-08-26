@@ -10,25 +10,6 @@ import happiNESs
 
 extension Color {
     init(nesColor: NESColor) {
-        switch nesColor {
-        case .black:
-            self = .black
-        case .white:
-            self = .white
-        case .grey:
-            self = .gray
-        case .red:
-            self = .red
-        case .green:
-            self = .green
-        case .blue:
-            self = .blue
-        case .magenta:
-            self.init(red: 1.0, green: 0.0, blue: 1.0)
-        case .yellow:
-            self.init(red: 1.0, green: 1.0, blue: 0.0)
-        case .cyan:
-            self = .cyan
-        }
+        self.init(red: Double(nesColor.red)/255, green: Double(nesColor.green)/255, blue: Double(nesColor.blue)/255)
     }
 }
