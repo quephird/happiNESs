@@ -1015,7 +1015,11 @@ extension CPU {
 
 extension CPU {
     mutating public func buttonDown(button: JoypadButton) {
-        self.writeByte(address: 0x00FF, byte: button.rawValue)
+        self.bus.joypad.updateButtonStatus(button: button, status: true)
+    }
+
+    mutating public func buttonUp(button: JoypadButton) {
+        self.bus.joypad.updateButtonStatus(button: button, status: false)
     }
 }
 

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		87184D032C67D9DD0003D090 /* CPU+withoutMutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D022C67D9DD0003D090 /* CPU+withoutMutation.swift */; };
 		87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D042C7028F10003D090 /* PPUStatusRegister.swift */; };
 		87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D092C7511F90003D090 /* MaskRegister.swift */; };
 		87184D0C2C7522B80003D090 /* ScrollRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D0B2C7522B80003D090 /* ScrollRegister.swift */; };
@@ -45,6 +44,7 @@
 		8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* RomTests.swift */; };
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
+		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +79,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		87184D022C67D9DD0003D090 /* CPU+withoutMutation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CPU+withoutMutation.swift"; sourceTree = "<group>"; };
 		87184D042C7028F10003D090 /* PPUStatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPUStatusRegister.swift; sourceTree = "<group>"; };
 		87184D092C7511F90003D090 /* MaskRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskRegister.swift; sourceTree = "<group>"; };
 		87184D0B2C7522B80003D090 /* ScrollRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollRegister.swift; sourceTree = "<group>"; };
@@ -116,6 +115,7 @@
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
+		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +208,7 @@
 				8719320F2C372F6900A73C22 /* Bus.swift */,
 				871F62352C65631F00132962 /* ControllerRegister.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
+				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				87184D092C7511F90003D090 /* MaskRegister.swift */,
 				871932112C37985700A73C22 /* Mirroring.swift */,
@@ -410,6 +411,7 @@
 				871932142C3798B400A73C22 /* Rom.swift in Sources */,
 				87184D0C2C7522B80003D090 /* ScrollRegister.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
+				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

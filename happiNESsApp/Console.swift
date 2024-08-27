@@ -56,20 +56,21 @@ enum NESError: Error {
         cpu.updateScreenBuffer(&self.screenBuffer)
     }
 
-    func keyDown(_ press: KeyPress) -> Bool {
-        switch press.key {
-        case .upArrow:
-            cpu.buttonDown(button: .up)
-        case .downArrow:
-            cpu.buttonDown(button: .down)
-        case .leftArrow:
-            cpu.buttonDown(button: .left)
-        case .rightArrow:
-            cpu.buttonDown(button: .right)
-        default:
-            return false
+    func keyDown(_ keyPress: KeyPress) -> Bool {
+        if let button = Joypad.keyMappings[keyPress.key.character] {
+            cpu.buttonDown(button: button)
+            return true
         }
 
-        return true
+        return false
+    }
+
+    func keyUp(_ keyPress: KeyPress) -> Bool {
+        if let button = Joypad.keyMappings[keyPress.key.character] {
+            cpu.buttonUp(button: button)
+            return true
+        }
+
+        return false
     }
 }
