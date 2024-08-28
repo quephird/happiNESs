@@ -1014,12 +1014,8 @@ extension CPU {
 }
 
 extension CPU {
-    mutating public func buttonDown(button: JoypadButton) {
-        self.bus.joypad.updateButtonStatus(button: button, status: true)
-    }
-
-    mutating public func buttonUp(button: JoypadButton) {
-        self.bus.joypad.updateButtonStatus(button: button, status: false)
+    mutating public func handleButton(button: JoypadButton, status: Bool) {
+        self.bus.joypad.updateButtonStatus(button: button, status: status)
     }
 }
 

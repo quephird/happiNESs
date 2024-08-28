@@ -5,20 +5,7 @@
 //  Created by Danielle Kefford on 8/27/24.
 //
 
-import SwiftUI
-
 public struct Joypad {
-    public static let keyMappings: [Character : JoypadButton] = [
-        KeyEquivalent.upArrow.character : .up,
-        KeyEquivalent.downArrow.character : .down,
-        KeyEquivalent.leftArrow.character : .left,
-        KeyEquivalent.rightArrow.character : .right,
-        KeyEquivalent.space.character : .select,
-        KeyEquivalent.return.character : .start,
-        "a" : .buttonA,
-        "s" : .buttonB,
-    ]
-
     public var strobe: Bool
     public var buttonIndex: Int
     public var joypadButton: JoypadButton
