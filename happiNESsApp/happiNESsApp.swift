@@ -13,7 +13,7 @@ struct happiNESsApp: App {
     @State var console = try! Console()
 
     var body: some Scene {
-        WindowGroup {
+        Window("happiNESs", id: "main") {
             ContentView()
                 .environment(console)
         }

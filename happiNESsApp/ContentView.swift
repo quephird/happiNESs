@@ -31,8 +31,8 @@ struct ContentView: View {
         .onAppear {
             focused = true
         }
-        .onKeyPress(phases: [.down]) { keyPress in
-            console.keyDown(keyPress) ? .handled : .ignored
+        .onKeyPress(phases: .all) { keyPress in
+            return console.handleKey(keyPress) ? .handled : .ignored
         }
     }
 }

@@ -17,6 +17,17 @@ enum NESError: Error {
 @Observable @MainActor class Console {
     static let frameRate = 60
 
+    public static let keyMappings: [KeyEquivalent : JoypadButton] = [
+        .upArrow : .up,
+        .downArrow : .down,
+        .leftArrow : .left,
+        .rightArrow : .right,
+        .space : .select,
+        .return : .start,
+        KeyEquivalent("a") : .buttonA,
+        KeyEquivalent("s") : .buttonB,
+    ]
+
     var displayTimer: Timer!
 
     // NOTA BENE: We don't want the screen updated every single time something inside
@@ -56,20 +67,12 @@ enum NESError: Error {
         cpu.updateScreenBuffer(&self.screenBuffer)
     }
 
-    func keyDown(_ press: KeyPress) -> Bool {
-        switch press.key {
-        case .upArrow:
-            cpu.buttonDown(button: .up)
-        case .downArrow:
-            cpu.buttonDown(button: .down)
-        case .leftArrow:
-            cpu.buttonDown(button: .left)
-        case .rightArrow:
-            cpu.buttonDown(button: .right)
-        default:
+    func handleKey(_ keyPress: KeyPress) -> Bool {
+        guard let button = Self.keyMappings[keyPress.key] else {
             return false
         }
 
+        cpu.handleButton(button: button, status: keyPress.phase != .up)
         return true
     }
 }

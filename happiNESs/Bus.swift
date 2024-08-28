@@ -15,6 +15,7 @@ public struct Bus {
     var vram: [UInt8]
     var prgRom: [UInt8]
     var cycles: Int
+    var joypad: Joypad
 
     public init(rom: Rom) {
         let ppu = PPU(chrRom: rom.chrRom, mirroring: rom.mirroring)
@@ -23,6 +24,7 @@ public struct Bus {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.prgRom = rom.prgRom
         self.cycles = 0
+        self.joypad = Joypad()
     }
 }
 
@@ -55,6 +57,8 @@ extension Bus {
         case 0x2008...Self.ppuRegistersMirrorsEnd:
             let mirrorDownAddress = address & 0b0010_0000_0000_0111
             return self.readByteWithoutMutating(address: mirrorDownAddress)
+        case 0x4016:
+            return self.joypad.readByteWithoutMutating()
         case 0x8000 ... 0xFFFF:
             return self.readPrgRom(address: address)
         default:
@@ -74,6 +78,8 @@ extension Bus {
         case 0x2008...Self.ppuRegistersMirrorsEnd:
             let mirrorDownAddress = address & 0b0010_0000_0000_0111
             return self.readByte(address: mirrorDownAddress)
+        case 0x4016:
+            return self.joypad.readByte()
         default:
             return self.readByteWithoutMutating(address: address)
         }
@@ -109,6 +115,8 @@ extension Bus {
                 buffer[index] = self.readByte(address: baseAddress + UInt16(index))
             }
             self.ppu.writeOamBuffer(buffer: buffer)
+        case 0x4016:
+            self.joypad.writeByte(byte: byte)
         case 0x8000 ... 0xFFFF:
             fatalError("Attempt to write to cartridge ROM space")
         default:
