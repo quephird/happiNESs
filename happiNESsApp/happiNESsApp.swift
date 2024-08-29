@@ -8,10 +8,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-extension UTType {
-    public static let nes = UTType("com.quephird.nes")!
-}
-
 @main
 @MainActor
 struct happiNESsApp: App {
