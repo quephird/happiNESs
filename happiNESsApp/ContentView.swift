@@ -24,15 +24,19 @@ struct ContentView: View {
     @FocusState private var focused: Bool
 
     var body: some View {
-        Screen(screenBuffer: console.screenBuffer)
-        .padding()
-        .focusable()
-        .focused($focused)
-        .onAppear {
-            focused = true
-        }
-        .onKeyPress(phases: .all) { keyPress in
-            return console.handleKey(keyPress) ? .handled : .ignored
+        if self.console.romLoaded {
+            Screen(screenBuffer: console.screenBuffer)
+            .padding()
+            .focusable()
+            .focused($focused)
+            .onAppear {
+                focused = true
+            }
+            .onKeyPress(phases: .all) { keyPress in
+                return console.handleKey(keyPress) ? .handled : .ignored
+            }
+        } else {
+            Image("happiNESs").fixedSize()
         }
     }
 }

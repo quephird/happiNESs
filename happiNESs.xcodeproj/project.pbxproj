@@ -45,6 +45,8 @@
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
+		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
+		878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +81,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8709FF122C7FB36700EDF82F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		87184D042C7028F10003D090 /* PPUStatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPUStatusRegister.swift; sourceTree = "<group>"; };
 		87184D092C7511F90003D090 /* MaskRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskRegister.swift; sourceTree = "<group>"; };
 		87184D0B2C7522B80003D090 /* ScrollRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollRegister.swift; sourceTree = "<group>"; };
@@ -116,6 +119,7 @@
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
+		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +152,7 @@
 		871931EE2C30BB2900A73C22 /* happiNESsApp */ = {
 			isa = PBXGroup;
 			children = (
+				8709FF122C7FB36700EDF82F /* Info.plist */,
 				871931EF2C30BB2900A73C22 /* happiNESsApp.swift */,
 				8719320A2C3366A900A73C22 /* Console.swift */,
 				871931F12C30BB2900A73C22 /* ContentView.swift */,
@@ -178,6 +183,7 @@
 		8744B1682C1CB9B3001B44B5 = {
 			isa = PBXGroup;
 			children = (
+				878D81432C7FEE3B0076ED30 /* image.xcassets */,
 				871F622C2C5C3C8900132962 /* nestest.nes */,
 				8763D0642C386A17006C1B4F /* snake.nes */,
 				8744B1742C1CB9B3001B44B5 /* happiNESs */,
@@ -353,6 +359,7 @@
 			files = (
 				871931F72C30BB2C00A73C22 /* Preview Assets.xcassets in Resources */,
 				871F622E2C5C3C8A00132962 /* nestest.nes in Resources */,
+				878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */,
 				8763D0662C386A2E006C1B4F /* snake.nes in Resources */,
 				871931F42C30BB2C00A73C22 /* Assets.xcassets in Resources */,
 			);
@@ -363,6 +370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8763D0652C386A17006C1B4F /* snake.nes in Resources */,
+				878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */,
 				871F622D2C5C3C8A00132962 /* nestest.nes in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -456,6 +464,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = happiNESsApp/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -483,6 +492,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = happiNESsApp/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

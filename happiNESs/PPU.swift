@@ -15,8 +15,8 @@ public struct PPU {
 
     public static let attributeTableOffset = 0x03C0
 
-    public var internalDataBuffer: UInt8
-    public var chrRom: [UInt8]
+    public var chrRom: [UInt8]?
+    public var mirroring: Mirroring?
 
     // The palette table is mapped to addresses in the following manner:
     //
@@ -57,7 +57,7 @@ public struct PPU {
     // +-----------------+--------------------------------------+
     public var paletteTable: [UInt8]
     public var vram: [UInt8]
-    public var mirroring: Mirroring
+    public var internalDataBuffer: UInt8
 
     public var addressRegister: AddressRegister
     public var controllerRegister: ControllerRegister
@@ -70,10 +70,8 @@ public struct PPU {
     public var scanline: UInt16
     public var nmiInterrupt: UInt8?
 
-    public init(chrRom: [UInt8], mirroring: Mirroring) {
+    public init() {
         self.internalDataBuffer = 0x00
-        self.chrRom = chrRom
-        self.mirroring = mirroring
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
         self.addressRegister = AddressRegister()
@@ -86,6 +84,11 @@ public struct PPU {
         self.cycles = 0
         self.scanline = 0
         self.nmiInterrupt = nil
+    }
+
+    mutating public func loadRom(chrRom: [UInt8], mirroring: Mirroring) {
+        self.chrRom = chrRom
+        self.mirroring = mirroring
     }
 }
 
@@ -168,7 +171,7 @@ extension PPU {
         // To the name table index
         let nameTable = vramIndex / 0x0400
 
-        return switch (self.mirroring, nameTable) {
+        return switch (self.mirroring!, nameTable) {
         case (Mirroring.vertical, 2), (Mirroring.vertical, 3):
             vramIndex - 0x0800
         case (Mirroring.horizontal, 2):
@@ -189,7 +192,7 @@ extension PPU {
         switch address {
         case 0 ... 0x1FFF:
             // TODO: Again... I'm concerned about the magnitude of `address` here and how large `chrRom` is
-            return (self.internalDataBuffer, self.chrRom[Int(address)])
+            return (self.internalDataBuffer, self.chrRom![Int(address)])
         case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
             return (internalDataBuffer, self.vram[Int(self.mirrorVramAddress(address: address))])
@@ -291,7 +294,7 @@ extension PPU {
 extension PPU {
     private func bytesForTileAt(bankIndex: Int, tileIndex: Int) -> ArraySlice<UInt8> {
         let startIndex = (bankIndex * 0x1000) + tileIndex * 16
-        return self.chrRom[startIndex ..< startIndex + 16]
+        return self.chrRom![startIndex ..< startIndex + 16]
     }
 
     private func getBackgroundPalette(tileX: Int, tileY: Int) -> [NESColor] {
