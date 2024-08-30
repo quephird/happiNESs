@@ -9,11 +9,6 @@ import happiNESs
 import Observation
 import SwiftUI
 
-enum NESError: Error {
-    case romCouldNotBeFound
-    case romCouldNotBeRead
-}
-
 @Observable @MainActor class Console {
     static let frameRate = 60
 
@@ -28,6 +23,7 @@ enum NESError: Error {
         KeyEquivalent("s") : .buttonB,
     ]
 
+    var romLoaded: Bool = false
     var displayTimer: Timer!
 
     // NOTA BENE: We don't want the screen updated every single time something inside
@@ -38,20 +34,21 @@ enum NESError: Error {
     var screenBuffer: [NESColor] = PPU.makeEmptyScreenBuffer()
 
     internal init() throws {
-        guard let filePath = Bundle.main.url(forResource: "pacman.nes", withExtension: nil) else {
-            throw NESError.romCouldNotBeFound
-        }
+        let bus = Bus()
+        let cpu = CPU(bus: bus, tracingOn: false)
+        self.cpu = cpu
+    }
 
-        let data: Data = try Data(contentsOf: filePath)
+    public func runGame(fileUrl: URL) throws {
+        let data: Data = try Data(contentsOf: fileUrl)
         let romBytes = [UInt8](data)
         guard let rom = Rom(bytes: romBytes) else {
             throw NESError.romCouldNotBeRead
         }
 
-        let bus = Bus(rom: rom)
-        var cpu = CPU(bus: bus, tracingOn: false)
-        cpu.reset()
-        self.cpu = cpu
+        self.cpu.loadRom(rom: rom)
+        self.romLoaded = true
+        self.cpu.reset()
 
         // This sets up a timer which will call `runForOneFrame()` every time it fires.
         self.displayTimer = Timer.scheduledTimer(

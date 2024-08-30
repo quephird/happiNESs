@@ -34,6 +34,10 @@ public struct CPU {
         self.tracingOn = tracingOn
     }
 
+    mutating public func loadRom(rom: Rom) {
+        self.bus.loadRom(rom: rom)
+    }
+
     mutating public func reset() {
         self.accumulator = 0x00;
         self.statusRegister.reset();
