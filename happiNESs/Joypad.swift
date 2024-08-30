@@ -19,20 +19,23 @@ public struct Joypad {
 
 extension Joypad {
     public func readByteWithoutMutating() -> UInt8 {
-        return (self.joypadButton.rawValue & (1 << self.buttonIndex)) >> self.buttonIndex
+        return (self.joypadButton.rawValue >> self.buttonIndex) & 0b0000_0001
     }
 
     mutating public func readByte() -> UInt8 {
-        if self.buttonIndex > 7 {
-            return 1
+        defer {
+            self.buttonIndex = self.buttonIndex &+ 1
+
+            if self.strobe {
+                self.buttonIndex = 0
+            }
         }
 
-        let result = self.readByteWithoutMutating()
-        if !self.strobe && self.buttonIndex <= 7 {
-            self.buttonIndex += 1
+        guard self.buttonIndex < 8 else {
+            return 0
         }
 
-        return result
+        return self.readByteWithoutMutating()
     }
 
     mutating public func writeByte(byte: UInt8) {

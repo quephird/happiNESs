@@ -9,11 +9,6 @@ import happiNESs
 import Observation
 import SwiftUI
 
-enum NESError: Error {
-    case romCouldNotBeFound
-    case romCouldNotBeRead
-}
-
 @Observable @MainActor class Console {
     static let frameRate = 60
 

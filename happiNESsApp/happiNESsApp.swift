@@ -12,12 +12,22 @@ import UniformTypeIdentifiers
 @MainActor
 struct happiNESsApp: App {
     @State var console = try! Console()
+
     @State private var showFileImporter = false
+    @State private var errorMessage = ""
+    @State private var showAlert = false
+
+    private func setErrorMessage(message: String) {
+        self.errorMessage = message
+        self.showAlert = true
+    }
 
     var body: some Scene {
         Window("happiNESs", id: "main") {
             ContentView()
                 .environment(console)
+                .alert(errorMessage, isPresented: $showAlert, actions: {})
+                .dialogSeverity(.critical)
         }
         .commands {
             CommandGroup(replacing: .newItem) {
@@ -29,22 +39,19 @@ struct happiNESsApp: App {
                     allowedContentTypes: [UTType(filenameExtension: "nes")!],
                     allowsMultipleSelection: false
                 ) { result in
-                    switch result {
-                    case .success(let fileUrls):
-                        fileUrls.forEach { fileUrl in
-                            guard fileUrl.startAccessingSecurityScopedResource() else {
-                                return
-                            }
-
-                            do {
-                                try self.console.runGame(fileUrl: fileUrl)
-                            } catch {
-                                return
-                            }
+                    do {
+                        guard let fileUrl = try result.get().first else {
+                            throw NESError.romFileCouldNotBeSelected
                         }
-                    case .failure(let error):
-                        // handle error
-                        print(error)
+
+                        guard fileUrl.startAccessingSecurityScopedResource() else {
+                            throw NESError.romFileCouldNotBeOpened
+                        }
+
+                        try self.console.runGame(fileUrl: fileUrl)
+                    }
+                    catch {
+                        self.setErrorMessage(message: error.localizedDescription)
                     }
                 }
             }
