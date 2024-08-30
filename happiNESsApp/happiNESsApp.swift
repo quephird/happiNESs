@@ -34,6 +34,7 @@ struct happiNESsApp: App {
                 Button("Open ROM...") {
                     self.showFileImporter = true
                 }
+                .keyboardShortcut("o", modifiers: .command)
                 .fileImporter(
                     isPresented: $showFileImporter,
                     allowedContentTypes: [UTType(filenameExtension: "nes")!],
