@@ -260,18 +260,29 @@ extension PPU {
         return result
     }
 
+    mutating func isSpriteZeroHit(cycles: Int) -> Bool {
+        let y = self.oamRegister.data[0]
+        let x = self.oamRegister.data[3]
+        return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
         self.cycles += cpuCycles * 3
 
         if self.cycles >= Self.ppuCyclesPerScanline {
+            if self.isSpriteZeroHit(cycles: self.cycles) {
+                self.statusRegister[.spriteZeroHit] = true
+            }
+
             self.cycles -= Self.ppuCyclesPerScanline
             self.scanline += 1
 
             if self.scanline == Self.nmiInterruptScanline {
                 self.statusRegister[.verticalBlankStarted] = true
                 self.statusRegister[.spriteZeroHit] = false
+
                 if self.controllerRegister[.generateNmi] {
                     self.nmiInterrupt = 1
                 }
