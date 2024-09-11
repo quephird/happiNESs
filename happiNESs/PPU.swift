@@ -416,9 +416,12 @@ extension PPU {
 
     private func drawBackgroundTile(to screenBuffer: inout [NESColor],
                                     attributeTable: ArraySlice<UInt8>,
+                                    viewPort: ViewPort,
                                     tileIndex: Int,
                                     tileX: Int,
-                                    tileY: Int) {
+                                    tileY: Int,
+                                    shiftX: Int,
+                                    shiftY: Int) {
         let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
         let tileBytes = bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
         let backgroundPalette = self.getBackgroundPalette(attributeTable: attributeTable,
@@ -434,7 +437,12 @@ extension PPU {
                 let backgroundColor = backgroundPalette[backgroundColorIndex]
                 let pixelX = tileX * 8 + x
                 let pixelY = tileY * 8 + y
-                screenBuffer[Self.width * pixelY + pixelX] = backgroundColor
+
+                if pixelX >= viewPort.startX && pixelX < viewPort.endX &&
+                    pixelY >= viewPort.startY && pixelY < viewPort.endY {
+                    screenBuffer[Self.width * (pixelY + shiftY) + (pixelX + shiftX)] = backgroundColor
+                }
+//                screenBuffer[Self.width * pixelY + pixelX] = backgroundColor
             }
         }
     }
@@ -453,9 +461,12 @@ extension PPU {
 
             self.drawBackgroundTile(to: &screenBuffer,
                                     attributeTable: attributeTable,
+                                    viewPort: viewPort,
                                     tileIndex: tileIndex,
                                     tileX: tileX,
-                                    tileY: tileY)
+                                    tileY: tileY,
+                                    shiftX: shiftX,
+                                    shiftY: shiftY)
         }
     }
 
