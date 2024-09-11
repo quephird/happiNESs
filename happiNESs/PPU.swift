@@ -13,6 +13,8 @@ public struct PPU {
     public static let ppuCyclesPerScanline = 341
     public static let nmiInterruptScanline = 241
 
+    public static let ppuAddressSpaceStart: UInt16 = 0x2000
+    public static let nametableSize: Int = 0x0400
     public static let attributeTableOffset = 0x03C0
 
     public var chrRom: [UInt8]?
@@ -154,35 +156,59 @@ extension PPU {
         self.addressRegister.incrementAddress(value: increment)
     }
 
-    // Horizontal:
-    //   [ A ] [ a ]
-    //   [ B ] [ b ]
-
-    // Vertical:
-    //   [ A ] [ B ]
-    //   [ a ] [ b ]
-    public func mirrorVramAddress(address: UInt16) -> UInt16 {
+    public func vramIndex(from address: UInt16) -> Int {
         // Mirror down 0x3000-0x3EFF to 0x2000-0x2EFF
-        let mirroredVram = address & 0b0010_1111_1111_1111
+        let mirroredVramAddress = address & 0b0010_1111_1111_1111
 
-        // To VRAM vector
-        let vramIndex = mirroredVram - 0x2000
+        let addressOffset = Int(mirroredVramAddress - Self.ppuAddressSpaceStart)
+        let nameTableIndex = addressOffset / Self.nametableSize
+        let nameTableOffset = addressOffset % Self.nametableSize
 
-        // To the name table index
-        let nameTable = vramIndex / 0x0400
-
-        return switch (self.mirroring!, nameTable) {
-        case (Mirroring.vertical, 2), (Mirroring.vertical, 3):
-            vramIndex - 0x0800
-        case (Mirroring.horizontal, 2):
-            vramIndex - 0x0400
-        case (Mirroring.horizontal, 1):
-            vramIndex - 0x0400
-        case (Mirroring.horizontal, 3):
-            vramIndex - 0x0800
+        // The actual "physical" layout of the nametables in the PPU VRAM is
+        // the following:
+        //
+        //     [ A ] [ B ]
+        //
+        // where A is the primary nametable and B is the secondary nametable,
+        // each with 32 x 30 = 960 bytes. (The next 64 bytes for each is reserved
+        // for the pattern tables.)
+        //
+        // However, the way PPU memory addresses map to the nametables depends on
+        // the mirroring strategy hardcoded into the ROM, and thus set in the PPU.
+        // In PPU address space, there are virtually _four_ nametables, two of which
+        // are mirrors of the other two:
+        //
+        //     [ 0 ] [ 1 ]
+        //     [ 2 ] [ 3 ]
+        //
+        // And so, we need to map the requested memory address to the correct index
+        // of the PPU VRAM array. For vertical mirroring, virtual nametable indices 0 and 2
+        // need to map to actual nametable A, whereas indices 1 and 3 need to map to
+        // B:
+        //
+        //     [ A ] [ B ]
+        //     [ A ] [ B ]
+        //
+        // For horizontal mirroring, virtual nametable indices 0 and 1 need to map to
+        // actual nametable A, whereas indices 2 and 3 need to map to B:
+        //
+        //     [ A ] [ A ]
+        //     [ B ] [ B ]
+        //
+        // And so, the `let` statement below maps the tuple of mirroring strategy
+        // and virtual nametable index to the beginning "physical" nametable address.
+        // From there, we can add the nametable offset to get the actual address.
+        // (For now, this emulator only handles vertical and horizontal mirroring.)
+        let actualNametableIndexStart = switch (self.mirroring!, nameTableIndex) {
+        case (_, 0), (.horizontal, 1), (.vertical, 2):
+            0
+        case (.horizontal, 2), (.vertical, 1), (_, 3):
+            0x0400
         default:
-            vramIndex
+            fatalError("Invalid nametable index")
         }
+
+        return actualNametableIndexStart + nameTableOffset
     }
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
@@ -195,7 +221,7 @@ extension PPU {
             return (self.internalDataBuffer, self.chrRom![Int(address)])
         case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
-            return (internalDataBuffer, self.vram[Int(self.mirrorVramAddress(address: address))])
+            return (internalDataBuffer, self.vram[self.vramIndex(from: address)])
         case 0x3000 ... 0x3EFF:
             let message = String(format: "address space 0x3000..0x3eff is not expected to be used, requested = %04X", address)
             fatalError(message)
@@ -232,7 +258,7 @@ extension PPU {
             let message = String(format: "Attempt to write to chr rom space: %04X", address)
             print(message)
         case 0x2000 ... 0x2FFF:
-            self.vram[Int(self.mirrorVramAddress(address: address))] = byte
+            self.vram[self.vramIndex(from: address)] = byte
         case 0x3000 ... 0x3EFF:
             let message = String(format: "Address shouldn't be used in reality: %04X", address)
             fatalError(message)
