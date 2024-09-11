@@ -334,9 +334,39 @@ extension PPU {
         return self.chrRom![startIndex ..< startIndex + 16]
     }
 
-    private func getBackgroundPalette(tileX: Int, tileY: Int) -> [NESColor] {
+//    private func getBackgroundPalette(tileX: Int, tileY: Int) -> [NESColor] {
+//        let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
+//        let attributeByte = self.vram[Self.attributeTableOffset + attributeTableIndex]
+//
+//        let paletteIndex = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
+//        case (0, 0):
+//            attributeByte & 0b0000_0011
+//        case (1, 0):
+//            (attributeByte >> 2) & 0b0000_0011
+//        case (0, 1):
+//            (attributeByte >> 4) & 0b0000_0011
+//        case (1, 1):
+//            (attributeByte >> 6) & 0b0000_0011
+//        default:
+//            fatalError("Whoops! We should never get here!")
+//        }
+//
+//        let paletteStartIndex = Int((paletteIndex * 4) + 1)
+//        return [
+//            0,
+//            paletteStartIndex,
+//            paletteStartIndex + 1,
+//            paletteStartIndex + 2,
+//        ].map { index in
+//            NESColor.systemPalette[Int(self.paletteTable[index])]
+//        }
+//    }
+
+    private func getBackgroundPalette(attributeTable: ArraySlice<UInt8>,
+                                      tileX: Int,
+                                      tileY: Int) -> [NESColor] {
         let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
-        let attributeByte = self.vram[Self.attributeTableOffset + attributeTableIndex]
+        let attributeByte = attributeTable[attributeTable.startIndex + attributeTableIndex]
 
         let paletteIndex = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
         case (0, 0):
@@ -362,13 +392,38 @@ extension PPU {
         }
     }
 
+//    private func drawBackgroundTile(to screenBuffer: inout [NESColor],
+//                                    bankIndex: Int,
+//                                    tileIndex: Int,
+//                                    tileX: Int,
+//                                    tileY: Int) {
+//        let tileBytes = bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
+//        let backgroundPalette = self.getBackgroundPalette(tileX: tileX, tileY: tileY)
+//
+//        for (y, var (firstByte, secondByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
+//            for x in (0 ... 7).reversed() {
+//                let backgroundColorIndex = Int((secondByte & 0x01) << 1 | (firstByte & 0x01))
+//                firstByte >>= 1
+//                secondByte >>= 1
+//
+//                let backgroundColor = backgroundPalette[backgroundColorIndex]
+//                let pixelX = tileX * 8 + x
+//                let pixelY = tileY * 8 + y
+//                screenBuffer[Self.width * pixelY + pixelX] = backgroundColor
+//            }
+//        }
+//    }
+
     private func drawBackgroundTile(to screenBuffer: inout [NESColor],
-                          bankIndex: Int,
-                          tileIndex: Int,
-                          tileX: Int,
-                          tileY: Int) {
+                                    attributeTable: ArraySlice<UInt8>,
+                                    tileIndex: Int,
+                                    tileX: Int,
+                                    tileY: Int) {
+        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
         let tileBytes = bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
-        let backgroundPalette = self.getBackgroundPalette(tileX: tileX, tileY: tileY)
+        let backgroundPalette = self.getBackgroundPalette(attributeTable: attributeTable,
+                                                          tileX: tileX,
+                                                          tileY: tileY)
 
         for (y, var (firstByte, secondByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
             for x in (0 ... 7).reversed() {
@@ -377,21 +432,86 @@ extension PPU {
                 secondByte >>= 1
 
                 let backgroundColor = backgroundPalette[backgroundColorIndex]
-                screenBuffer[Self.width * (tileY * 8 + y) + (tileX * 8 + x)] = backgroundColor
+                let pixelX = tileX * 8 + x
+                let pixelY = tileY * 8 + y
+                screenBuffer[Self.width * pixelY + pixelX] = backgroundColor
             }
         }
     }
 
-    public func drawBackground(to screenBuffer: inout [NESColor]) {
-        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+    private func drawNametable(to screenBuffer: inout [NESColor],
+                               nametable: ArraySlice<UInt8>,
+                               viewPort: ViewPort,
+                               shiftX: Int,
+                               shiftY: Int) {
+        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
+
         for i in 0 ..< Self.attributeTableOffset {
-            let tileIndex = Int(self.vram[i])
+            let tileIndex = Int(nametable[nametable.startIndex + i])
             let tileX = (i % 32)
             let tileY = (i / 32)
 
-            self.drawBackgroundTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
+            self.drawBackgroundTile(to: &screenBuffer,
+                                    attributeTable: attributeTable,
+                                    tileIndex: tileIndex,
+                                    tileX: tileX,
+                                    tileY: tileY)
         }
     }
+
+    public func drawBackground(to screenBuffer: inout [NESColor]) {
+        let scrollX = Int(self.scrollRegister.scrollX)
+        let scrollY = Int(self.scrollRegister.scrollY)
+
+        let (mainNametable, secondaryNametable) = switch (self.mirroring!, self.controllerRegister.nametableAddress()) {
+        case (Mirroring.vertical, 0x2000),
+            (Mirroring.vertical, 0x2800),
+            (Mirroring.horizontal, 0x2000),
+            (Mirroring.horizontal, 0x2400):
+            (self.vram[0x0000 ..< 0x0400], self.vram[0x0400 ..< 0x0800])
+        case (Mirroring.vertical, 0x2400),
+            (Mirroring.vertical, 0x2C00),
+            (Mirroring.horizontal, 0x2800),
+            (Mirroring.horizontal, 0x2C00):
+            (self.vram[0x0400 ..< 0x0800], self.vram[0x0000 ..< 0x0400])
+        default:
+            fatalError("Unsupported mirroring type: \(self.mirroring!)")
+        }
+
+        let mainViewPort = ViewPort(startX: scrollX, startY: scrollY, endX: Self.width, endY: Self.height)
+        self.drawNametable(to: &screenBuffer,
+                           nametable: mainNametable,
+                           viewPort: mainViewPort,
+                           shiftX: -scrollX,
+                           shiftY: -scrollY)
+
+        if scrollX > 0 {
+            let secondaryViewPort = ViewPort(startX: 0, startY: 0, endX: scrollX, endY: Self.height)
+            self.drawNametable(to: &screenBuffer,
+                               nametable: secondaryNametable,
+                               viewPort: secondaryViewPort,
+                               shiftX: Self.width - scrollX,
+                               shiftY: 0)
+        } else if scrollY > 0 {
+            let secondaryViewPort = ViewPort(startX: 0, startY: 0, endX: Self.width, endY: scrollY)
+            self.drawNametable(to: &screenBuffer,
+                               nametable: secondaryNametable,
+                               viewPort: secondaryViewPort,
+                               shiftX: 0,
+                               shiftY: Self.height - scrollY)
+        }
+    }
+
+//    public func drawBackground(to screenBuffer: inout [NESColor]) {
+//        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+//        for i in 0 ..< Self.attributeTableOffset {
+//            let tileIndex = Int(self.vram[i])
+//            let tileX = (i % 32)
+//            let tileY = (i / 32)
+//
+//            self.drawBackgroundTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
+//        }
+//    }
 
     private func getSpritePalette(paletteIndex: Int) -> [NESColor] {
         // NOTA BENE: The sprite palettes occupy the _upper_ 16 bytes
