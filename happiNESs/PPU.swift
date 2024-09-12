@@ -332,34 +332,6 @@ extension PPU {
         return self.chrRom![startIndex ..< startIndex + 16]
     }
 
-//    private func getBackgroundPalette(tileX: Int, tileY: Int) -> [NESColor] {
-//        let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
-//        let attributeByte = self.vram[Self.attributeTableOffset + attributeTableIndex]
-//
-//        let paletteIndex = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
-//        case (0, 0):
-//            attributeByte & 0b0000_0011
-//        case (1, 0):
-//            (attributeByte >> 2) & 0b0000_0011
-//        case (0, 1):
-//            (attributeByte >> 4) & 0b0000_0011
-//        case (1, 1):
-//            (attributeByte >> 6) & 0b0000_0011
-//        default:
-//            fatalError("Whoops! We should never get here!")
-//        }
-//
-//        let paletteStartIndex = Int((paletteIndex * 4) + 1)
-//        return [
-//            0,
-//            paletteStartIndex,
-//            paletteStartIndex + 1,
-//            paletteStartIndex + 2,
-//        ].map { index in
-//            NESColor.systemPalette[Int(self.paletteTable[index])]
-//        }
-//    }
-
     private func getBackgroundPalette(attributeTable: ArraySlice<UInt8>,
                                       tileX: Int,
                                       tileY: Int) -> [NESColor] {
@@ -390,27 +362,9 @@ extension PPU {
         }
     }
 
-//    private func drawBackgroundTile(to screenBuffer: inout [NESColor],
-//                                    bankIndex: Int,
-//                                    tileIndex: Int,
-//                                    tileX: Int,
-//                                    tileY: Int) {
-//        let tileBytes = bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
-//        let backgroundPalette = self.getBackgroundPalette(tileX: tileX, tileY: tileY)
-//
-//        for (y, var (firstByte, secondByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
-//            for x in (0 ... 7).reversed() {
-//                let backgroundColorIndex = Int((secondByte & 0x01) << 1 | (firstByte & 0x01))
-//                firstByte >>= 1
-//                secondByte >>= 1
-//
-//                let backgroundColor = backgroundPalette[backgroundColorIndex]
-//                let pixelX = tileX * 8 + x
-//                let pixelY = tileY * 8 + y
-//                screenBuffer[Self.width * pixelY + pixelX] = backgroundColor
-//            }
-//        }
-//    }
+    private func setColorAt(x: Int, y: Int, in screenBuffer: inout [NESColor], to color: NESColor) {
+        screenBuffer[Self.width * y + x] = color
+    }
 
     private func drawBackgroundTile(to screenBuffer: inout [NESColor],
                                     attributeTable: ArraySlice<UInt8>,
@@ -438,9 +392,8 @@ extension PPU {
 
                 if pixelX >= viewPort.startX && pixelX < viewPort.endX &&
                     pixelY >= viewPort.startY && pixelY < viewPort.endY {
-                    screenBuffer[Self.width * (pixelY + shiftY) + (pixelX + shiftX)] = backgroundColor
+                    self.setColorAt(x: (pixelX + shiftX), y: (pixelY + shiftY), in: &screenBuffer, to: backgroundColor)
                 }
-//                screenBuffer[Self.width * pixelY + pixelX] = backgroundColor
             }
         }
     }
@@ -511,17 +464,6 @@ extension PPU {
         }
     }
 
-//    public func drawBackground(to screenBuffer: inout [NESColor]) {
-//        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
-//        for i in 0 ..< Self.attributeTableOffset {
-//            let tileIndex = Int(self.vram[i])
-//            let tileX = (i % 32)
-//            let tileY = (i / 32)
-//
-//            self.drawBackgroundTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
-//        }
-//    }
-
     private func getSpritePalette(paletteIndex: Int) -> [NESColor] {
         // NOTA BENE: The sprite palettes occupy the _upper_ 16 bytes
         // of the palette table, which is why the offset below is 0x11
@@ -575,9 +517,8 @@ extension PPU {
                         (tileX + 7 - x, tileY + 7 - y)
                     }
 
-                    let bufferIndex = Self.width * screenY + screenX
                     if screenX >= 0 && screenX < Self.width && screenY >= 0 && screenY < Self.height {
-                        screenBuffer[bufferIndex] = spriteColor
+                        self.setColorAt(x: screenX, y: screenY, in: &screenBuffer, to: spriteColor)
                     }
                 }
             }
