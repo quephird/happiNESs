@@ -319,12 +319,10 @@ extension PPU {
                 self.nmiInterrupt = nil
                 self.statusRegister[.verticalBlankStarted] = false
                 self.statusRegister[.spriteZeroHit] = false
-
-                return true
             }
         }
 
-        return false
+        return self.nmiInterrupt != nil
     }
 }
 
