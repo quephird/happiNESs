@@ -19,7 +19,7 @@ public struct ScrollRegister {
 
 extension ScrollRegister {
     mutating public func writeByte(byte: UInt8) {
-        if self.latch == false {
+        if self.latch {
             self.scrollY = byte
         } else {
             self.scrollX = byte

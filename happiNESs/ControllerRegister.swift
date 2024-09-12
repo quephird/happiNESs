@@ -59,6 +59,17 @@ public struct ControllerRegister: OptionSet {
         }
     }
 
+    public func nametableAddress() -> UInt16 {
+        switch self.rawValue & 0b0000_0011 {
+        case 0b0000_0000: 0x2000
+        case 0b0000_0001: 0x2400
+        case 0b0000_0010: 0x2800
+        case 0b0000_0011: 0x2C00
+        default:
+            fatalError("Impossible bit configuration for nametable address")
+        }
+    }
+
     mutating public func update(byte: UInt8) {
         self.rawValue = byte
     }

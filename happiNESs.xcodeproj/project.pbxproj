@@ -48,6 +48,7 @@
 		878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81472C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
+		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +122,7 @@
 		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
+		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +231,7 @@
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
 				871F62332C6541D300132962 /* UInt16+bytes.swift */,
+				87D265142C9146F400C143B1 /* ViewPort.swift */,
 			);
 			path = happiNESs;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
+				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,

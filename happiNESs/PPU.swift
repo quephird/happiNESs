@@ -13,6 +13,8 @@ public struct PPU {
     public static let ppuCyclesPerScanline = 341
     public static let nmiInterruptScanline = 241
 
+    public static let ppuAddressSpaceStart: UInt16 = 0x2000
+    public static let nametableSize: Int = 0x0400
     public static let attributeTableOffset = 0x03C0
 
     public var chrRom: [UInt8]?
@@ -154,35 +156,59 @@ extension PPU {
         self.addressRegister.incrementAddress(value: increment)
     }
 
-    // Horizontal:
-    //   [ A ] [ a ]
-    //   [ B ] [ b ]
-
-    // Vertical:
-    //   [ A ] [ B ]
-    //   [ a ] [ b ]
-    public func mirrorVramAddress(address: UInt16) -> UInt16 {
+    public func vramIndex(from address: UInt16) -> Int {
         // Mirror down 0x3000-0x3EFF to 0x2000-0x2EFF
-        let mirroredVram = address & 0b0010_1111_1111_1111
+        let mirroredVramAddress = address & 0b0010_1111_1111_1111
 
-        // To VRAM vector
-        let vramIndex = mirroredVram - 0x2000
+        let addressOffset = Int(mirroredVramAddress - Self.ppuAddressSpaceStart)
+        let nameTableIndex = addressOffset / Self.nametableSize
+        let nameTableOffset = addressOffset % Self.nametableSize
 
-        // To the name table index
-        let nameTable = vramIndex / 0x0400
-
-        return switch (self.mirroring!, nameTable) {
-        case (Mirroring.vertical, 2), (Mirroring.vertical, 3):
-            vramIndex - 0x0800
-        case (Mirroring.horizontal, 2):
-            vramIndex - 0x0400
-        case (Mirroring.horizontal, 1):
-            vramIndex - 0x0400
-        case (Mirroring.horizontal, 3):
-            vramIndex - 0x0800
+        // The actual "physical" layout of the nametables in the PPU VRAM is
+        // the following:
+        //
+        //     [ A ] [ B ]
+        //
+        // where A is the primary nametable and B is the secondary nametable,
+        // each with 32 x 30 = 960 bytes. (The next 64 bytes for each is reserved
+        // for the pattern tables.)
+        //
+        // However, the way PPU memory addresses map to the nametables depends on
+        // the mirroring strategy hardcoded into the ROM, and thus set in the PPU.
+        // In PPU address space, there are virtually _four_ nametables, two of which
+        // are mirrors of the other two:
+        //
+        //     [ 0 ] [ 1 ]
+        //     [ 2 ] [ 3 ]
+        //
+        // And so, we need to map the requested memory address to the correct index
+        // of the PPU VRAM array. For vertical mirroring, virtual nametable indices 0 and 2
+        // need to map to actual nametable A, whereas indices 1 and 3 need to map to
+        // B:
+        //
+        //     [ A ] [ B ]
+        //     [ A ] [ B ]
+        //
+        // For horizontal mirroring, virtual nametable indices 0 and 1 need to map to
+        // actual nametable A, whereas indices 2 and 3 need to map to B:
+        //
+        //     [ A ] [ A ]
+        //     [ B ] [ B ]
+        //
+        // And so, the `let` statement below maps the tuple of mirroring strategy
+        // and virtual nametable index to the beginning "physical" nametable address.
+        // From there, we can add the nametable offset to get the actual address.
+        // (For now, this emulator only handles vertical and horizontal mirroring.)
+        let actualNametableIndexStart = switch (self.mirroring!, nameTableIndex) {
+        case (_, 0), (.horizontal, 1), (.vertical, 2):
+            0
+        case (.horizontal, 2), (.vertical, 1), (_, 3):
+            0x0400
         default:
-            vramIndex
+            fatalError("Invalid nametable index")
         }
+
+        return actualNametableIndexStart + nameTableOffset
     }
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
@@ -195,7 +221,7 @@ extension PPU {
             return (self.internalDataBuffer, self.chrRom![Int(address)])
         case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
-            return (internalDataBuffer, self.vram[Int(self.mirrorVramAddress(address: address))])
+            return (internalDataBuffer, self.vram[self.vramIndex(from: address)])
         case 0x3000 ... 0x3EFF:
             let message = String(format: "address space 0x3000..0x3eff is not expected to be used, requested = %04X", address)
             fatalError(message)
@@ -232,7 +258,7 @@ extension PPU {
             let message = String(format: "Attempt to write to chr rom space: %04X", address)
             print(message)
         case 0x2000 ... 0x2FFF:
-            self.vram[Int(self.mirrorVramAddress(address: address))] = byte
+            self.vram[self.vramIndex(from: address)] = byte
         case 0x3000 ... 0x3EFF:
             let message = String(format: "Address shouldn't be used in reality: %04X", address)
             fatalError(message)
@@ -260,18 +286,29 @@ extension PPU {
         return result
     }
 
+    mutating func isSpriteZeroHit(cycles: Int) -> Bool {
+        let y = self.oamRegister.data[0]
+        let x = self.oamRegister.data[3]
+        return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
         self.cycles += cpuCycles * 3
 
         if self.cycles >= Self.ppuCyclesPerScanline {
+            if self.isSpriteZeroHit(cycles: self.cycles) {
+                self.statusRegister[.spriteZeroHit] = true
+            }
+
             self.cycles -= Self.ppuCyclesPerScanline
             self.scanline += 1
 
             if self.scanline == Self.nmiInterruptScanline {
                 self.statusRegister[.verticalBlankStarted] = true
                 self.statusRegister[.spriteZeroHit] = false
+
                 if self.controllerRegister[.generateNmi] {
                     self.nmiInterrupt = 1
                 }
@@ -282,12 +319,10 @@ extension PPU {
                 self.nmiInterrupt = nil
                 self.statusRegister[.verticalBlankStarted] = false
                 self.statusRegister[.spriteZeroHit] = false
-
-                return true
             }
         }
 
-        return false
+        return self.nmiInterrupt != nil
     }
 }
 
@@ -297,9 +332,11 @@ extension PPU {
         return self.chrRom![startIndex ..< startIndex + 16]
     }
 
-    private func getBackgroundPalette(tileX: Int, tileY: Int) -> [NESColor] {
+    private func getBackgroundPalette(attributeTable: ArraySlice<UInt8>,
+                                      tileX: Int,
+                                      tileY: Int) -> [NESColor] {
         let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
-        let attributeByte = self.vram[Self.attributeTableOffset + attributeTableIndex]
+        let attributeByte = attributeTable[attributeTable.startIndex + attributeTableIndex]
 
         let paletteIndex = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
         case (0, 0):
@@ -325,13 +362,23 @@ extension PPU {
         }
     }
 
+    private func setColorAt(x: Int, y: Int, in screenBuffer: inout [NESColor], to color: NESColor) {
+        screenBuffer[Self.width * y + x] = color
+    }
+
     private func drawBackgroundTile(to screenBuffer: inout [NESColor],
-                          bankIndex: Int,
-                          tileIndex: Int,
-                          tileX: Int,
-                          tileY: Int) {
+                                    attributeTable: ArraySlice<UInt8>,
+                                    viewPort: ViewPort,
+                                    tileIndex: Int,
+                                    tileX: Int,
+                                    tileY: Int,
+                                    shiftX: Int,
+                                    shiftY: Int) {
+        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
         let tileBytes = bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
-        let backgroundPalette = self.getBackgroundPalette(tileX: tileX, tileY: tileY)
+        let backgroundPalette = self.getBackgroundPalette(attributeTable: attributeTable,
+                                                          tileX: tileX,
+                                                          tileY: tileY)
 
         for (y, var (firstByte, secondByte)) in zip(tileBytes.prefix(8), tileBytes.suffix(8)).enumerated() {
             for x in (0 ... 7).reversed() {
@@ -340,19 +387,80 @@ extension PPU {
                 secondByte >>= 1
 
                 let backgroundColor = backgroundPalette[backgroundColorIndex]
-                screenBuffer[Self.width * (tileY * 8 + y) + (tileX * 8 + x)] = backgroundColor
+                let pixelX = tileX * 8 + x
+                let pixelY = tileY * 8 + y
+
+                if pixelX >= viewPort.startX && pixelX < viewPort.endX &&
+                    pixelY >= viewPort.startY && pixelY < viewPort.endY {
+                    self.setColorAt(x: (pixelX + shiftX), y: (pixelY + shiftY), in: &screenBuffer, to: backgroundColor)
+                }
             }
         }
     }
 
-    public func drawBackground(to screenBuffer: inout [NESColor]) {
-        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+    private func drawNametable(to screenBuffer: inout [NESColor],
+                               nametable: ArraySlice<UInt8>,
+                               viewPort: ViewPort,
+                               shiftX: Int,
+                               shiftY: Int) {
+        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
+
         for i in 0 ..< Self.attributeTableOffset {
-            let tileIndex = Int(self.vram[i])
+            let tileIndex = Int(nametable[nametable.startIndex + i])
             let tileX = (i % 32)
             let tileY = (i / 32)
 
-            self.drawBackgroundTile(to: &screenBuffer, bankIndex: bankIndex, tileIndex: tileIndex, tileX: tileX, tileY: tileY)
+            self.drawBackgroundTile(to: &screenBuffer,
+                                    attributeTable: attributeTable,
+                                    viewPort: viewPort,
+                                    tileIndex: tileIndex,
+                                    tileX: tileX,
+                                    tileY: tileY,
+                                    shiftX: shiftX,
+                                    shiftY: shiftY)
+        }
+    }
+
+    public func drawBackground(to screenBuffer: inout [NESColor]) {
+        let scrollX = Int(self.scrollRegister.scrollX)
+        let scrollY = Int(self.scrollRegister.scrollY)
+
+        let (mainNametable, secondaryNametable) = switch (self.mirroring!, self.controllerRegister.nametableAddress()) {
+        case (Mirroring.vertical, 0x2000),
+            (Mirroring.vertical, 0x2800),
+            (Mirroring.horizontal, 0x2000),
+            (Mirroring.horizontal, 0x2400):
+            (self.vram[0x0000 ..< 0x0400], self.vram[0x0400 ..< 0x0800])
+        case (Mirroring.vertical, 0x2400),
+            (Mirroring.vertical, 0x2C00),
+            (Mirroring.horizontal, 0x2800),
+            (Mirroring.horizontal, 0x2C00):
+            (self.vram[0x0400 ..< 0x0800], self.vram[0x0000 ..< 0x0400])
+        default:
+            fatalError("Unsupported mirroring type: \(self.mirroring!)")
+        }
+
+        let mainViewPort = ViewPort(startX: scrollX, startY: scrollY, endX: Self.width, endY: Self.height)
+        self.drawNametable(to: &screenBuffer,
+                           nametable: mainNametable,
+                           viewPort: mainViewPort,
+                           shiftX: -scrollX,
+                           shiftY: -scrollY)
+
+        if scrollX > 0 {
+            let secondaryViewPort = ViewPort(startX: 0, startY: 0, endX: scrollX, endY: Self.height)
+            self.drawNametable(to: &screenBuffer,
+                               nametable: secondaryNametable,
+                               viewPort: secondaryViewPort,
+                               shiftX: Self.width - scrollX,
+                               shiftY: 0)
+        } else if scrollY > 0 {
+            let secondaryViewPort = ViewPort(startX: 0, startY: 0, endX: Self.width, endY: scrollY)
+            self.drawNametable(to: &screenBuffer,
+                               nametable: secondaryNametable,
+                               viewPort: secondaryViewPort,
+                               shiftX: 0,
+                               shiftY: Self.height - scrollY)
         }
     }
 
@@ -409,9 +517,8 @@ extension PPU {
                         (tileX + 7 - x, tileY + 7 - y)
                     }
 
-                    let bufferIndex = Self.width * screenY + screenX
                     if screenX >= 0 && screenX < Self.width && screenY >= 0 && screenY < Self.height {
-                        screenBuffer[bufferIndex] = spriteColor
+                        self.setColorAt(x: screenX, y: screenY, in: &screenBuffer, to: spriteColor)
                     }
                 }
             }
