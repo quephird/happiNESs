@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 7/4/24.
 //
 
-public struct Rom {
+public class Cartridge {
     static let nesTag: [UInt8] = [0x4E, 0x45, 0x53, 0x1A]
     static let prgRomPageSize: Int = 16384
     static let chrRomPageSize: Int = 8192
@@ -47,5 +47,19 @@ public struct Rom {
         self.mapper = mapper
         self.prgRom = prgRom
         self.chrRom = chrRom
+    }
+
+    public func readChrRom(address: UInt16) -> UInt8 {
+        return self.chrRom[Int(address)]
+    }
+
+    public func readPrgRom(address: UInt16) -> UInt8 {
+        var addressOffset = address - 0x8000
+
+        // Mirror if needed
+        if self.prgRom.count == 0x4000 && addressOffset >= 0x4000 {
+            addressOffset = addressOffset % 0x4000
+        }
+        return self.prgRom[Int(addressOffset)]
     }
 }

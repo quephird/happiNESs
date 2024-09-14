@@ -12,6 +12,7 @@ public struct Bus {
     static let ppuRegistersMirrorsEnd: UInt16 = 0x3FFF;
 
     var ppu: PPU
+    var cartridge: Cartridge?
     var vram: [UInt8]
     var prgRom: [UInt8]?
     var cycles: Int
@@ -26,23 +27,15 @@ public struct Bus {
         self.joypad = Joypad()
     }
 
-    mutating public func loadRom(rom: Rom) {
-        self.ppu.chrRom = rom.chrRom
-        self.ppu.mirroring = rom.mirroring
-        self.prgRom = rom.prgRom
+    mutating public func loadCartridge(cartridge: Cartridge) {
+        self.cartridge = cartridge
+        self.ppu.cartridge = cartridge
     }
 }
 
 extension Bus {
     private func readPrgRom(address: UInt16) -> UInt8 {
-        var addressOffset = address - 0x8000
-
-        // Mirror if needed
-        if self.prgRom!.count == 0x4000 && addressOffset >= 0x4000 {
-            addressOffset = addressOffset % 0x4000
-        }
-
-        return self.prgRom![Int(addressOffset)]
+        return self.cartridge!.readPrgRom(address: address)
     }
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()

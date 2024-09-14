@@ -17,8 +17,7 @@ public struct PPU {
     public static let nametableSize: Int = 0x0400
     public static let attributeTableOffset = 0x03C0
 
-    public var chrRom: [UInt8]?
-    public var mirroring: Mirroring?
+    public var cartridge: Cartridge?
 
     // The palette table is mapped to addresses in the following manner:
     //
@@ -86,11 +85,6 @@ public struct PPU {
         self.cycles = 0
         self.scanline = 0
         self.nmiInterrupt = nil
-    }
-
-    mutating public func loadRom(chrRom: [UInt8], mirroring: Mirroring) {
-        self.chrRom = chrRom
-        self.mirroring = mirroring
     }
 }
 
@@ -199,7 +193,7 @@ extension PPU {
         // and virtual nametable index to the beginning "physical" nametable address.
         // From there, we can add the nametable offset to get the actual address.
         // (For now, this emulator only handles vertical and horizontal mirroring.)
-        let actualNametableIndexStart = switch (self.mirroring!, nameTableIndex) {
+        let actualNametableIndexStart = switch (self.cartridge!.mirroring, nameTableIndex) {
         case (_, 0), (.horizontal, 1), (.vertical, 2):
             0
         case (.horizontal, 2), (.vertical, 1), (_, 3):
@@ -216,9 +210,9 @@ extension PPU {
         let address = self.addressRegister.getAddress()
 
         switch address {
-        case 0 ... 0x1FFF:
+        case 0x0000 ... 0x1FFF:
             // TODO: Again... I'm concerned about the magnitude of `address` here and how large `chrRom` is
-            return (self.internalDataBuffer, self.chrRom![Int(address)])
+            return (self.internalDataBuffer, self.cartridge!.readChrRom(address: address))
         case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
             return (internalDataBuffer, self.vram[self.vramIndex(from: address)])
@@ -254,7 +248,7 @@ extension PPU {
         let address = self.addressRegister.getAddress()
 
         switch address {
-        case 0 ... 0x1FFF:
+        case 0x0000 ... 0x1FFF:
             let message = String(format: "Attempt to write to chr rom space: %04X", address)
             print(message)
         case 0x2000 ... 0x2FFF:
@@ -329,7 +323,7 @@ extension PPU {
 extension PPU {
     private func bytesForTileAt(bankIndex: Int, tileIndex: Int) -> ArraySlice<UInt8> {
         let startIndex = (bankIndex * 0x1000) + tileIndex * 16
-        return self.chrRom![startIndex ..< startIndex + 16]
+        return self.cartridge!.chrRom[startIndex ..< startIndex + 16]
     }
 
     private func getBackgroundPalette(attributeTable: ArraySlice<UInt8>,
@@ -425,7 +419,7 @@ extension PPU {
         let scrollX = Int(self.scrollRegister.scrollX)
         let scrollY = Int(self.scrollRegister.scrollY)
 
-        let (mainNametable, secondaryNametable) = switch (self.mirroring!, self.controllerRegister.nametableAddress()) {
+        let (mainNametable, secondaryNametable) = switch (self.cartridge!.mirroring, self.controllerRegister.nametableAddress()) {
         case (Mirroring.vertical, 0x2000),
             (Mirroring.vertical, 0x2800),
             (Mirroring.horizontal, 0x2000),
@@ -437,7 +431,7 @@ extension PPU {
             (Mirroring.horizontal, 0x2C00):
             (self.vram[0x0400 ..< 0x0800], self.vram[0x0000 ..< 0x0400])
         default:
-            fatalError("Unsupported mirroring type: \(self.mirroring!)")
+            fatalError("Unsupported mirroring type: \(self.cartridge!.mirroring)")
         }
 
         let mainViewPort = ViewPort(startX: scrollX, startY: scrollY, endX: Self.width, endY: Self.height)
