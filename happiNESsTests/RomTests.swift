@@ -19,7 +19,7 @@ final class RomTests: XCTestCase {
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
 
-        if let badRom = Rom(bytes: romBytes) {
+        if let badRom = Cartridge(bytes: romBytes) {
             XCTFail("ROM with bad tag should not have loaded!")
         }
     }
@@ -34,7 +34,7 @@ final class RomTests: XCTestCase {
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
 
-        if let badRom = Rom(bytes: romBytes) {
+        if let badRom = Cartridge(bytes: romBytes) {
             XCTFail("ROM with bad iNES version should not have loaded!")
         }
     }
@@ -49,7 +49,7 @@ final class RomTests: XCTestCase {
         let chrBytes = [UInt8](repeating: 0x00, count: 8192)
 
         let allBytes = header + trainer + prgBytes + chrBytes
-        if let rom = Rom(bytes: allBytes) {
+        if let rom = Cartridge(bytes: allBytes) {
             XCTAssertEqual(rom.prgRom[0], 0xA9)
             XCTAssertEqual(rom.prgRom[1], 0x42)
         } else {

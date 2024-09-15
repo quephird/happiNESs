@@ -24,7 +24,7 @@ struct ContentView: View {
     @FocusState private var focused: Bool
 
     var body: some View {
-        if self.console.romLoaded {
+        if self.console.cartridgeLoaded {
             Screen(screenBuffer: console.screenBuffer)
             .padding()
             .focusable()

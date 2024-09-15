@@ -34,8 +34,8 @@ public struct CPU {
         self.tracingOn = tracingOn
     }
 
-    mutating public func loadRom(rom: Rom) {
-        self.bus.loadRom(rom: rom)
+    mutating public func loadCartridge(cartridge: Cartridge) {
+        self.bus.loadCartridge(cartridge: cartridge)
     }
 
     mutating public func reset() {

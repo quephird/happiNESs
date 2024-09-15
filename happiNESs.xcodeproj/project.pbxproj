@@ -22,7 +22,7 @@
 		8719320C2C3366B000A73C22 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320A2C3366A900A73C22 /* Console.swift */; };
 		871932102C372F6900A73C22 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320F2C372F6900A73C22 /* Bus.swift */; };
 		871932122C37985700A73C22 /* Mirroring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932112C37985700A73C22 /* Mirroring.swift */; };
-		871932142C3798B400A73C22 /* Rom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932132C3798B400A73C22 /* Rom.swift */; };
+		871932142C3798B400A73C22 /* Cartridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932132C3798B400A73C22 /* Cartridge.swift */; };
 		871F622D2C5C3C8A00132962 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 871F622C2C5C3C8900132962 /* nestest.nes */; };
 		871F622E2C5C3C8A00132962 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 871F622C2C5C3C8900132962 /* nestest.nes */; };
 		871F62302C62FE9E00132962 /* PPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F622F2C62FE9E00132962 /* PPU.swift */; };
@@ -99,7 +99,7 @@
 		8719320A2C3366A900A73C22 /* Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Console.swift; path = happiNESsApp/Console.swift; sourceTree = SOURCE_ROOT; };
 		8719320F2C372F6900A73C22 /* Bus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bus.swift; sourceTree = "<group>"; };
 		871932112C37985700A73C22 /* Mirroring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mirroring.swift; sourceTree = "<group>"; };
-		871932132C3798B400A73C22 /* Rom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rom.swift; sourceTree = "<group>"; };
+		871932132C3798B400A73C22 /* Cartridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
 		871F622C2C5C3C8900132962 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
 		871F622F2C62FE9E00132962 /* PPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPU.swift; sourceTree = "<group>"; };
 		871F62312C6314C900132962 /* AddressRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressRegister.swift; sourceTree = "<group>"; };
@@ -226,7 +226,7 @@
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
 				87184D042C7028F10003D090 /* PPUStatusRegister.swift */,
-				871932132C3798B400A73C22 /* Rom.swift */,
+				871932132C3798B400A73C22 /* Cartridge.swift */,
 				87184D0B2C7522B80003D090 /* ScrollRegister.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
@@ -421,7 +421,7 @@
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
-				871932142C3798B400A73C22 /* Rom.swift in Sources */,
+				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
 				87184D0C2C7522B80003D090 /* ScrollRegister.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,

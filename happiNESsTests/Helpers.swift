@@ -7,7 +7,7 @@
 
 @testable import happiNESs
 
-func makeRom(programBytes: [UInt8]) -> Rom {
+func makeRom(programBytes: [UInt8]) -> Cartridge {
     let header: [UInt8] = [
         0x4E, 0x45, 0x53, 0x1A,
         0x02, 0x01, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -16,7 +16,7 @@ func makeRom(programBytes: [UInt8]) -> Rom {
     let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
     let romBytes = header + prgRomBytes + chrRomBytes
 
-    return Rom(bytes: romBytes)!
+    return Cartridge(bytes: romBytes)!
 }
 
 func makeCpu(programBytes: [UInt8]) -> CPU {

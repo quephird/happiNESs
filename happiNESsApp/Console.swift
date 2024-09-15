@@ -23,7 +23,7 @@ import SwiftUI
         KeyEquivalent("s") : .buttonB,
     ]
 
-    var romLoaded: Bool = false
+    var cartridgeLoaded: Bool = false
     var displayTimer: Timer!
 
     // NOTA BENE: We don't want the screen updated every single time something inside
@@ -42,12 +42,12 @@ import SwiftUI
     public func runGame(fileUrl: URL) throws {
         let data: Data = try Data(contentsOf: fileUrl)
         let romBytes = [UInt8](data)
-        guard let rom = Rom(bytes: romBytes) else {
+        guard let cartridge = Cartridge(bytes: romBytes) else {
             throw NESError.romCouldNotBeRead
         }
 
-        self.cpu.loadRom(rom: rom)
-        self.romLoaded = true
+        self.cpu.loadCartridge(cartridge: cartridge)
+        self.cartridgeLoaded = true
         self.cpu.reset()
 
         // We need to do this to avoid keeping around previously registered timers
