@@ -322,8 +322,8 @@ extension PPU {
 
 extension PPU {
     private func bytesForTileAt(bankIndex: Int, tileIndex: Int) -> ArraySlice<UInt8> {
-        let startIndex = (bankIndex * 0x1000) + tileIndex * 16
-        return self.cartridge!.chrRom[startIndex ..< startIndex + 16]
+        let startAddress = UInt16((bankIndex * 0x1000) + tileIndex * 16)
+        return self.cartridge!.readTileFromChrRom(startAddress: startAddress)
     }
 
     private func getBackgroundPalette(attributeTable: ArraySlice<UInt8>,

@@ -53,6 +53,10 @@ public class Cartridge {
         return self.chrRom[Int(address)]
     }
 
+    public func readTileFromChrRom(startAddress: UInt16) -> ArraySlice<UInt8> {
+        return self.chrRom[Int(startAddress) ..< Int(startAddress) + 16]
+    }
+
     public func readPrgRom(address: UInt16) -> UInt8 {
         var addressOffset = address - 0x8000
 
