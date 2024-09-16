@@ -569,6 +569,10 @@ extension CPU {
         return (false, 0)
     }
 
+    mutating func sha(addressingMode: AddressingMode) -> (Bool, Int) {
+        return (false, 0)
+    }
+
     mutating func slo(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let oldValue = self.readByte(address: address)
@@ -812,6 +816,8 @@ extension CPU {
                 self.sed()
             case .sei:
                 self.sei()
+            case .shaAbsoluteY, .shaIndirectY:
+                self.sha(addressingMode: opcode.addressingMode)
             case .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY:
                 self.slo(addressingMode: opcode.addressingMode)
             case .sreAbsolute, .sreAbsoluteX, .sreAbsoluteY, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectY:

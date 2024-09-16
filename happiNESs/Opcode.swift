@@ -242,6 +242,9 @@ enum Opcode: UInt8 {
     case sed = 0xF8
     case sei = 0x78
 
+    case shaAbsoluteY = 0x9F
+    case shaIndirectY = 0x93
+
     case sloAbsolute = 0x0F
     case sloAbsoluteX = 0x1F
     case sloAbsoluteY = 0x1B
@@ -520,6 +523,9 @@ extension Opcode {
         case .sec: .implicit
         case .sed: .implicit
         case .sei: .implicit
+
+        case .shaAbsoluteY: .absoluteY
+        case .shaIndirectY: .indirectY
 
         case .sloAbsolute: .absolute
         case .sloAbsoluteX: .absoluteX
@@ -802,6 +808,9 @@ extension Opcode {
         case .sed: 1
         case .sei: 1
 
+        case .shaAbsoluteY: 3
+        case .shaIndirectY: 2
+
         case .sloAbsolute: 3
         case .sloAbsoluteX: 3
         case .sloAbsoluteY: 3
@@ -868,6 +877,7 @@ extension Opcode {
                 .rraAbsolute, .rraAbsoluteX, .rraAbsoluteY, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectY,
                 .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
                 .sbcImmediate2,
+                .shaAbsoluteY, .shaIndirectY,
                 .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY,
                 .sreAbsolute, .sreAbsoluteX, .sreAbsoluteY, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectY:
             return false
@@ -1115,6 +1125,9 @@ extension Opcode {
         case .sec: 2
         case .sed: 2
         case .sei: 2
+
+        case .shaAbsoluteY: 5
+        case .shaIndirectY: 6
 
         case .sloAbsolute: 6
         case .sloAbsoluteX: 7
