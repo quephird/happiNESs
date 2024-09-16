@@ -570,6 +570,24 @@ extension CPU {
     }
 
     mutating func sha(addressingMode: AddressingMode) -> (Bool, Int) {
+        let (address2, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
+
+        let address: UInt16
+        switch addressingMode {
+        case .indirectY:
+            let pos = self.readByte(address: self.programCounter)
+            address = self.readWord(address: UInt16(pos)) + UInt16(self.yRegister)
+        case .absoluteY:
+            address = self.readWord(address: self.programCounter) + UInt16(self.yRegister)
+        default:
+            fatalError("Unsupported addressing mode for SHA instruction")
+        }
+
+        print("Address: \(address)")
+        print("Address2: \(address2)")
+        let result = self.accumulator & self.xRegister & address.highByte
+        self.writeByte(address: address, byte: result)
+
         return (false, 0)
     }
 
