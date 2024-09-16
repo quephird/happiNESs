@@ -412,7 +412,7 @@ extension CPU {
         // NOTA BENE: We need to set the so-called B flag upon a push to the stack:
         //
         //    https://www.nesdev.org/wiki/Status_flags#The_B_flag
-        self.pushStack(byte: self.statusRegister.rawValue | 0b0001_0000)
+        self.pushStack(byte: self.statusRegister.rawValue | 0b0011_0000)
 
         return (false, 0)
     }
@@ -570,21 +570,7 @@ extension CPU {
     }
 
     mutating func sha(addressingMode: AddressingMode) -> (Bool, Int) {
-        let (address2, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
-
-        let address: UInt16
-        switch addressingMode {
-        case .indirectY:
-            let pos = self.readByte(address: self.programCounter)
-            address = self.readWord(address: UInt16(pos)) + UInt16(self.yRegister)
-        case .absoluteY:
-            address = self.readWord(address: self.programCounter) + UInt16(self.yRegister)
-        default:
-            fatalError("Unsupported addressing mode for SHA instruction")
-        }
-
-        print("Address: \(address)")
-        print("Address2: \(address2)")
+        let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let result = self.accumulator & self.xRegister & address.highByte
         self.writeByte(address: address, byte: result)
 
@@ -932,12 +918,9 @@ extension CPU {
             let newAddress = baseAddress &+ UInt16(self.yRegister)
             return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .relative:
-            let offset = UInt16(self.readByte(address: address)) &+ 1
-            let newAddress = if offset >> 7 == 0 {
-                self.programCounter &+ offset
-            } else {
-                self.programCounter &+ offset &- 0x0100
-            }
+            let signedOffset = Int(Int8(bitPattern: self.readByte(address: address)))
+            let signedNewAddress = Int(self.programCounter) + signedOffset + 1
+            let newAddress = UInt16(truncatingIfNeeded: signedNewAddress)
 
             return (newAddress, wasPageCrossed(fromAddress: address + 1, toAddress: newAddress))
         default:
