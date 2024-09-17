@@ -306,6 +306,8 @@ extension PPU {
                 if self.controllerRegister[.generateNmi] {
                     self.nmiInterrupt = 1
                 }
+
+                return true
             }
 
             if self.scanline >= Self.scanlinesPerFrame {
@@ -316,7 +318,7 @@ extension PPU {
             }
         }
 
-        return self.nmiInterrupt != nil
+        return false
     }
 }
 
