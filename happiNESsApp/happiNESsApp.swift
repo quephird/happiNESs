@@ -56,6 +56,12 @@ struct happiNESsApp: App {
                     }
                 }
             }
+            CommandGroup(after: .sidebar) {
+                Button("Dump PPU State") {
+                    console.cpu.bus.ppu.dump()
+                }
+                Divider()
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ public struct Bus {
     static let ppuRegistersMirrorsBegin: UInt16 = 0x2000;
     static let ppuRegistersMirrorsEnd: UInt16 = 0x3FFF;
 
-    var ppu: PPU
+    public var ppu: PPU
     var cartridge: Cartridge?
     var vram: [UInt8]
     var prgRom: [UInt8]?
