@@ -362,6 +362,15 @@ extension PPU {
         screenBuffer[Self.width * y + x] = color
     }
 
+    private func drawBackgroundColor(to screenBuffer: inout [NESColor]) {
+        let backgroundColor = NESColor.systemPalette[Int(self.paletteTable[0])]
+        for y in 0 ..< Self.height {
+            for x in 0 ..< Self.width {
+                self.setColorAt(x: x, y: y, in: &screenBuffer, to: backgroundColor)
+            }
+        }
+    }
+
     private func drawBackgroundTile(to screenBuffer: inout [NESColor],
                                     attributeTable: ArraySlice<UInt8>,
                                     viewPort: ViewPort,
@@ -381,6 +390,11 @@ extension PPU {
                 let backgroundColorIndex = Int((secondByte & 0x01) << 1 | (firstByte & 0x01))
                 firstByte >>= 1
                 secondByte >>= 1
+
+                if backgroundColorIndex == 0 {
+                    // Transparent pixel!
+                    continue
+                }
 
                 let backgroundColor = backgroundPalette[backgroundColorIndex]
                 let pixelX = tileX * 8 + x
@@ -417,7 +431,7 @@ extension PPU {
         }
     }
 
-    public func drawBackground(to screenBuffer: inout [NESColor]) {
+    public func drawBackgroundTiles(to screenBuffer: inout [NESColor]) {
         let scrollX = Int(self.scrollRegister.scrollX)
         let scrollY = Int(self.scrollRegister.scrollY)
 
@@ -475,8 +489,32 @@ extension PPU {
         }
     }
 
-    private func drawSprites(to screenBuffer: inout [NESColor]) {
-        for oamDataIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4).reversed() {
+    // This function inspects the fifth bit of the tile attributes for each sprite
+    // in the OAM data, and separates out which ones should be rendered behind the
+    // background tiles and which should be drawn in front. It returns a tuple
+    // of indices into the OAM data array.
+    private func getSpriteIndices() -> ([Int], [Int]) {
+        var backgroundSprites: [Int] = []
+        var foregroundSprites: [Int] = []
+        for oamDataIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4) {
+            let tileAttributes = self.oamRegister.data[oamDataIndex + 2]
+            let spriteInBack = tileAttributes >> 5 & 1 == 1
+
+            if spriteInBack {
+                backgroundSprites.append(oamDataIndex)
+            } else {
+                foregroundSprites.append(oamDataIndex)
+            }
+        }
+
+        return (backgroundSprites, foregroundSprites)
+    }
+
+    private func drawSprites(to screenBuffer: inout [NESColor],
+                             for indices: [Int]) {
+        // NOTA BENE: We render sprites in reverse order below; ones at
+        // lower indices in the OAM are rendered _after_ ones at higher indices.
+        for oamDataIndex in indices.reversed() {
             let tileY = Int(self.oamRegister.data[oamDataIndex])
             let tileIndex = Int(self.oamRegister.data[oamDataIndex + 1])
             let tileAttributes = self.oamRegister.data[oamDataIndex + 2]
@@ -524,11 +562,82 @@ extension PPU {
     // We pass screenBuffer as a mutable parameter to avoid copying
     // and to maximize performance.
     public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
-        self.drawBackground(to: &screenBuffer)
-        self.drawSprites(to: &screenBuffer)
+        // NOTA BENE: This rendering strategy is based on this post on the NESDev forum:
+        //
+        //     https://forums.nesdev.org/viewtopic.php?p=41698#p41698
+        self.drawBackgroundColor(to: &screenBuffer)
+        let (backgroundSpriteIndices, foregroundSpriteIndices) = getSpriteIndices()
+        self.drawSprites(to: &screenBuffer, for: backgroundSpriteIndices)
+        self.drawBackgroundTiles(to: &screenBuffer)
+        self.drawSprites(to: &screenBuffer, for: foregroundSpriteIndices)
     }
 
     static public func makeEmptyScreenBuffer() -> [NESColor] {
         [NESColor](repeating: .black, count: Self.width * Self.height)
+    }
+}
+
+extension PPU {
+    public func dump() {
+        print("cycles: \(cycles), scanline: \(scanline)")
+        dumpSprites()
+        dumpNametable(vram.prefix(2048), labeled: "A")
+        dumpNametable(vram.suffix(2048), labeled: "B")
+    }
+
+    func dumpSprites() {
+        print("sprites: ")
+        for oamDataIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4).reversed() {
+            let tileY = Int(self.oamRegister.data[oamDataIndex])
+            let tileIndex = Int(self.oamRegister.data[oamDataIndex + 1])
+            let tileAttributes = self.oamRegister.data[oamDataIndex + 2]
+            let tileX = Int(self.oamRegister.data[oamDataIndex + 3])
+
+            let flipVertical = tileAttributes >> 7 & 1 == 1
+            let flipHorizontal = tileAttributes >> 6 & 1 == 1
+            let paletteIndex = Int(tileAttributes & 0b11)
+
+            print("- \(oamDataIndex / 4):", tileIndex, "@ \(tileX),\(tileY)",
+                  (flipVertical ? "vflip" : ""), (flipHorizontal ? "hflip" : ""),
+                  "colored", paletteIndex)
+        }
+    }
+
+    func dumpNametable(_ nametable: ArraySlice<UInt8>, labeled: String) {
+        print("nametable \(labeled):")
+
+        for row in 0..<30 {
+            print("- tiles: ", terminator: "")
+            for column in 0..<32 {
+                let i = column + row * 32
+                let tileIndex = Int(nametable[i])
+                print(String(format: "%2x", tileIndex), terminator: " ")
+            }
+            print()
+        }
+
+        for row in 0..<15 {
+            print("- attrs: ", terminator: "")
+            for column in 0..<16 {
+                let i = column + row * 16
+                let attrs = Int(nametable[i])
+                let topLeft = attrs & 0b11
+                let topRight = attrs & 0b1100 >> 2
+                print(String(format: "%2x", topLeft), terminator: " ")
+                print(String(format: "%2x", topRight), terminator: " ")
+            }
+            print()
+
+            print("         ", terminator: "")
+            for column in 0..<16 {
+                let i = column + row * 16
+                let attrs = Int(nametable[i])
+                let botLeft = attrs & 0b110000 >> 4
+                let botRight = attrs & 0b11000000 >> 6
+                print(String(format: "%2x", botLeft), terminator: " ")
+                print(String(format: "%2x", botRight), terminator: " ")
+            }
+            print()
+        }
     }
 }
