@@ -49,6 +49,7 @@
 		878D81472C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
+		87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* Mapper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +124,7 @@
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
+		87D265162C9DECAF00C143B1 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +220,7 @@
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
+				87D265162C9DECAF00C143B1 /* Mapper.swift */,
 				87184D092C7511F90003D090 /* MaskRegister.swift */,
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
@@ -422,6 +425,7 @@
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
 				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
+				87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */,
 				87184D0C2C7522B80003D090 /* ScrollRegister.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,

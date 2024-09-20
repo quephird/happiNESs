@@ -11,10 +11,12 @@ public class Cartridge {
     static let chrRomPageSize: Int = 8192
 
     public var mirroring: Mirroring
-    public var mapper: UInt8
+    public var mapper: Mapper
     public var prgRom: [UInt8]
     public var chrRom: [UInt8]
+    public var chrBankIndex: Int
 
+    // TODO: Throw errors instead of returning nil
     public init?(bytes: [UInt8]) {
         if Array(bytes[0..<4]) != Self.nesTag {
             return nil
@@ -33,7 +35,11 @@ public class Cartridge {
         case (false, false): .horizontal
         }
 
-        let mapper = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
+        let mapperNumber = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
+        guard let mapper = Mapper(rawValue: mapperNumber) else {
+            return nil
+        }
+        self.mapper = mapper
 
         let prgRomSize = Int(bytes[4]) * Self.prgRomPageSize
         let chrRomSize = Int(bytes[5]) * Self.chrRomPageSize
@@ -47,23 +53,30 @@ public class Cartridge {
         self.mapper = mapper
         self.prgRom = prgRom
         self.chrRom = chrRom
+        self.chrBankIndex = 0
     }
 
-    public func readChrRom(address: UInt16) -> UInt8 {
-        return self.chrRom[Int(address)]
+    public func readPrg(address: UInt16) -> UInt8 {
+        mapper.readPrg(address: address, cartridge: self)
     }
 
-    public func readTileFromChrRom(startAddress: UInt16) -> ArraySlice<UInt8> {
-        return self.chrRom[Int(startAddress) ..< Int(startAddress) + 16]
+    public func readChr(address: UInt16) -> UInt8 {
+        mapper.readChr(address: address, cartridge: self)
     }
 
-    public func readPrgRom(address: UInt16) -> UInt8 {
-        var addressOffset = address - 0x8000
+    public func readTileFromChr(startAddress: UInt16) -> ArraySlice<UInt8> {
+        mapper.readTileFromChr(startAddress: startAddress, cartridge: self)
+    }
 
-        // Mirror if needed
-        if self.prgRom.count == 0x4000 && addressOffset >= 0x4000 {
-            addressOffset = addressOffset % 0x4000
-        }
-        return self.prgRom[Int(addressOffset)]
+    public func writePrg(address: UInt16, byte: UInt8) {
+        mapper.writePrg(address: address, byte: byte, cartridge: self)
+    }
+
+    public func writeChr(address: UInt16, byte: UInt8) {
+        mapper.writeChr(address: address, byte: byte, cartridge: self)
+    }
+
+    public func setChrBankIndex(byte: UInt8) {
+        mapper.setChrBankIndex(byte: byte, cartridge: self)
     }
 }

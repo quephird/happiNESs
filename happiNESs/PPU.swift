@@ -229,7 +229,7 @@ extension PPU {
         switch address {
         case 0x0000 ... 0x1FFF:
             // TODO: Again... I'm concerned about the magnitude of `address` here and how large `chrRom` is
-            return (self.internalDataBuffer, self.cartridge!.readChrRom(address: address))
+            return (self.internalDataBuffer, self.cartridge!.readChr(address: address))
         case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
             return (internalDataBuffer, self.vram[self.vramIndex(from: address)])
@@ -342,7 +342,7 @@ extension PPU {
 extension PPU {
     private func bytesForTileAt(bankIndex: Int, tileIndex: Int) -> ArraySlice<UInt8> {
         let startAddress = UInt16((bankIndex * 0x1000) + tileIndex * 16)
-        return self.cartridge!.readTileFromChrRom(startAddress: startAddress)
+        return self.cartridge!.readTileFromChr(startAddress: startAddress)
     }
 
     private func getBackgroundPalette(attributeTable: ArraySlice<UInt8>,
