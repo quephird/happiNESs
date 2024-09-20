@@ -15,6 +15,12 @@ public struct ScrollRegister {
         self.scrollY = 0
         self.latch = false
     }
+
+    mutating public func reset() {
+        self.scrollX = 0
+        self.scrollY = 0
+        self.latch = false
+    }
 }
 
 extension ScrollRegister {

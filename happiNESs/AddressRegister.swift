@@ -16,6 +16,11 @@ extension AddressRegister {
         self.highPointer = true
     }
 
+    mutating public func reset() {
+        self.address = 0x0000
+        self.highPointer = true
+    }
+
     mutating public func setAddress(address: UInt16) {
         self.address = address
     }

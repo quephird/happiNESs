@@ -31,6 +31,10 @@ public struct Bus {
         self.cartridge = cartridge
         self.ppu.cartridge = cartridge
     }
+
+    mutating public func reset() {
+        self.ppu.reset()
+    }
 }
 
 extension Bus {

@@ -12,6 +12,10 @@ public struct ControllerRegister: OptionSet {
         self.rawValue = rawValue
     }
 
+    mutating public func reset() {
+        self.rawValue = 0
+    }
+
     //  7 6 5 4 3 2 1 0
     //  V P H B S I N N
     //  | | | | | | | +--- Nametable bit 1

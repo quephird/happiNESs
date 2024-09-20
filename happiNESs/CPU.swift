@@ -46,6 +46,7 @@ public struct CPU {
         self.stackPointer = Self.resetStackPointerValue
         self.programCounter = self.readWord(address: Self.resetVectorAddress)
 
+        self.bus.reset()
         // TODO: Look more deeply into whether or not this is the best strategy
         // for simulating the initial number of CPU cycles when resetting the CPU
         let _ = self.bus.tick(cycles: 7)

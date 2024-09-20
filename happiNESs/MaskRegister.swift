@@ -50,7 +50,7 @@ public struct MaskRegister: OptionSet {
         }
     }
 
-    mutating func reset() {
+    mutating public func reset() {
         self.rawValue = 0b0000_0000
     }
 

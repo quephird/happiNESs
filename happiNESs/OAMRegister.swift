@@ -13,6 +13,11 @@ public struct OAMRegister {
         self.address = 0
         self.data = [UInt8](repeating: 0x00, count: 256)
     }
+
+    mutating public func reset() {
+        self.address = 0
+        self.data = [UInt8](repeating: 0x00, count: 256)
+    }
 }
 
 extension OAMRegister {
