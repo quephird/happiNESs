@@ -86,6 +86,23 @@ public struct PPU {
         self.scanline = 0
         self.nmiInterrupt = nil
     }
+
+    mutating public func reset() {
+        self.internalDataBuffer = 0x00
+        self.vram = [UInt8](repeating: 0x00, count: 2048)
+        self.paletteTable = [UInt8](repeating: 0x00, count: 32)
+
+        self.addressRegister.reset()
+        self.controllerRegister.reset()
+        self.maskRegister.reset()
+        self.oamRegister.reset()
+        self.scrollRegister.reset()
+        self.statusRegister.reset()
+
+        self.cycles = 0
+        self.scanline = 0
+        self.nmiInterrupt = nil
+    }
 }
 
 extension PPU {
