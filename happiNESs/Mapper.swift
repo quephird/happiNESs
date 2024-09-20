@@ -63,7 +63,9 @@ public enum Mapper: UInt8 {
     public func setChrBankIndex(byte: UInt8, cartridge: Cartridge) {
         switch self {
         case .nrom:
-            fatalError("Cannot write to CHR ROM for mapper type NROM")
+            // For some reason Ms. Pacman calls this even though there is
+            // no bank switching for NROM games, so for now just ignore it.
+            break
         case .cnrom:
             let bankIndex = byte & 0b0000_0011
             cartridge.chrBankIndex = Int(bankIndex)
