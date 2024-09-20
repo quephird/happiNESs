@@ -16,15 +16,14 @@ public class Cartridge {
     public var chrRom: [UInt8]
     public var chrBankIndex: Int
 
-    // TODO: Throw errors instead of returning nil
-    public init?(bytes: [UInt8]) {
+    public init(bytes: [UInt8]) throws {
         if Array(bytes[0..<4]) != Self.nesTag {
-            return nil
+            throw NESError.romNotInInesFormat
         }
 
         let inesVersion = (bytes[7] >> 2) & 0b11;
         if inesVersion != 0 {
-            return nil
+            throw NESError.versionTwoPointOhNotSupported
         }
 
         let fourScreenBit = bytes[6] & 0b1000 != 0;
@@ -37,7 +36,7 @@ public class Cartridge {
 
         let mapperNumber = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
         guard let mapper = Mapper(rawValue: mapperNumber) else {
-            return nil
+            throw NESError.mapperNotSupported(Int(mapperNumber))
         }
         self.mapper = mapper
 
