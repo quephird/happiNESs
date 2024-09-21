@@ -120,7 +120,7 @@ extension Bus {
         case 0x4016:
             self.joypad.writeByte(byte: byte)
         case 0x8000 ... 0xFFFF:
-            self.cartridge!.setChrBankIndex(byte: byte)
+            self.cartridge!.writeByte(address: address, byte: byte)
         default:
             // TODO: Implement memory writing to these addresses?
             break

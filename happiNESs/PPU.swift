@@ -266,8 +266,7 @@ extension PPU {
 
         switch address {
         case 0x0000 ... 0x1FFF:
-            let message = String(format: "Attempt to write to chr rom space: %04X", address)
-            print(message)
+            self.cartridge!.writeChr(address: address, byte: byte)
         case 0x2000 ... 0x2FFF:
             self.vram[self.vramIndex(from: address)] = byte
         case 0x3000 ... 0x3EFF:

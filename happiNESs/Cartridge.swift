@@ -7,13 +7,14 @@
 
 public class Cartridge {
     static let nesTag: [UInt8] = [0x4E, 0x45, 0x53, 0x1A]
-    static let prgRomPageSize: Int = 16384
-    static let chrRomPageSize: Int = 8192
+    static let prgMemoryPageSize: Int = 16384
+    static let chrMemoryPageSize: Int = 8192
 
     public var mirroring: Mirroring
     public var mapper: Mapper
-    public var prgRom: [UInt8]
-    public var chrRom: [UInt8]
+    public var prgMemory: [UInt8]
+    public var prgBankIndex: Int
+    public var chrMemory: [UInt8]
     public var chrBankIndex: Int
 
     public init(bytes: [UInt8]) throws {
@@ -40,23 +41,43 @@ public class Cartridge {
         }
         self.mapper = mapper
 
-        let prgRomSize = Int(bytes[4]) * Self.prgRomPageSize
-        let chrRomSize = Int(bytes[5]) * Self.chrRomPageSize
+        let prgRomSize = Int(bytes[4]) * Self.prgMemoryPageSize
+        let chrRomSize = Int(bytes[5]) * Self.chrMemoryPageSize
         let skipTrainerBit = bytes[6] & 0b100 != 0
-        let prgRomStart = 16 + (skipTrainerBit ? 512 : 0)
-        let chrRomStart = prgRomStart + prgRomSize
-        let prgRom = Array(bytes[prgRomStart ..< (prgRomStart + prgRomSize)])
-        let chrRom = Array(bytes[chrRomStart ..< (chrRomStart + chrRomSize)])
+        let prgMemoryStart = 16 + (skipTrainerBit ? 512 : 0)
+        let chrMemoryStart = prgMemoryStart + prgRomSize
+        let prgMemory = Array(bytes[prgMemoryStart ..< (prgMemoryStart + prgRomSize)])
+        let chrMemory = if chrRomSize == 0 {
+            [UInt8](repeating: 0x00, count: Self.chrMemoryPageSize)
+        } else {
+            Array(bytes[chrMemoryStart ..< (chrMemoryStart + chrRomSize)])
+        }
 
         self.mirroring = mirroring
         self.mapper = mapper
-        self.prgRom = prgRom
-        self.chrRom = chrRom
+        self.prgMemory = prgMemory
+        self.prgBankIndex = 0
+        self.chrMemory = chrMemory
         self.chrBankIndex = 0
+    }
+
+    public func writeByte(address: UInt16, byte: UInt8) {
+        switch self.mapper {
+        case .nrom:
+            break
+        case .uxrom:
+            self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
+        case .cnrom:
+            self.mapper.setChrBankIndex(byte: byte, cartridge: self)
+        }
     }
 
     public func readPrg(address: UInt16) -> UInt8 {
         mapper.readPrg(address: address, cartridge: self)
+    }
+
+    public func writePrg(address: UInt16, byte: UInt8) {
+        mapper.writePrg(address: address, byte: byte, cartridge: self)
     }
 
     public func readChr(address: UInt16) -> UInt8 {
@@ -67,15 +88,7 @@ public class Cartridge {
         mapper.readTileFromChr(startAddress: startAddress, cartridge: self)
     }
 
-    public func writePrg(address: UInt16, byte: UInt8) {
-        mapper.writePrg(address: address, byte: byte, cartridge: self)
-    }
-
     public func writeChr(address: UInt16, byte: UInt8) {
         mapper.writeChr(address: address, byte: byte, cartridge: self)
-    }
-
-    public func setChrBankIndex(byte: UInt8) {
-        mapper.setChrBankIndex(byte: byte, cartridge: self)
     }
 }
