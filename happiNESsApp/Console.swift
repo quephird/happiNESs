@@ -63,8 +63,7 @@ import SwiftUI
 
     @objc func runForOneFrame() {
         cpu.executeInstructions(stoppingAfter: .nextFrame)
-//        cpu.updateScreenBuffer(&self.screenBuffer)
-        self.screenBuffer = cpu.bus.ppu.getScreenBuffer()
+        cpu.bus.ppu.getScreenBuffer(&self.screenBuffer)
     }
 
     func handleKey(_ keyPress: KeyPress) -> Bool {

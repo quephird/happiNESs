@@ -70,7 +70,9 @@ public struct PPU {
     public var cycles: Int
     public var scanline: UInt16
     public var nmiInterrupt: UInt8?
+
     private var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
+    private var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
 
     public init() {
         self.internalDataBuffer = 0x00
@@ -303,12 +305,40 @@ extension PPU {
         return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
     }
 
-    public func getScreenBuffer() -> [NESColor] {
-        return self.screenBuffer
+    mutating public func getScreenBuffer(_ otherBuffer: inout [NESColor]) {
+        swap(&self.screenBuffer, &otherBuffer)
     }
 
     mutating private func setColorAt(x: Int, y: Int, to color: NESColor) {
         self.screenBuffer[Self.width * y + x] = color
+    }
+
+    private func getBackgroundPaletteColor(attributeTable: ArraySlice<UInt8>,
+                                           colorIndex: Int,
+                                           tileX: Int,
+                                           tileY: Int) -> NESColor? {
+        guard colorIndex != 0 else {
+            return nil
+        }
+
+        let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
+        let attributeByte = attributeTable[attributeTable.startIndex + attributeTableIndex]
+
+        let paletteIndexBase = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
+        case (0, 0):
+            attributeByte & 0b0000_0011
+        case (1, 0):
+            (attributeByte >> 2) & 0b0000_0011
+        case (0, 1):
+            (attributeByte >> 4) & 0b0000_0011
+        case (1, 1):
+            (attributeByte >> 6) & 0b0000_0011
+        default:
+            fatalError("Whoops! We should never get here!")
+        }
+
+        let paletteIndex = Int((paletteIndexBase * 4)) + colorIndex
+        return NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
     }
 
     private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
@@ -342,7 +372,6 @@ extension PPU {
         let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
 
         let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
-        let palette = self.getBackgroundPalette(attributeTable: attributeTable, tileX: nametableColumn, tileY: nametableRow)
 
         let tilePixelX = nametableX % 8
         let tilePixelY = nametableY % 8
@@ -355,12 +384,14 @@ extension PPU {
         let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
         let colorIndex = secondBit | firstBit
 
-        return colorIndex == 0 ? nil : palette[colorIndex]
+        return self.getBackgroundPaletteColor(attributeTable: attributeTable,
+                                              colorIndex: colorIndex,
+                                              tileX: nametableColumn,
+                                              tileY: nametableRow)
     }
 
     private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
-        let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
-        if let spriteIndex = allSpriteIndices.first(
+        if let spriteIndex = self.spriteIndicesForCurrentScanline.first(
             where: { oamIndex in
                 // Determine if the sprite priority matches
                 let tileAttributes = self.oamRegister.data[oamIndex + 2]
@@ -371,9 +402,7 @@ extension PPU {
 
                 // Determine if the (x, y) coordinates fall inside the sprite
                 let tileX = Int(self.oamRegister.data[oamIndex + 3])
-                let tileY = Int(self.oamRegister.data[oamIndex])
-                if x >= tileX && x <= tileX + 7 &&
-                    y >= tileY && y <= tileY + 7 {
+                if x >= tileX && x <= tileX + 7 {
                     return true
                 }
 
@@ -437,10 +466,27 @@ extension PPU {
         setColorAt(x: x, y: y, to: color)
     }
 
+    mutating private func cacheSpriteIndices() {
+        let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
+        self.spriteIndicesForCurrentScanline = allSpriteIndices.filter({
+            oamIndex in
+                // Cache only the sprites residing on this scanline
+                let tileY = Int(self.oamRegister.data[oamIndex])
+                if self.scanline >= tileY && self.scanline <= tileY + 7 {
+                    return true
+                }
+
+                return false
+        }).prefix(8)
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
         var redrawScreen = false
+        if self.cycles == 0 {
+            self.cacheSpriteIndices()
+        }
 
         for _ in 0 ..< cpuCycles * 3 {
             if self.cycles < Self.width && self.scanline < Self.height {
@@ -456,6 +502,7 @@ extension PPU {
 
                 self.cycles = 0
                 self.scanline += 1
+                self.cacheSpriteIndices()
 
                 if self.scanline == Self.nmiInterruptScanline {
                     self.statusRegister[.verticalBlankStarted] = true
