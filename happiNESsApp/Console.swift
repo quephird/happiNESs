@@ -42,9 +42,7 @@ import SwiftUI
     public func runGame(fileUrl: URL) throws {
         let data: Data = try Data(contentsOf: fileUrl)
         let romBytes = [UInt8](data)
-        guard let cartridge = Cartridge(bytes: romBytes) else {
-            throw NESError.romCouldNotBeRead
-        }
+        let cartridge = try Cartridge(bytes: romBytes)
 
         self.cpu.loadCartridge(cartridge: cartridge)
         self.cartridgeLoaded = true

@@ -14,7 +14,6 @@ public struct Bus {
     public var ppu: PPU
     var cartridge: Cartridge?
     var vram: [UInt8]
-    var prgRom: [UInt8]?
     var cycles: Int
     var joypad: Joypad
 
@@ -38,8 +37,8 @@ public struct Bus {
 }
 
 extension Bus {
-    private func readPrgRom(address: UInt16) -> UInt8 {
-        return self.cartridge!.readPrgRom(address: address)
+    private func readPrg(address: UInt16) -> UInt8 {
+        return self.cartridge!.readPrg(address: address)
     }
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
@@ -62,7 +61,7 @@ extension Bus {
         case 0x4016:
             return self.joypad.readByteWithoutMutating()
         case 0x8000 ... 0xFFFF:
-            return self.readPrgRom(address: address)
+            return self.readPrg(address: address)
         default:
             // TODO: Implement memory reading from these addresses?
             return 0x00
@@ -120,7 +119,7 @@ extension Bus {
         case 0x4016:
             self.joypad.writeByte(byte: byte)
         case 0x8000 ... 0xFFFF:
-            fatalError("Attempt to write to cartridge ROM space")
+            self.cartridge!.writeByte(address: address, byte: byte)
         default:
             // TODO: Implement memory writing to these addresses?
             break

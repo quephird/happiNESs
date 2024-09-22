@@ -50,8 +50,8 @@ final class RomTests: XCTestCase {
 
         let allBytes = header + trainer + prgBytes + chrBytes
         if let rom = Cartridge(bytes: allBytes) {
-            XCTAssertEqual(rom.prgRom[0], 0xA9)
-            XCTAssertEqual(rom.prgRom[1], 0x42)
+            XCTAssertEqual(rom.prgMemory[0], 0xA9)
+            XCTAssertEqual(rom.prgMemory[1], 0x42)
         } else {
             XCTFail("ROM should have been successfully constructed")
         }
