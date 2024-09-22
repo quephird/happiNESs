@@ -311,14 +311,19 @@ extension PPU {
         self.screenBuffer[Self.width * y + x] = color
     }
 
+    private func getColorFromPalette(baseIndex: Int, entryIndex: Int) -> NESColor? {
+        guard entryIndex != 0 else {
+            return nil
+        }
+
+        let paletteIndex = baseIndex + entryIndex
+        return NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
+    }
+
     private func getBackgroundPaletteColor(attributeTable: ArraySlice<UInt8>,
                                            colorIndex: Int,
                                            tileX: Int,
                                            tileY: Int) -> NESColor? {
-        guard colorIndex != 0 else {
-            return nil
-        }
-
         let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
         let attributeByte = attributeTable[attributeTable.startIndex + attributeTableIndex]
 
@@ -335,8 +340,7 @@ extension PPU {
             fatalError("Whoops! We should never get here!")
         }
 
-        let paletteIndex = Int((paletteIndexBase * 4)) + colorIndex
-        return NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
+        return getColorFromPalette(baseIndex: Int((paletteIndexBase * 4)), entryIndex: colorIndex)
     }
 
     private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
@@ -388,19 +392,12 @@ extension PPU {
                                               tileY: nametableRow)
     }
 
-    private func getSpritePalette(paletteIndex: Int) -> [NESColor] {
+    private func getSpritePalette(paletteIndex: Int, colorIndex: Int) -> NESColor? {
         // NOTA BENE: The sprite palettes occupy the _upper_ 16 bytes
-        // of the palette table, which is why the offset below is 0x11
-        // and not 0x01.
-        let paletteStartIndex = Int(0x11 + (paletteIndex * 4))
-        return [
-            0,
-            paletteStartIndex,
-            paletteStartIndex + 1,
-            paletteStartIndex + 2,
-        ].map { index in
-            NESColor.systemPalette[Int(self.paletteTable[index])]
-        }
+        // of the palette table, which is why the offset below is 0x10
+        // and not 0x00.
+        let paletteStartIndex = Int(0x10 + (paletteIndex * 4))
+        return getColorFromPalette(baseIndex: paletteStartIndex, entryIndex: colorIndex)
     }
 
     private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
@@ -423,7 +420,6 @@ extension PPU {
             let flipHorizontal = tileAttributes >> 6 & 1 == 1
             let paletteIndex = Int(tileAttributes & 0b11)
 
-            let palette = self.getSpritePalette(paletteIndex: paletteIndex)
             let bankIndex = self.controllerRegister[.spritePatternBankIndex] ? 1 : 0
             let tileIndex = Int(self.oamRegister.data[spriteIndex + 1])
 
@@ -453,10 +449,11 @@ extension PPU {
             let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
             let colorIndex = secondBit | firstBit
 
-            guard colorIndex != 0 else {
+            guard let spriteColor = self.getSpritePalette(paletteIndex: paletteIndex, colorIndex: colorIndex) else {
                 continue
             }
-            return palette[colorIndex]
+
+            return spriteColor
         }
 
         return nil
