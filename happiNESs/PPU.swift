@@ -433,15 +433,21 @@ extension PPU {
 
             let tileX = Int(self.oamRegister.data[spriteIndex + 3])
             let tileY = Int(self.oamRegister.data[spriteIndex])
+            let deltaX = x - tileX
+            let deltaY = y - tileY
+
+            guard deltaX >= 0 && deltaY >= 0 else {
+                return nil
+            }
             let (tilePixelX, tilePixelY) = switch (flipHorizontal, flipVertical) {
             case (false, false):
-                ((x - tileX) % 8, (y - tileY) % 8)
+                (deltaX % 8, deltaY % 8)
             case (true, false):
-                (7 - (x - tileX) % 8, (y - tileY) % 8)
+                (7 - deltaX % 8, deltaY % 8)
             case (false, true):
-                ((x - tileX) % 8, 7 - (y - tileY) % 8)
+                (deltaX % 8, 7 - deltaY % 8)
             case (true, true):
-                (7 - (x - tileX) % 8, 7 - (y - tileY) % 8)
+                (7 - deltaX % 8, 7 - deltaY % 8)
             }
 
             let tileBytes = self.bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
