@@ -70,6 +70,7 @@ public struct PPU {
     public var cycles: Int
     public var scanline: UInt16
     public var nmiInterrupt: UInt8?
+    private var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
 
     public init() {
         self.internalDataBuffer = 0x00
@@ -302,39 +303,60 @@ extension PPU {
         return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
     }
 
+    public func getScreenBuffer() -> [NESColor] {
+        return self.screenBuffer
+    }
+
+    mutating private func setColorAt(x: Int, y: Int, to color: NESColor) {
+        self.screenBuffer[Self.width * y + x] = color
+    }
+
+    mutating private func renderPixel(x: Int, y: Int) {
+        let color = NESColor.systemPalette[42]
+        setColorAt(x: x, y: y, to: color)
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
-        self.cycles += cpuCycles * 3
+        var redrawScreen = false
 
-        if self.cycles >= Self.ppuCyclesPerScanline {
-            if self.isSpriteZeroHit(cycles: self.cycles) {
-                self.statusRegister[.spriteZeroHit] = true
+        for _ in 0 ..< cpuCycles * 3 {
+            if self.cycles < Self.width && self.scanline < Self.height {
+                self.renderPixel(x: self.cycles, y: Int(self.scanline))
             }
 
-            self.cycles -= Self.ppuCyclesPerScanline
-            self.scanline += 1
+            self.cycles += 1
 
-            if self.scanline == Self.nmiInterruptScanline {
-                self.statusRegister[.verticalBlankStarted] = true
-                self.statusRegister[.spriteZeroHit] = false
-
-                if self.controllerRegister[.generateNmi] {
-                    self.nmiInterrupt = 1
+            if self.cycles >= Self.ppuCyclesPerScanline {
+                if self.isSpriteZeroHit(cycles: self.cycles) {
+                    self.statusRegister[.spriteZeroHit] = true
                 }
 
-                return true
-            }
+                self.cycles = 0
+                self.scanline += 1
 
-            if self.scanline >= Self.scanlinesPerFrame {
-                self.scanline = 0
-                self.nmiInterrupt = nil
-                self.statusRegister[.verticalBlankStarted] = false
-                self.statusRegister[.spriteZeroHit] = false
+                if self.scanline == Self.nmiInterruptScanline {
+                    self.statusRegister[.verticalBlankStarted] = true
+                    self.statusRegister[.spriteZeroHit] = false
+
+                    if self.controllerRegister[.generateNmi] {
+                        self.nmiInterrupt = 1
+                    }
+
+                    redrawScreen = true
+                }
+
+                if self.scanline >= Self.scanlinesPerFrame {
+                    self.scanline = 0
+                    self.nmiInterrupt = nil
+                    self.statusRegister[.verticalBlankStarted] = false
+                    self.statusRegister[.spriteZeroHit] = false
+                }
             }
         }
 
-        return false
+        return redrawScreen
     }
 }
 
