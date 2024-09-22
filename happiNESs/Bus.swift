@@ -14,7 +14,6 @@ public struct Bus {
     public var ppu: PPU
     var cartridge: Cartridge?
     var vram: [UInt8]
-    var prgRom: [UInt8]?
     var cycles: Int
     var joypad: Joypad
 
