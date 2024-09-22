@@ -311,8 +311,63 @@ extension PPU {
         self.screenBuffer[Self.width * y + x] = color
     }
 
+    private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
+        let scrollX = Int(self.scrollRegister.scrollX)
+        let scrollY = Int(self.scrollRegister.scrollY)
+
+        let shiftX = x + scrollX
+        let shiftY = y + scrollY
+
+        let startAddressOffset: UInt16 = switch (shiftX < Self.width, shiftY < Self.height) {
+        case (true, true):
+            0x0000
+        case (false, true):
+            0x0400
+        case (true, false):
+            0x0800
+        case (false, false):
+            0x0C00
+        }
+        let startAddress = self.controllerRegister.nametableAddress() + startAddressOffset
+        let startIndex = self.vramIndex(from: startAddress)
+        let nametable = self.vram[startIndex ..< startIndex + 0x0400]
+
+        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
+
+        let nametableX = shiftX % Self.width
+        let nametableY = shiftY % Self.height
+        let nametableColumn = nametableX/8
+        let nametableRow = nametableY/8
+        let nametableIndex = 32 * nametableRow + nametableColumn
+        let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
+
+        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+        let palette = self.getBackgroundPalette(attributeTable: attributeTable, tileX: nametableColumn, tileY: nametableRow)
+
+        let tilePixelX = nametableX % 8
+        let tilePixelY = nametableY % 8
+
+        let tileBytes = self.bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
+        let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
+        let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
+        let bitMask: UInt8 = 0b1000_0000 >> tilePixelX
+        let firstBit = firstByte & bitMask > 0 ? 0b01 : 0b00
+        let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
+        let colorIndex = secondBit | firstBit
+
+        return colorIndex == 0 ? nil : palette[colorIndex]
+    }
+
+    private func computeColorAt(x: Int, y: Int) -> NESColor {
+        if let color = self.getBackgroundTileColor(x: x, y: y) {
+            return color
+        }
+
+        return NESColor.systemPalette[Int(self.paletteTable[0])]
+    }
+
     mutating private func renderPixel(x: Int, y: Int) {
-        let color = NESColor.systemPalette[42]
+        let color = self.computeColorAt(x: x, y: y)
         setColorAt(x: x, y: y, to: color)
     }
 
