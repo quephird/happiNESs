@@ -404,25 +404,21 @@ extension PPU {
     }
 
     private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
-        if let spriteIndex = self.spriteIndicesForCurrentScanline.first(
-            where: { oamIndex in
-                // Determine if the sprite priority matches
-                let tileAttributes = self.oamRegister.data[oamIndex + 2]
-                let spriteBackgroundPriority = tileAttributes >> 5 & 1 == 1
-                if spriteBackgroundPriority != backgroundPriority {
-                    return false
-                }
-
-                // Determine if the (x, y) coordinates fall inside the sprite
-                let tileX = Int(self.oamRegister.data[oamIndex + 3])
-                if x >= tileX && x <= tileX + 7 {
-                    return true
-                }
-
-                return false
-            }
-        ) {
+        for spriteIndex in self.spriteIndicesForCurrentScanline {
+            // Determine if the sprite priority matches
             let tileAttributes = self.oamRegister.data[spriteIndex + 2]
+            let spriteBackgroundPriority = tileAttributes >> 5 & 1 == 1
+            if spriteBackgroundPriority != backgroundPriority {
+                continue
+            }
+
+            // Determine if the (x, y) coordinates fall inside the sprite
+            let tileX = Int(self.oamRegister.data[spriteIndex + 3])
+            guard x >= tileX && x <= tileX + 7 else {
+                continue
+            }
+            let tileY = Int(self.oamRegister.data[spriteIndex])
+
             let flipVertical = tileAttributes >> 7 & 1 == 1
             let flipHorizontal = tileAttributes >> 6 & 1 == 1
             let paletteIndex = Int(tileAttributes & 0b11)
@@ -431,14 +427,13 @@ extension PPU {
             let bankIndex = self.controllerRegister[.spritePatternBankIndex] ? 1 : 0
             let tileIndex = Int(self.oamRegister.data[spriteIndex + 1])
 
-            let tileX = Int(self.oamRegister.data[spriteIndex + 3])
-            let tileY = Int(self.oamRegister.data[spriteIndex])
             let deltaX = x - tileX
             let deltaY = y - tileY
-
             guard deltaX >= 0 && deltaY >= 0 else {
-                return nil
+                // Sprite is at least partially off screen
+                continue
             }
+
             let (tilePixelX, tilePixelY) = switch (flipHorizontal, flipVertical) {
             case (false, false):
                 (deltaX % 8, deltaY % 8)
@@ -458,7 +453,10 @@ extension PPU {
             let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
             let colorIndex = secondBit | firstBit
 
-            return colorIndex == 0 ? nil : palette[colorIndex]
+            guard colorIndex != 0 else {
+                continue
+            }
+            return palette[colorIndex]
         }
 
         return nil
