@@ -358,8 +358,74 @@ extension PPU {
         return colorIndex == 0 ? nil : palette[colorIndex]
     }
 
+    private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
+        let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
+        if let spriteIndex = allSpriteIndices.first(
+            where: { oamIndex in
+                // Determine if the sprite priority matches
+                let tileAttributes = self.oamRegister.data[oamIndex + 2]
+                let spriteBackgroundPriority = tileAttributes >> 5 & 1 == 1
+                if spriteBackgroundPriority != backgroundPriority {
+                    return false
+                }
+
+                // Determine if the (x, y) coordinates fall inside the sprite
+                let tileX = Int(self.oamRegister.data[oamIndex + 3])
+                let tileY = Int(self.oamRegister.data[oamIndex])
+                if x >= tileX && x <= tileX + 7 &&
+                    y >= tileY && y <= tileY + 7 {
+                    return true
+                }
+
+                return false
+            }
+        ) {
+            let tileAttributes = self.oamRegister.data[spriteIndex + 2]
+            let flipVertical = tileAttributes >> 7 & 1 == 1
+            let flipHorizontal = tileAttributes >> 6 & 1 == 1
+            let paletteIndex = Int(tileAttributes & 0b11)
+
+            let palette = self.getSpritePalette(paletteIndex: paletteIndex)
+            let bankIndex = self.controllerRegister[.spritePatternBankIndex] ? 1 : 0
+            let tileIndex = Int(self.oamRegister.data[spriteIndex + 1])
+
+            let tileX = Int(self.oamRegister.data[spriteIndex + 3])
+            let tileY = Int(self.oamRegister.data[spriteIndex])
+            let (tilePixelX, tilePixelY) = switch (flipHorizontal, flipVertical) {
+            case (false, false):
+                ((x - tileX) % 8, (y - tileY) % 8)
+            case (true, false):
+                (7 - (x - tileX) % 8, (y - tileY) % 8)
+            case (false, true):
+                ((x - tileX) % 8, 7 - (y - tileY) % 8)
+            case (true, true):
+                (7 - (x - tileX) % 8, 7 - (y - tileY) % 8)
+            }
+
+            let tileBytes = self.bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
+            let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
+            let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
+            let bitMask: UInt8 = 0b1000_0000 >> tilePixelX
+            let firstBit = firstByte & bitMask > 0 ? 0b01 : 0b00
+            let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
+            let colorIndex = secondBit | firstBit
+
+            return colorIndex == 0 ? nil : palette[colorIndex]
+        }
+
+        return nil
+    }
+
     private func computeColorAt(x: Int, y: Int) -> NESColor {
+        if let color = self.getSpriteColor(backgroundPriority: false, x: x, y: y) {
+            return color
+        }
+
         if let color = self.getBackgroundTileColor(x: x, y: y) {
+            return color
+        }
+
+        if let color = self.getSpriteColor(backgroundPriority: true, x: x, y: y) {
             return color
         }
 
