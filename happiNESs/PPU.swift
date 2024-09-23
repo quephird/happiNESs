@@ -302,7 +302,10 @@ extension PPU {
         swap(&self.screenBuffer, &otherBuffer)
     }
 
-    private func bytesForTileAt(bankIndex: Int, tileIndex: Int) -> ArraySlice<UInt8> {
+    private func bytesForTileAt(bankIndexRegisterMask: ControllerRegister,
+                                tileIndex: Int) -> ArraySlice<UInt8> {
+        let bankIndex = self.controllerRegister[bankIndexRegisterMask] ? 1 : 0
+
         let startAddress = UInt16((bankIndex * 0x1000) + tileIndex * 16)
         return self.cartridge!.readTileFromChr(startAddress: startAddress)
     }
@@ -343,6 +346,20 @@ extension PPU {
         return getColorFromPalette(baseIndex: Int((paletteIndexBase * 4)), entryIndex: colorIndex)
     }
 
+    private func getTileColorIndex(bankIndexRegisterMask: ControllerRegister,
+                                   tileIndex: Int,
+                                   tilePixelX: Int,
+                                   tilePixelY: Int) -> Int {
+        let tileBytes = self.bytesForTileAt(bankIndexRegisterMask: bankIndexRegisterMask,
+                                            tileIndex: tileIndex)
+        let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
+        let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
+        let bitMask: UInt8 = 0b1000_0000 >> tilePixelX
+        let firstBit = firstByte & bitMask > 0 ? 0b01 : 0b00
+        let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
+        return secondBit | firstBit
+    }
+
     private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
         let scrollX = Int(self.scrollRegister.scrollX)
         let scrollY = Int(self.scrollRegister.scrollY)
@@ -371,20 +388,14 @@ extension PPU {
         let nametableColumn = nametableX/8
         let nametableRow = nametableY/8
         let nametableIndex = 32 * nametableRow + nametableColumn
+
         let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
-
-        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
-
         let tilePixelX = nametableX % 8
         let tilePixelY = nametableY % 8
-
-        let tileBytes = self.bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
-        let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
-        let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
-        let bitMask: UInt8 = 0b1000_0000 >> tilePixelX
-        let firstBit = firstByte & bitMask > 0 ? 0b01 : 0b00
-        let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
-        let colorIndex = secondBit | firstBit
+        let colorIndex = self.getTileColorIndex(bankIndexRegisterMask: .backgroundPatternBankIndex,
+                                                tileIndex: tileIndex,
+                                                tilePixelX: tilePixelX,
+                                                tilePixelY: tilePixelY)
 
         return self.getBackgroundPaletteColor(attributeTable: attributeTable,
                                               colorIndex: colorIndex,
@@ -400,66 +411,60 @@ extension PPU {
         return getColorFromPalette(baseIndex: paletteStartIndex, entryIndex: colorIndex)
     }
 
-    private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
+    mutating private func getSpriteColor(backgroundPriority: Bool, 
+                                         spriteIndex: Int,
+                                         x: Int,
+                                         y: Int) -> NESColor? {
+        // Determine if the sprite priority matches
+        let tileAttributes = self.oamRegister.data[spriteIndex + 2]
+        let spriteBackgroundPriority = tileAttributes >> 5 & 1 == 1
+        if spriteBackgroundPriority != backgroundPriority {
+            return nil
+        }
+
+        let tileX = Int(self.oamRegister.data[spriteIndex + 3])
+        // Determine if the x coordinate falls inside the sprite
+        guard x >= tileX && x <= tileX + 7 else {
+            return nil
+        }
+        let tileY = Int(self.oamRegister.data[spriteIndex])
+
+        let flipVertical = tileAttributes >> 7 & 1 == 1
+        let flipHorizontal = tileAttributes >> 6 & 1 == 1
+        let paletteIndex = Int(tileAttributes & 0b11)
+
+        let deltaX = x - tileX
+        let deltaY = y - tileY
+        guard deltaX >= 0 && deltaY >= 0 else {
+            // Sprite is at least partially off screen
+            return nil
+        }
+
+        let tileIndex = Int(self.oamRegister.data[spriteIndex + 1])
+        let tilePixelX = flipHorizontal ? 7 - deltaX % 8 : deltaX % 8
+        let tilePixelY = flipVertical ? 7 - deltaY % 8 : deltaY % 8
+        let colorIndex = self.getTileColorIndex(bankIndexRegisterMask: .spritePatternBankIndex,
+                                                tileIndex: tileIndex,
+                                                tilePixelX: tilePixelX,
+                                                tilePixelY: tilePixelY)
+
+        return self.getSpritePalette(paletteIndex: paletteIndex, colorIndex: colorIndex)
+    }
+
+    mutating private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
         for spriteIndex in self.spriteIndicesForCurrentScanline {
-            // Determine if the sprite priority matches
-            let tileAttributes = self.oamRegister.data[spriteIndex + 2]
-            let spriteBackgroundPriority = tileAttributes >> 5 & 1 == 1
-            if spriteBackgroundPriority != backgroundPriority {
-                continue
+            if let spriteColor = self.getSpriteColor(backgroundPriority: backgroundPriority,
+                                                     spriteIndex: spriteIndex,
+                                                     x: x,
+                                                     y: y) {
+                return spriteColor
             }
-
-            // Determine if the (x, y) coordinates fall inside the sprite
-            let tileX = Int(self.oamRegister.data[spriteIndex + 3])
-            guard x >= tileX && x <= tileX + 7 else {
-                continue
-            }
-            let tileY = Int(self.oamRegister.data[spriteIndex])
-
-            let flipVertical = tileAttributes >> 7 & 1 == 1
-            let flipHorizontal = tileAttributes >> 6 & 1 == 1
-            let paletteIndex = Int(tileAttributes & 0b11)
-
-            let bankIndex = self.controllerRegister[.spritePatternBankIndex] ? 1 : 0
-            let tileIndex = Int(self.oamRegister.data[spriteIndex + 1])
-
-            let deltaX = x - tileX
-            let deltaY = y - tileY
-            guard deltaX >= 0 && deltaY >= 0 else {
-                // Sprite is at least partially off screen
-                continue
-            }
-
-            let (tilePixelX, tilePixelY) = switch (flipHorizontal, flipVertical) {
-            case (false, false):
-                (deltaX % 8, deltaY % 8)
-            case (true, false):
-                (7 - deltaX % 8, deltaY % 8)
-            case (false, true):
-                (deltaX % 8, 7 - deltaY % 8)
-            case (true, true):
-                (7 - deltaX % 8, 7 - deltaY % 8)
-            }
-
-            let tileBytes = self.bytesForTileAt(bankIndex: bankIndex, tileIndex: tileIndex)
-            let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
-            let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
-            let bitMask: UInt8 = 0b1000_0000 >> tilePixelX
-            let firstBit = firstByte & bitMask > 0 ? 0b01 : 0b00
-            let secondBit = secondByte & bitMask > 0 ? 0b10 : 0b00
-            let colorIndex = secondBit | firstBit
-
-            guard let spriteColor = self.getSpritePalette(paletteIndex: paletteIndex, colorIndex: colorIndex) else {
-                continue
-            }
-
-            return spriteColor
         }
 
         return nil
     }
 
-    private func computeColorAt(x: Int, y: Int) -> NESColor {
+    mutating private func computeColorAt(x: Int, y: Int) -> NESColor {
         if let color = self.getSpriteColor(backgroundPriority: false, x: x, y: y) {
             return color
         }
