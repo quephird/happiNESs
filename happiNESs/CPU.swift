@@ -1032,12 +1032,6 @@ extension CPU {
 }
 
 extension CPU {
-    mutating public func updateScreenBuffer(_ screenBuffer: inout [NESColor]) {
-        self.bus.ppu.updateScreenBuffer(&screenBuffer)
-    }
-}
-
-extension CPU {
     mutating private func interruptNmi() {
         self.pushStack(word: self.programCounter)
 
