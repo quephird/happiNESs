@@ -302,8 +302,9 @@ extension PPU {
         swap(&self.screenBuffer, &otherBuffer)
     }
 
-    private func bytesForTileAt(bankAddressStart: UInt16,
+    private func bytesForTileAt(bankIndex: Int,
                                 tileIndex: Int) -> ArraySlice<UInt8> {
+        let bankAddressStart = UInt16(bankIndex * 0x1000)
         let startAddress = bankAddressStart + UInt16(tileIndex * 16)
         return self.cartridge!.readTileFromChr(startAddress: startAddress)
     }
@@ -344,11 +345,11 @@ extension PPU {
         return getColorFromPalette(baseIndex: Int((paletteIndexBase * 4)), entryIndex: colorIndex)
     }
 
-    private func getTileColorIndex(bankAddressStart: UInt16,
+    private func getTileColorIndex(bankIndex: Int,
                                    tileIndex: Int,
                                    tilePixelX: Int,
                                    tilePixelY: Int) -> Int {
-        let tileBytes = self.bytesForTileAt(bankAddressStart: bankAddressStart,
+        let tileBytes = self.bytesForTileAt(bankIndex: bankIndex,
                                             tileIndex: tileIndex)
         let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
         let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
@@ -391,8 +392,8 @@ extension PPU {
         let tilePixelX = nametableX % 8
         let tilePixelY = nametableY % 8
 
-        let bankAddressStart: UInt16 = self.controllerRegister[.backgroundPatternBankIndex] ? 0x1000 : 0x0000
-        let colorIndex = self.getTileColorIndex(bankAddressStart: bankAddressStart,
+        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+        let colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
                                                 tileIndex: tileIndex,
                                                 tilePixelX: tilePixelX,
                                                 tilePixelY: tilePixelY)
@@ -450,7 +451,7 @@ extension PPU {
 
         let tileIndexByte = self.oamRegister.data[spriteIndex + 1]
         let topTileIndex: Int
-        let bankAddressStart: UInt16
+        let bankIndex: Int
         if self.controllerRegister[.spritesAre8x16] {
             // The bits in the tile index byte are arranged like 'tttttttb'.
             // The first seven bits form the base for the tile index, where the
@@ -460,10 +461,10 @@ extension PPU {
             // 0x0000, 1 means 0x1000. See the following for more details:
             //
             //     https://www.nesdev.org/wiki/PPU_OAM#Byte_1
-            bankAddressStart = tileIndexByte & 0b0000_0001 == 1 ? 0x1000 : 0x0000
+            bankIndex = Int(tileIndexByte & 0b0000_0001)
             topTileIndex = Int(tileIndexByte & 0b1111_1110)
         } else {
-            bankAddressStart = self.controllerRegister[.spritePatternBankIndex] ? 0x1000 : 0x0000
+            bankIndex = self.controllerRegister[.spritePatternBankIndex] ? 1 : 0
             topTileIndex = Int(tileIndexByte)
         }
 
@@ -475,7 +476,7 @@ extension PPU {
         // still in the top tile. If we're handling an 8x8 sprite, then it's
         // as if we're handling the top tile of an 8x16 sprite.
         if spritePixelY < tileHeight {
-            colorIndex = self.getTileColorIndex(bankAddressStart: bankAddressStart,
+            colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
                                                 tileIndex: topTileIndex,
                                                 tilePixelX: spritePixelX,
                                                 tilePixelY: spritePixelY)
@@ -484,7 +485,7 @@ extension PPU {
             // in which case its index is one more than that for the top tile.
             // Also, the tile's y coordinate needs to be adjusted to fall inside
             // the tile.
-            colorIndex = self.getTileColorIndex(bankAddressStart: bankAddressStart,
+            colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
                                                 tileIndex: topTileIndex + 1,
                                                 tilePixelX: spritePixelX,
                                                 tilePixelY: spritePixelY % tileHeight)
