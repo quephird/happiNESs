@@ -302,11 +302,9 @@ extension PPU {
         swap(&self.screenBuffer, &otherBuffer)
     }
 
-    private func bytesForTileAt(bankIndexRegisterMask: ControllerRegister,
+    private func bytesForTileAt(bankAddressStart: UInt16,
                                 tileIndex: Int) -> ArraySlice<UInt8> {
-        let bankIndex = self.controllerRegister[bankIndexRegisterMask] ? 1 : 0
-
-        let startAddress = UInt16((bankIndex * 0x1000) + tileIndex * 16)
+        let startAddress = bankAddressStart + UInt16(tileIndex * 16)
         return self.cartridge!.readTileFromChr(startAddress: startAddress)
     }
 
@@ -346,11 +344,11 @@ extension PPU {
         return getColorFromPalette(baseIndex: Int((paletteIndexBase * 4)), entryIndex: colorIndex)
     }
 
-    private func getTileColorIndex(bankIndexRegisterMask: ControllerRegister,
+    private func getTileColorIndex(bankAddressStart: UInt16,
                                    tileIndex: Int,
                                    tilePixelX: Int,
                                    tilePixelY: Int) -> Int {
-        let tileBytes = self.bytesForTileAt(bankIndexRegisterMask: bankIndexRegisterMask,
+        let tileBytes = self.bytesForTileAt(bankAddressStart: bankAddressStart,
                                             tileIndex: tileIndex)
         let firstByte = tileBytes[tileBytes.startIndex + tilePixelY]
         let secondByte = tileBytes[tileBytes.startIndex + tilePixelY + 8]
@@ -392,7 +390,9 @@ extension PPU {
         let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
         let tilePixelX = nametableX % 8
         let tilePixelY = nametableY % 8
-        let colorIndex = self.getTileColorIndex(bankIndexRegisterMask: .backgroundPatternBankIndex,
+
+        let bankAddressStart: UInt16 = self.controllerRegister[.backgroundPatternBankIndex] ? 0x1000 : 0x0000
+        let colorIndex = self.getTileColorIndex(bankAddressStart: bankAddressStart,
                                                 tileIndex: tileIndex,
                                                 tilePixelX: tilePixelX,
                                                 tilePixelY: tilePixelY)
@@ -411,6 +411,11 @@ extension PPU {
         return getColorFromPalette(baseIndex: paletteStartIndex, entryIndex: colorIndex)
     }
 
+    var tileWidth: Int { 8 }
+    var tileHeight: Int { 8 }
+    var spriteWidth: Int { tileWidth }
+    var spriteHeight: Int { self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight }
+
     mutating private func getSpriteColor(backgroundPriority: Bool, 
                                          spriteIndex: Int,
                                          x: Int,
@@ -424,7 +429,7 @@ extension PPU {
 
         let tileX = Int(self.oamRegister.data[spriteIndex + 3])
         // Determine if the x coordinate falls inside the sprite
-        guard x >= tileX && x <= tileX + 7 else {
+        guard x >= tileX && x <= tileX + self.spriteWidth - 1 else {
             return nil
         }
         let tileY = Int(self.oamRegister.data[spriteIndex])
@@ -440,13 +445,50 @@ extension PPU {
             return nil
         }
 
-        let tileIndex = Int(self.oamRegister.data[spriteIndex + 1])
-        let tilePixelX = flipHorizontal ? 7 - deltaX % 8 : deltaX % 8
-        let tilePixelY = flipVertical ? 7 - deltaY % 8 : deltaY % 8
-        let colorIndex = self.getTileColorIndex(bankIndexRegisterMask: .spritePatternBankIndex,
-                                                tileIndex: tileIndex,
-                                                tilePixelX: tilePixelX,
-                                                tilePixelY: tilePixelY)
+        let spritePixelX = flipHorizontal ? (spriteWidth - 1) - deltaX % spriteWidth : deltaX % spriteWidth
+        let spritePixelY = flipVertical ? (spriteHeight - 1) - deltaY % spriteHeight : deltaY % spriteHeight
+
+        let tileIndexByte = self.oamRegister.data[spriteIndex + 1]
+        let topTileIndex: Int
+        let bankAddressStart: UInt16
+        if self.controllerRegister[.spritesAre8x16] {
+            // The bits in the tile index byte are arranged like 'tttttttb'.
+            // The first seven bits form the base for the tile index, where the
+            // top half of the sprite has tile index ttttttt0, and the bottom
+            // half has index ttttttt1. The last bit indicates which tile bank
+            // to use to fetch the tile; 0 means the starting address should be
+            // 0x0000, 1 means 0x1000. See the following for more details:
+            //
+            //     https://www.nesdev.org/wiki/PPU_OAM#Byte_1
+            bankAddressStart = tileIndexByte & 0b0000_0001 == 1 ? 0x1000 : 0x0000
+            topTileIndex = Int(tileIndexByte & 0b1111_1110)
+        } else {
+            bankAddressStart = self.controllerRegister[.spritePatternBankIndex] ? 0x1000 : 0x0000
+            topTileIndex = Int(tileIndexByte)
+        }
+
+        let colorIndex: Int
+        // The following test effectively checks to see if we're sampling
+        // from the top tile or the the bottom tile for an 8x16 sprite.
+        // If the sprite's y value is larger than the height of a tile, then
+        // we know that we're dealing with the bottom tile; otherwise, we're
+        // still in the top tile. If we're handling an 8x8 sprite, then it's
+        // as if we're handling the top tile of an 8x16 sprite.
+        if spritePixelY < tileHeight {
+            colorIndex = self.getTileColorIndex(bankAddressStart: bankAddressStart,
+                                                tileIndex: topTileIndex,
+                                                tilePixelX: spritePixelX,
+                                                tilePixelY: spritePixelY)
+        } else {
+            // If we're here, then we know that we're handling the bottom tile
+            // in which case its index is one more than that for the top tile.
+            // Also, the tile's y coordinate needs to be adjusted to fall inside
+            // the tile.
+            colorIndex = self.getTileColorIndex(bankAddressStart: bankAddressStart,
+                                                tileIndex: topTileIndex + 1,
+                                                tilePixelX: spritePixelX,
+                                                tilePixelY: spritePixelY % tileHeight)
+        }
 
         return self.getSpritePalette(paletteIndex: paletteIndex, colorIndex: colorIndex)
     }
@@ -490,15 +532,18 @@ extension PPU {
     // that lie on the current scanline.
     mutating private func cacheSpriteIndices() {
         let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
-        self.spriteIndicesForCurrentScanline = allSpriteIndices.filter({
-            oamIndex in
-                // Cache only the sprites residing on this scanline
-                let tileY = Int(self.oamRegister.data[oamIndex])
-                if self.scanline >= tileY && self.scanline <= tileY + 7 {
-                    return true
-                }
+        self.spriteIndicesForCurrentScanline = allSpriteIndices.filter({ oamIndex in
+            let tileY = Int(self.oamRegister.data[oamIndex])
 
-                return false
+            // The sprite height property takes into account whether or not
+            // it is 8x8 or 8x16, and so we need to test to see if the current
+            // scanline intersects it anywhere vertically.
+            let deltaY = self.spriteHeight - 1
+            if self.scanline >= tileY && self.scanline <= tileY + deltaY {
+                return true
+            }
+
+            return false
         }).prefix(8)
     }
 }
