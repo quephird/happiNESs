@@ -38,7 +38,7 @@ public struct ControllerRegister: OptionSet {
     public static let vramAddressIncrement = Self(rawValue: 1 << 2)
     public static let spritePatternBankIndex = Self(rawValue: 1 << 3)
     public static let backgroundPatternBankIndex = Self(rawValue: 1 << 4)
-    public static let spriteSize = Self(rawValue: 1 << 5)
+    public static let spritesAre8x16 = Self(rawValue: 1 << 5)
     public static let masterSlaveSelect = Self(rawValue: 1 << 6)
     public static let generateNmi = Self(rawValue: 1 << 7)
 
