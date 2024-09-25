@@ -30,7 +30,7 @@ import SwiftUI
     // this class changes, which is the one being observed by `ContentView`. We're only
     // really interested in changes to `Console`'s state such that at least of the underlying
     // pixels has changed, namely any of the elements of  `screenBuffer`.
-    @ObservationIgnored var cpu: CPU
+    @ObservationIgnored private var cpu: CPU
     var screenBuffer: [NESColor] = PPU.makeEmptyScreenBuffer()
 
     internal init() throws {
@@ -73,5 +73,21 @@ import SwiftUI
 
         cpu.handleButton(button: button, status: keyPress.phase != .up)
         return true
+    }
+
+    public func dumpPpu() {
+        self.cpu.bus.ppu.dump()
+    }
+
+    var tracingOn: Bool {
+        get {
+            access(keyPath: \.tracingOn)
+            return self.cpu.tracingOn
+        }
+        set {
+            withMutation(keyPath: \.tracingOn) {
+                self.cpu.tracingOn = newValue
+            }
+        }
     }
 }

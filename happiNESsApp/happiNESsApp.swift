@@ -58,8 +58,9 @@ struct happiNESsApp: App {
             }
             CommandGroup(after: .sidebar) {
                 Button("Dump PPU State") {
-                    console.cpu.bus.ppu.dump()
+                    console.dumpPpu()
                 }
+                Toggle("Toggle tracing", isOn: $console.tracingOn)
                 Divider()
             }
         }
