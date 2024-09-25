@@ -1,6 +1,6 @@
 # Purpose
 
-I've been wanting to build an emulator for _years_ without knowing how on earth to approach doing so. I had already built a small Chip-8 emulator but it was so limited in graphical capabilities and there are so few games or other other useful software available for it. As a result, I got a little bored with that project, and wanted to work on something more substantial and most likely an actual game console. However, finding a platform to emulate that wouldn't be too difficult for a newbie like me was itself difficult! Even amongst consoles and computers from the early 1980s, I had read that most of them were actually quite difficult as a first foray into emulation. Then I finally came across this tutorial, <a href="https://bugzmanov.github.io/nes_ebook/"></a>, that was 1) very friendly to someone unfamiliar with this topic, 2) wasn't just a series of YouTube videos and instead had actual step-by-step written content, as well as provided example source code, and 3) showed you how to build about 90% of the system. And so, this project was borne out of that discovery...
+I've been wanting to build an emulator for _years_ without knowing how on earth to approach doing so. I had already built a small Chip-8 emulator but it was so limited in graphical capabilities and there are so few games or other other useful software available for it. As a result, I got a little bored with that project, and wanted to work on something more substantial and most likely an actual game console. However, finding a platform to emulate that wouldn't be too difficult for a newbie like me was itself difficult! Even amongst consoles and computers from the early 1980s, I had read that most of them were actually quite difficult as a first foray into emulation. Then I finally came across this tutorial, <a href="https://bugzmanov.github.io/nes_ebook/">https://bugzmanov.github.io/nes_ebook/</a>, that was 1) very friendly to someone unfamiliar with this topic, 2) wasn't just a series of YouTube videos and instead had actual step-by-step written content, as well as provided example source code, and 3) showed you how to build about 90% of the system. And so, this project was borne out of that discovery...
 
 # Building and usage
 
@@ -86,7 +86,11 @@ And so I wound up using one for opcodes, which was _really_ useful in the early 
 
 ### Tracing and test ROMs
 
-There is a menu item in the GUI that allows you to toggle CPU/PPU tracing on and off; you can do so at any point in the emulation. Turning tracing on results in lines being written out to standard output when launching the app from within Xcode; the format of each line follows that of the canonical `nestest.log` file:
+There is a menu item in the GUI that allows you to toggle CPU/PPU tracing on and off:
+
+<img src="./images/toggle_tracing.png" />
+
+... and you can do so at any point in the emulation. Turning tracing on results in lines being written out to standard output when launching the app from within Xcode; the format of each line follows that of the canonical `nestest.log` file:
 
 ```
 C004  78        SEI                             A:00 X:00 Y:00 P:24 SP:FD PPU:  0, 21 CYC:7
@@ -106,7 +110,7 @@ Doing this _will slow performance down significantly_ and so is only intended fo
 
 ### Error handling
 
-Since this is an actual GUI application, most errors result in a dialog box being displayed to the user with a simple message instead of simply crashing like the Rust version does. That said, there are some games that could result in a hard crash; I haven't ironed out all of the bugs!
+Since this is a GUI application, most errors result in a dialog box being displayed to the user with a descriptive message instead of simply crashing like the Rust version does. That said, there are some games that could result in a hard crash; I haven't ironed out all of the bugs!
 
 # Unit testing
 
