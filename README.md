@@ -84,6 +84,26 @@ As I've done in other projects, I have found enums to be far easier to use for g
 
 And so I wound up using one for opcodes, which was _really_ useful in the early stages of this project. I would immediately know if CPU was not looking for any extant opcodes because the compiler would fail and display an error. Similarly, mappers are encapsulated in an enum, and I get the same benefit.
 
+### Tracing and test ROMs
+
+There is a menu item in the GUI that allows you to toggle CPU/PPU tracing on and off; you can do so at any point in the emulation. Turning tracing on results in lines being written out to standard output when launching the app from within Xcode; the format of each line follows that of the canonical `nestest.log` file:
+
+```
+C004  78        SEI                             A:00 X:00 Y:00 P:24 SP:FD PPU:  0, 21 CYC:7
+C005  D8        CLD                             A:00 X:00 Y:00 P:24 SP:FD PPU:  0, 27 CYC:9
+C006  A2 FF     LDX #$FF                        A:00 X:00 Y:00 P:24 SP:FD PPU:  0, 33 CYC:11
+C008  9A        TXS                             A:00 X:FF Y:00 P:A4 SP:FD PPU:  0, 39 CYC:13
+C009  AD 02 20  LDA $2002 = 00                  A:00 X:FF Y:00 P:A4 SP:FF PPU:  0, 45 CYC:15
+C00C  10 FB     BPL $C009                       A:00 X:FF Y:00 P:26 SP:FF PPU:  0, 57 CYC:19
+.
+.
+.
+```
+
+Doing this _will slow performance down significantly_ and so is only intended for debugging purposes. You can also run the latest `nestest.nes` ROM and at the moment all tests pass:
+
+<img src="./images/nestest.png" />
+
 ### Error handling
 
 Since this is an actual GUI application, most errors result in a dialog box being displayed to the user with a simple message instead of simply crashing like the Rust version does. That said, there are some games that could result in a hard crash; I haven't ironed out all of the bugs!
@@ -100,5 +120,7 @@ For the time being, the unit tests are primarily focused on the implementations 
   <a href="https://www.pagetable.com/c64ref/6502/?tab=2">https://www.pagetable.com/c64ref/6502/?tab=2</a>
 - The indispensible NES Wiki  
   <a href="https://www.nesdev.org/wiki/Nesdev_Wiki">https://www.nesdev.org/wiki/Nesdev_Wiki</a>
-- NES ROM directory, listing games and their respective mapper numbers
+- NES ROM directory, listing games and their respective mapper numbers  
   <a href="https://nesdir.github.io/">https://nesdir.github.io/</a>
+- A page listing various test ROMS  
+  <a href="https://www.nesdev.org/wiki/Emulator_tests">https://www.nesdev.org/wiki/Emulator_tests</a>
