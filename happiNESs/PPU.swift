@@ -417,17 +417,10 @@ extension PPU {
     var spriteWidth: Int { tileWidth }
     var spriteHeight: Int { self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight }
 
-    mutating private func getSpriteColor(backgroundPriority: Bool, 
-                                         spriteIndex: Int,
-                                         x: Int,
-                                         y: Int) -> NESColor? {
-        // Determine if the sprite priority matches
+    private func getSpriteColor(spriteIndex: Int,
+                                x: Int,
+                                y: Int) -> NESColor? {
         let tileAttributes = self.oamRegister.data[spriteIndex + 2]
-        let spriteBackgroundPriority = tileAttributes >> 5 & 1 == 1
-        if spriteBackgroundPriority != backgroundPriority {
-            return nil
-        }
-
         let tileX = Int(self.oamRegister.data[spriteIndex + 3])
         // Determine if the x coordinate falls inside the sprite
         guard x >= tileX && x <= tileX + self.spriteWidth - 1 else {
@@ -491,16 +484,18 @@ extension PPU {
                                                 tilePixelY: spritePixelY % tileHeight)
         }
 
-        return self.getSpritePalette(paletteIndex: paletteIndex, colorIndex: colorIndex)
+        let color = self.getSpritePalette(paletteIndex: paletteIndex, colorIndex: colorIndex)
+        return color
     }
 
-    mutating private func getSpriteColor(backgroundPriority: Bool, x: Int, y: Int) -> NESColor? {
-        for spriteIndex in self.spriteIndicesForCurrentScanline {
-            if let spriteColor = self.getSpriteColor(backgroundPriority: backgroundPriority,
-                                                     spriteIndex: spriteIndex,
-                                                     x: x,
-                                                     y: y) {
-                return spriteColor
+    private func getSpriteColor(x: Int, y: Int) -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
+        for index in self.spriteIndicesForCurrentScanline {
+            if let color = self.getSpriteColor(spriteIndex: index,
+                                               x: x,
+                                               y: y) {
+                let tileAttributes = self.oamRegister.data[index + 2]
+                let backgroundPriority = tileAttributes >> 5 & 1 == 1
+                return (color, index, backgroundPriority)
             }
         }
 
@@ -508,19 +503,24 @@ extension PPU {
     }
 
     mutating private func computeColorAt(x: Int, y: Int) -> NESColor {
-        if let color = self.getSpriteColor(backgroundPriority: false, x: x, y: y) {
-            return color
-        }
+        let maybeSpriteColor = self.getSpriteColor(x: x, y: y)
+        let maybeBackgroundColor = self.getBackgroundTileColor(x: x, y: y)
 
-        if let color = self.getBackgroundTileColor(x: x, y: y) {
-            return color
+        switch (maybeSpriteColor, maybeBackgroundColor) {
+        case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
+            switch backgroundPriority {
+            case true:
+                return backgroundColor
+            case false:
+                return spriteColor
+            }
+        case (.some((let spriteColor, _, _)), nil):
+            return spriteColor
+        case (nil, .some(let backgroundColor)):
+            return backgroundColor
+        case (nil, nil):
+            return NESColor.systemPalette[Int(self.paletteTable[0])]
         }
-
-        if let color = self.getSpriteColor(backgroundPriority: true, x: x, y: y) {
-            return color
-        }
-
-        return NESColor.systemPalette[Int(self.paletteTable[0])]
     }
 
     mutating private func renderPixel(x: Int, y: Int) {
@@ -566,11 +566,12 @@ extension PPU {
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
         var redrawScreen = false
-        if self.cycles == 0 {
-            self.cacheSpriteIndices()
-        }
 
         for _ in 0 ..< cpuCycles * 3 {
+            if self.cycles == 0 {
+                self.cacheSpriteIndices()
+            }
+
             if self.cycles < Self.width && self.scanline < Self.height {
                 self.renderPixel(x: self.cycles, y: Int(self.scanline))
             }
@@ -584,7 +585,6 @@ extension PPU {
 
                 self.cycles = 0
                 self.scanline += 1
-                self.cacheSpriteIndices()
 
                 if self.scanline == Self.nmiInterruptScanline {
                     self.statusRegister[.verticalBlankStarted] = true
