@@ -604,6 +604,40 @@ extension PPU {
                     self.statusRegister[.spriteZeroHit] = false
                 }
             }
+
+//            if self.scanline < Self.height {
+//                if self.cycles == 0 {
+//                    self.cacheSpriteIndices()
+//                }
+//
+//                if self.cycles < Self.width {
+//                    self.renderPixel(x: self.cycles, y: Int(self.scanline))
+//                }
+//            }
+//
+//            self.cycles += 1
+//
+//            if self.cycles >= Self.ppuCyclesPerScanline {
+//                self.cycles = 0
+//                self.scanline += 1
+//            }
+//
+//            if self.scanline == Self.nmiInterruptScanline && self.cycles == 1 {
+//                self.statusRegister[.verticalBlankStarted] = true
+//
+//                if self.controllerRegister[.generateNmi] {
+//                    self.nmiInterrupt = 1
+//                }
+//
+//                redrawScreen = true
+//            }
+//
+//            if self.scanline == 261 {
+//                self.statusRegister[.verticalBlankStarted] = false
+//                self.statusRegister[.spriteZeroHit] = false
+//                self.scanline = 0
+//                self.nmiInterrupt = nil
+//            }
         }
 
         return redrawScreen
