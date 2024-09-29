@@ -508,6 +508,15 @@ extension PPU {
 
         switch (maybeSpriteColor, maybeBackgroundColor) {
         case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
+            // NOTA BENE: The following is commented out for the time being because
+            // we need to fix some fundamental things first before this will work.
+            // If we enabled it, Super Mario Bros. will eventually hang due to a bug
+            // somewhere in our computation of the background tile color.
+            //
+            // if spriteIndex == 0 {
+            //     self.statusRegister[.spriteZeroHit] = true
+            // }
+
             switch backgroundPriority {
             case true:
                 return backgroundColor
@@ -588,7 +597,6 @@ extension PPU {
 
                 if self.scanline == Self.nmiInterruptScanline {
                     self.statusRegister[.verticalBlankStarted] = true
-                    self.statusRegister[.spriteZeroHit] = false
 
                     if self.controllerRegister[.generateNmi] {
                         self.nmiInterrupt = 1
