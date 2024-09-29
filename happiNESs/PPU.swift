@@ -73,6 +73,8 @@ public struct PPU {
 
     private var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
     private var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
+    private var currentVramAddress: UInt16 = 0
+    private var currentNametableByte: UInt8 = 0
 
     public init() {
         self.internalDataBuffer = 0x00
@@ -416,6 +418,12 @@ extension PPU {
     var tileHeight: Int { 8 }
     var spriteWidth: Int { tileWidth }
     var spriteHeight: Int { self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight }
+
+    var tileAddress: UInt16 { 0x2000 | (0x0FFF & self.currentVramAddress) }
+
+    mutating private func fetchNametableByte() {
+        self.currentNametableByte = self.vram[vramIndex(from: self.currentVramAddress)]
+    }
 
     private func getSpriteColor(spriteIndex: Int,
                                 x: Int,
