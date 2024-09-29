@@ -73,8 +73,12 @@ public struct PPU {
 
     private var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
     private var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
-    private var currentVramAddress: UInt16 = 0
+
+    // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
+    private var currentSharedAddress: UInt16 = 0
     private var currentNametableByte: UInt8 = 0
+    private var currentLowTileByte: UInt8 = 0
+    private var currentHighTileByte: UInt8 = 0
 
     public init() {
         self.internalDataBuffer = 0x00
@@ -227,17 +231,14 @@ extension PPU {
         return actualNametableIndexStart + nameTableOffset
     }
 
-    // NOTA BENE: Called directly by the tracer, as well as by readByte()
-    public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
-        let address = self.addressRegister.getAddress()
-
+    private func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
         switch address {
         case 0x0000 ... 0x1FFF:
             // TODO: Again... I'm concerned about the magnitude of `address` here and how large `chrRom` is
-            return (self.internalDataBuffer, self.cartridge!.readChr(address: address))
+            return (self.cartridge!.readChr(address: address), true)
         case 0x2000 ... 0x2FFF:
             // TODO: Same same concern as above
-            return (internalDataBuffer, self.vram[self.vramIndex(from: address)])
+            return (self.vram[self.vramIndex(from: address)], true)
         case 0x3000 ... 0x3EFF:
             let message = String(format: "address space 0x3000..0x3eff is not expected to be used, requested = %04X", address)
             fatalError(message)
@@ -245,14 +246,26 @@ extension PPU {
             let basePaletteIndex = Int((address & 0xFF) % 0x20)
             switch basePaletteIndex {
             case 0x10, 0x14, 0x18, 0x1C:
-                return (self.paletteTable[basePaletteIndex - 0x10], nil)
+                return (self.paletteTable[basePaletteIndex - 0x10], false)
             default:
-                return (self.paletteTable[basePaletteIndex], nil)
+                return (self.paletteTable[basePaletteIndex], false)
             }
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
         }
+    }
+
+    // NOTA BENE: Called directly by the tracer, as well as by readByte()
+    public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
+        let address = self.addressRegister.getAddress()
+
+        let (result, shouldBuffer) = self.readByte(address: address)
+        if shouldBuffer {
+            return (self.internalDataBuffer, result)
+        }
+
+        return (result, nil)
     }
 
     mutating public func readByte() -> UInt8 {
@@ -419,10 +432,66 @@ extension PPU {
     var spriteWidth: Int { tileWidth }
     var spriteHeight: Int { self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight }
 
-    var tileAddress: UInt16 { 0x2000 | (0x0FFF & self.currentVramAddress) }
+    var tileAddress: UInt16 { 0x2000 | (0x0FFF & self.currentSharedAddress) }
+    var backgroundPatternBaseAddress: UInt16 { self.controllerRegister[.backgroundPatternBankIndex] ? 0x1000 : 0x0000 }
+    var currentFineY: UInt8 {
+        // During the rendering phase, the shared address field has the following structure:
+        //
+        // 0yyy nnYY YYYX XXXX
+        //  ||| |||| |||| ||||
+        //  ||| |||| |||+-++++-- coarse x, or the x coordinate of the current tile
+        //  ||| |||| |||
+        //  ||| ||++-+++-------- course y, or the y coordinate of the current tile
+        //  ||| ||
+        //  ||| ++-------------- nametable index
+        //  |||
+        //  +++----------------- fine y of the current tile
+        get {
+            UInt8(truncatingIfNeeded: (self.currentSharedAddress & 0b0111_0000_0000_0000) >> 12)
+        }
+        set {
+            self.currentSharedAddress = (self.currentSharedAddress & 0b1000_1111_1111_1111) | UInt16(newValue) << 12
+        }
+    }
 
     mutating private func fetchNametableByte() {
-        self.currentNametableByte = self.vram[vramIndex(from: self.currentVramAddress)]
+        self.currentNametableByte = self.readByte(address: self.currentSharedAddress).result
+    }
+
+    private static func makeChrTileAddress(bankIndex: Bool, tileIndex: UInt8, bitPlaneIndex: Bool, fineY: UInt8) -> UInt16 {
+        // The stucture of CHR pattern tile addresses is the following:
+        //
+        // 000b tttt tttt pyyy
+        //    | |||| |||| ||||
+        //    | |||| |||| |+++-- fine y offset within the tile
+        //    | |||| |||| |
+        //    | |||| |||| +----- bit plane index: 0 is low, 1 is high
+        //    | |||| ||||
+        //    | ++++-++++------- tile index
+        //    |
+        //    +----------------- bank index
+        return (bankIndex ? 0x1000 : 0x0000) |
+               UInt16(tileIndex) << 4 |
+               (bitPlaneIndex ? 0b1000 : 0b000) |
+               UInt16(fineY)
+    }
+
+    mutating private func fetchLowTileByte() {
+        let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
+                                              tileIndex: self.currentNametableByte,
+                                              bitPlaneIndex: false,
+                                              fineY: self.currentFineY)
+
+        self.currentLowTileByte = self.readByte(address: address).result
+    }
+
+    mutating private func fetchHighTileByte() {
+        let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
+                                              tileIndex: self.currentNametableByte,
+                                              bitPlaneIndex: true,
+                                              fineY: self.currentFineY)
+
+        self.currentLowTileByte = self.readByte(address: address).result
     }
 
     private func getSpriteColor(spriteIndex: Int,
