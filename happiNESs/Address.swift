@@ -34,9 +34,10 @@ extension Address {
         UInt8((self & bitMask.rawValue) >> bitMask.rawValue.trailingZeroBitCount)
     }
 
-    mutating private func setBits(using bitMask: AddressBitMask, newBits: UInt8) {
+    mutating private func setBits(using bitMask: AddressBitMask, bits: UInt8) {
         let shiftAmount = bitMask.rawValue.trailingZeroBitCount
-        self = (self & ~(bitMask.rawValue)) | Self(newBits << shiftAmount)
+        let maskedBits = (Self(bits) << shiftAmount) & bitMask.rawValue
+        self = (self & ~(bitMask.rawValue)) | maskedBits
     }
 
     subscript(index: AddressBitMask) -> UInt8 {
@@ -44,7 +45,7 @@ extension Address {
             self.getBits(using: index)
         }
         set {
-            self.setBits(using: index, newBits: newValue)
+            self.setBits(using: index, bits: newValue)
         }
     }
 }
