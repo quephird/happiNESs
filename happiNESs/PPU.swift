@@ -75,8 +75,9 @@ public struct PPU {
     private var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
 
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
-    private var currentSharedAddress: UInt16 = 0
+    private var currentSharedAddress: Address = 0
     private var currentNametableByte: UInt8 = 0
+    private var currentAttributeTableByte: UInt8 = 0
     private var currentLowTileByte: UInt8 = 0
     private var currentHighTileByte: UInt8 = 0
 
@@ -434,28 +435,40 @@ extension PPU {
 
     var tileAddress: UInt16 { 0x2000 | (0x0FFF & self.currentSharedAddress) }
     var backgroundPatternBaseAddress: UInt16 { self.controllerRegister[.backgroundPatternBankIndex] ? 0x1000 : 0x0000 }
-    var currentFineY: UInt8 {
-        // During the rendering phase, the shared address field has the following structure:
+    var currentAttributeAddress: UInt16 {
+        // The attribute table byte associated with any one tile is actually
+        // shared with all sixteen tiles for that tile's metatile block. The
+        // attribute table bytes start at byte 960 (or 0x03C0) after the current
+        // nametable beginning, further indexed by the metatile block index along
+        // Y and the metatile block index along X.
         //
-        // 0yyy nnYY YYYX XXXX
-        //  ||| |||| |||| ||||
-        //  ||| |||| |||+-++++-- coarse x, or the x coordinate of the current tile
-        //  ||| |||| |||
-        //  ||| ||++-+++-------- course y, or the y coordinate of the current tile
-        //  ||| ||
-        //  ||| ++-------------- nametable index
-        //  |||
-        //  +++----------------- fine y of the current tile
-        get {
-            UInt8(truncatingIfNeeded: (self.currentSharedAddress & 0b0111_0000_0000_0000) >> 12)
-        }
-        set {
-            self.currentSharedAddress = (self.currentSharedAddress & 0b1000_1111_1111_1111) | UInt16(newValue) << 12
-        }
-    }
-
-    mutating private func fetchNametableByte() {
-        self.currentNametableByte = self.readByte(address: self.currentSharedAddress).result
+        // The following shows how the tile //address maps to its attribute address:
+        // the first six bytes of each are the same; the top three bits of the
+        // coarse Y value (YYY) and the the top three bits of coarse X (XXX) designate
+        // the metatile block indices for each axis, and form the last six bits of
+        // the attribute address. The offset 0x03C0 corresponds with the middle four bits,
+        // all turned on.
+        //
+        //    Tile address            Attribute address
+        // 0010 NNYY YyyX XXxx  -->  0010 NN11 11YY YXXX
+        //
+        // You may be wondering if it is possible for these two addresses to be the
+        // same... and it turns out that they are never so! The reason is that
+        // the visible screen is 32 x 30 tiles. That means that the final tile address
+        // for a given nametable, correspondent with the 960th tile is:
+        //
+        // 0010 NN11 1011 1111
+        //
+        // ... where YYYyy is 11110 and XXXxx is 11111. However, the _first_ attribute
+        // tile address, correspondent with the 0th tile is:
+        //
+        // 0010 0011 1100 0000
+        //
+        // ... where YYY is 000 and XXX is 000. Quite ingenious!
+        return 0x23C0 |
+               UInt16(self.currentSharedAddress[.nametable]) << 10 |
+               UInt16(self.currentSharedAddress[.coarseY] / 4) << 3 |
+               UInt16(self.currentSharedAddress[.coarseX] / 4)
     }
 
     private static func makeChrTileAddress(bankIndex: Bool, tileIndex: UInt8, bitPlaneIndex: Bool, fineY: UInt8) -> UInt16 {
@@ -476,11 +489,87 @@ extension PPU {
                UInt16(fineY)
     }
 
+    mutating private func fetchNametableByte() {
+        self.currentNametableByte = self.readByte(address: self.currentSharedAddress).result
+    }
+
+    mutating private func fetchAttributeTableByte() {
+        // ACHTUNG! Think about what Becca said about this, but for now,
+        // we're gonna keep this implementation.
+        //
+        // Ultimately, the goal of this function is to compute and cache an
+        // index into the background palette for the current cached values of
+        // coarse X and coarse Y.
+        //
+        // In the NES, a single attribute table byte is used to manage the palettes
+        // of a group of 4x4 tiles arranged in what is called a metatile block.
+        // Within that block, they are further subdivided into 2x2 blocks called
+        // metatiles. Each tile in the metatile block is effectively associated with a
+        // pair of bits that are used to index into the corresponding attribute table
+        // byte. The diagram below illustrates how those bit indices are associated
+        // with each tile in a metatile block:
+        //
+        //                   coarse X
+        //               0    1    2    3   ...
+        //             +----+----+----+----+
+        //          0  | 00 | 00 | 10 | 10 |
+        //             +----+----|----+----|
+        //          1  | 00 | 00 | 10 | 10 |
+        // coarse Y    +----+----|----+----|
+        //          2  | 01 | 01 | 11 | 11 |
+        //             +----+----|----+----|
+        //          3  | 01 | 01 | 11 | 11 |
+        //             +----+----+----+----|
+        //          .
+        //          .
+        //          .
+        //
+        // ... and below shows how those indices need to map to pairs of bits in the
+        // attribute table byte
+        //
+        // +----+----+----+----+
+        // | 11 | 01 | 10 | 00 |
+        // +----+----+----+----+
+
+        // First we need to grab the current coarse X and coarse Y values...
+        let coarseX = self.currentSharedAddress[.coarseX]
+        let coarseY = self.currentSharedAddress[.coarseY]
+
+        // ... then we need to convert them into a shift index into the corresponding
+        // attribute table byte. We do this by first doing modulo division on each
+        // by four to get the X and Y indices _within the given metatile block_, then
+        // dividing again by two to get the _metatile index within the 4x4 block_ ...
+        let metatileBlockIndexX = (coarseX % 4) / 2
+        let metatileBlockIndexY = (coarseY % 4) / 2
+
+        // We need to index into the corresponding attribute table byte and pluck out
+        // the two bits starting there, and so we need to map the metatile (X, Y) pairs
+        // to the attribute byte indices like below:
+        //
+        // (0, 0) -> 0
+        // (1, 0) -> 2
+        // (0, 1) -> 4
+        // (1, 1) -> 6
+        //
+        // To do this mapping, we form a two bit number by taking metatile block index Y as
+        // the two's bit and metatile block index X as the one's bit. Then we need
+        // to multiply that number by two because we need to index in _steps of two_,
+        // not one.
+        let paletteIndexShift = (metatileBlockIndexY << 1 | metatileBlockIndexX) * 2
+
+        // ... now actually grab the palette byte using the current attribute address...
+        let paletteByte = self.readByte(address: self.currentAttributeAddress).result
+
+        // ACHTUNG! Figure out why everyone else is storing something slightly different
+        // into this field. For now, just save what is the palette index into it.
+        self.currentAttributeTableByte = (paletteByte >> paletteIndexShift) & 0b0000_0011
+    }
+
     mutating private func fetchLowTileByte() {
         let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
                                               tileIndex: self.currentNametableByte,
                                               bitPlaneIndex: false,
-                                              fineY: self.currentFineY)
+                                              fineY: self.currentSharedAddress[.fineY])
 
         self.currentLowTileByte = self.readByte(address: address).result
     }
@@ -489,7 +578,7 @@ extension PPU {
         let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
                                               tileIndex: self.currentNametableByte,
                                               bitPlaneIndex: true,
-                                              fineY: self.currentFineY)
+                                              fineY: self.currentSharedAddress[.fineY])
 
         self.currentLowTileByte = self.readByte(address: address).result
     }
