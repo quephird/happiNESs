@@ -77,9 +77,10 @@ public struct PPU {
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
     private var currentSharedAddress: Address = 0
     private var currentNametableByte: UInt8 = 0
-    private var currentAttributeTableByte: UInt8 = 0
+    private var currentPaletteIndex: UInt8 = 0
     private var currentLowTileByte: UInt8 = 0
     private var currentHighTileByte: UInt8 = 0
+    private var currentTileData: UInt64 = 0
 
     public init() {
         self.internalDataBuffer = 0x00
@@ -489,16 +490,16 @@ extension PPU {
                UInt16(fineY)
     }
 
-    mutating private func fetchNametableByte() {
+    mutating private func cacheNametableByte() {
         self.currentNametableByte = self.readByte(address: self.currentSharedAddress).result
     }
 
-    mutating private func fetchAttributeTableByte() {
+    mutating private func cachePaletteIndex() {
         // ACHTUNG! Think about what Becca said about this, but for now,
         // we're gonna keep this implementation.
         //
         // Ultimately, the goal of this function is to compute and cache an
-        // index into the background palette for the current cached values of
+        // index into the background palette for the currently cached values of
         // coarse X and coarse Y.
         //
         // In the NES, a single attribute table byte is used to manage the palettes
@@ -560,12 +561,11 @@ extension PPU {
         // ... now actually grab the palette byte using the current attribute address...
         let paletteByte = self.readByte(address: self.currentAttributeAddress).result
 
-        // ACHTUNG! Figure out why everyone else is storing something slightly different
-        // into this field. For now, just save what is the palette index into it.
-        self.currentAttributeTableByte = (paletteByte >> paletteIndexShift) & 0b0000_0011
+        // ... finally, pluck out and cache the two bits representing the palette index
+        self.currentPaletteIndex = (paletteByte >> paletteIndexShift) & 0b0000_0011
     }
 
-    mutating private func fetchLowTileByte() {
+    mutating private func cacheLowTileByte() {
         let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
                                               tileIndex: self.currentNametableByte,
                                               bitPlaneIndex: false,
@@ -574,13 +574,41 @@ extension PPU {
         self.currentLowTileByte = self.readByte(address: address).result
     }
 
-    mutating private func fetchHighTileByte() {
+    mutating private func cacheHighTileByte() {
         let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
                                               tileIndex: self.currentNametableByte,
                                               bitPlaneIndex: true,
                                               fineY: self.currentSharedAddress[.fineY])
 
         self.currentLowTileByte = self.readByte(address: address).result
+    }
+
+    mutating private func cacheTileData() {
+        // This function builds a new 32-bit integer which will contain 8 nibbles,
+        // each of which contains data for a pixel within the current tile.
+        // It will be structured like the following:
+        //
+        //   0    1    2    3    4    5    6    7
+        // pphl pphl pphl pphl pphl pphl pphl pphl
+        //
+        // ... where pp is the two bits for the palette index, h is the high tile bit,
+        // and l is the low tile bit, all associated with each pixel in the
+        // current tile.
+        //
+        // Once the new tile data are assembled, it is ORed onto the 64-bit cache,
+        // which has data for both the current _and_ next tiles.
+        var newTileData: UInt32 = 0
+        for _ in 0 ..< 8 {
+            let lowBit = (self.currentLowTileByte & 0b1000_0000) >> 7
+            let highBit = (self.currentHighTileByte & 0b1000_0000) >> 6
+            let paletteBits = self.currentPaletteIndex << 2
+            let newTileDataNibble = paletteBits | highBit | lowBit
+            newTileData <<= 4
+            newTileData |= UInt32(newTileDataNibble)
+            self.currentLowTileByte <<= 1
+            self.currentHighTileByte <<= 1
+        }
+        self.currentTileData |= UInt64(newTileData)
     }
 
     private func getSpriteColor(spriteIndex: Int,
