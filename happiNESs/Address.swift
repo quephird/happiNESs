@@ -27,6 +27,9 @@ enum AddressBitMask: Address {
     case nametable = 0b0000_1100_0000_0000
     case coarseY   = 0b0000_0011_1110_0000
     case coarseX   = 0b0000_0000_0001_1111
+
+    case highByte  = 0b0011_1111_0000_0000
+    case lowByte   = 0b0000_0000_1111_1111
 }
 
 extension Address {
