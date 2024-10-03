@@ -653,6 +653,43 @@ extension PPU {
         self.currentTileData |= UInt64(newTileData)
     }
 
+    mutating private func incrementX() {
+        if self.currentSharedAddress[.coarseX] == 0b1_1111 {
+            // Reset coarse X
+            self.currentSharedAddress[.coarseX] = 0b0_0000
+            // Toggle horizontal nametable
+            self.currentSharedAddress[.nametable] ^= 0b01
+        } else {
+            // Just increment coarse X
+            self.currentSharedAddress[.coarseX] += 0b0_0001
+        }
+    }
+
+    mutating private func incrementY() {
+        if self.currentSharedAddress[.fineY] == 0b111 {
+            // Reset fine Y
+            self.currentSharedAddress[.fineY] = 0b000
+
+            if self.currentSharedAddress[.coarseY] == 0b1_1110 {
+                // Reset coarse Y
+                self.currentSharedAddress[.coarseY] = 0b0_0000
+                // Toggle vertical nametable
+                self.currentSharedAddress[.nametable] ^= 0b10
+            } else if self.currentSharedAddress[.coarseY] == 0b1_1111 {
+                // ACHTUNG! How would we ever get to this branch?
+                //
+                // Reset coarse Y
+                self.currentSharedAddress[.coarseY] = 0b0_0000
+            } else {
+                // Just increment coarse Y
+                self.currentSharedAddress[.coarseY] += 0b0_0001
+            }
+        } else {
+            // Just increment fine Y
+            self.currentSharedAddress[.fineY] += 0b001
+        }
+    }
+
     private func getSpriteColor(spriteIndex: Int,
                                 x: Int,
                                 y: Int) -> NESColor? {
