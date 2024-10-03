@@ -653,6 +653,17 @@ extension PPU {
         self.currentTileData |= UInt64(newTileData)
     }
 
+    mutating private func copyX() {
+        self.currentSharedAddress[.coarseX] = self.nextSharedAddress[.coarseX]
+        self.currentSharedAddress[.nametableX] = self.nextSharedAddress[.nametableX]
+    }
+
+    mutating private func copyY() {
+        self.currentSharedAddress[.coarseY] = self.nextSharedAddress[.coarseY]
+        self.currentSharedAddress[.fineY] = self.nextSharedAddress[.fineY]
+        self.currentSharedAddress[.nametableY] = self.nextSharedAddress[.nametableY]
+    }
+
     mutating private func incrementX() {
         if self.currentSharedAddress[.coarseX] == 0b1_1111 {
             // Reset coarse X

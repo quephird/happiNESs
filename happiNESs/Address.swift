@@ -21,15 +21,19 @@ typealias Address = UInt16
 //  +++----------------- fine y of the current tile
 //
 // The subscript function in Address plucks out the desired bits (as a UInt8)
-// based on the bit mask passed in.
+// based on the bit mask passed in. (Note that this only works because none of
+// of the bit masks exceeds eight bits.)
 enum AddressBitMask: Address {
-    case fineY     = 0b0111_0000_0000_0000
-    case nametable = 0b0000_1100_0000_0000
-    case coarseY   = 0b0000_0011_1110_0000
-    case coarseX   = 0b0000_0000_0001_1111
+    case fineY      = 0b0111_0000_0000_0000
+    case nametable  = 0b0000_1100_0000_0000
+    case coarseY    = 0b0000_0011_1110_0000
+    case coarseX    = 0b0000_0000_0001_1111
 
-    case highByte  = 0b0011_1111_0000_0000
-    case lowByte   = 0b0000_0000_1111_1111
+    case highByte   = 0b0011_1111_0000_0000
+    case lowByte    = 0b0000_0000_1111_1111
+
+    case nametableY = 0b0000_1000_0000_0000
+    case nametableX = 0b0000_0100_0000_0000
 }
 
 extension Address {
