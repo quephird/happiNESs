@@ -44,6 +44,7 @@
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
+		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
 		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81472C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
@@ -121,6 +122,7 @@
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
+		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
@@ -213,9 +215,11 @@
 			children = (
 				8744B1752C1CB9B3001B44B5 /* happiNESs.h */,
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
+				878C69722CAA424400DA9BD4 /* Address.swift */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
 				871F62312C6314C900132962 /* AddressRegister.swift */,
 				8719320F2C372F6900A73C22 /* Bus.swift */,
+				871932132C3798B400A73C22 /* Cartridge.swift */,
 				871F62352C65631F00132962 /* ControllerRegister.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
@@ -229,7 +233,6 @@
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
 				87184D042C7028F10003D090 /* PPUStatusRegister.swift */,
-				871932132C3798B400A73C22 /* Cartridge.swift */,
 				87184D0B2C7522B80003D090 /* ScrollRegister.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
@@ -414,6 +417,7 @@
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
 				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
+				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,

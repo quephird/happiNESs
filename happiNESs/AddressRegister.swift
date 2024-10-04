@@ -7,7 +7,7 @@
 
 public struct AddressRegister {
     private var address: UInt16
-    private var highPointer: Bool
+    public var highPointer: Bool
 }
 
 extension AddressRegister {
