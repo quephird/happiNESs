@@ -855,6 +855,40 @@ extension PPU {
         return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
     }
 
+    mutating private func updateCaches() {
+        if self.scanline < Self.height || self.scanline == Self.scanlinesPerFrame {
+            if self.cycles < Self.width || (self.cycles >= 320 && self.cycles <= 335) {
+                switch self.cycles % 8 {
+                case 1:
+                    self.cacheNametableByte()
+                case 3:
+                    self.cachePaletteIndex()
+                case 5:
+                    self.cacheLowTileByte()
+                case 7:
+                    self.cacheHighTileByte()
+                case 0:
+                    self.incrementX()
+                    self.cacheTileData()
+                default:
+                    break
+                }
+            }
+
+            if self.cycles == 255 {
+                self.incrementY()
+            }
+
+            if self.cycles == 256 {
+                self.copyX()
+            }
+        }
+
+        if self.scanline == Self.scanlinesPerFrame && self.cycles >= 279 && self.cycles <= 303 {
+            self.copyY()
+        }
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
