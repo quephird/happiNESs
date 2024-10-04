@@ -276,18 +276,14 @@ extension PPU {
     }
 
     private func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
-        switch address {
+        let mirroredAddress = address % 0x4000
+        switch mirroredAddress {
         case 0x0000 ... 0x1FFF:
-            // TODO: Again... I'm concerned about the magnitude of `address` here and how large `chrRom` is
-            return (self.cartridge!.readChr(address: address), true)
-        case 0x2000 ... 0x2FFF:
-            // TODO: Same same concern as above
-            return (self.vram[self.vramIndex(from: address)], true)
-        case 0x3000 ... 0x3EFF:
-            let message = String(format: "address space 0x3000..0x3eff is not expected to be used, requested = %04X", address)
-            fatalError(message)
+            return (self.cartridge!.readChr(address: mirroredAddress), true)
+        case 0x2000 ... 0x3EFF:
+            return (self.vram[self.vramIndex(from: mirroredAddress)], true)
         case 0x3F00 ... 0x3FFF:
-            let basePaletteIndex = Int((address & 0xFF) % 0x20)
+            let basePaletteIndex = Int((mirroredAddress & 0xFF) % 0x20)
             switch basePaletteIndex {
             case 0x10, 0x14, 0x18, 0x1C:
                 return (self.paletteTable[basePaletteIndex - 0x10], false)
@@ -902,6 +898,8 @@ extension PPU {
             if self.cycles < Self.width && self.scanline < Self.height {
                 self.renderPixel(x: self.cycles, y: Int(self.scanline))
             }
+
+            self.updateCaches()
 
             self.cycles += 1
 
