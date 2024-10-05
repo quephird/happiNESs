@@ -81,7 +81,7 @@ public struct PPU {
     private var currentPaletteIndex: UInt8 = 0
     private var currentLowTileByte: UInt8 = 0
     private var currentHighTileByte: UInt8 = 0
-    private var currentTileData: UInt64 = 0
+    private var currentAndNextTileData: UInt64 = 0
     private var currentFineX: UInt8 = 0
 
     public init() {
@@ -415,48 +415,52 @@ extension PPU {
     }
 
     private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
-        let scrollX = Int(self.scrollRegister.scrollX)
-        let scrollY = Int(self.scrollRegister.scrollY)
-
-        let shiftX = x + scrollX
-        let shiftY = y + scrollY
-
-        let startAddressOffset: UInt16 = switch (shiftX < Self.width, shiftY < Self.height) {
-        case (true, true):
-            0x0000
-        case (false, true):
-            0x0400
-        case (true, false):
-            0x0800
-        case (false, false):
-            0x0C00
-        }
-        let startAddress = self.controllerRegister.nametableAddress() + startAddressOffset
-        let startIndex = self.vramIndex(from: startAddress)
-        let nametable = self.vram[startIndex ..< startIndex + 0x0400]
-
-        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
-
-        let nametableX = shiftX % Self.width
-        let nametableY = shiftY % Self.height
-        let nametableColumn = nametableX/8
-        let nametableRow = nametableY/8
-        let nametableIndex = 32 * nametableRow + nametableColumn
-
-        let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
-        let tilePixelX = nametableX % 8
-        let tilePixelY = nametableY % 8
-
-        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
-        let colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
-                                                tileIndex: tileIndex,
-                                                tilePixelX: tilePixelX,
-                                                tilePixelY: tilePixelY)
-
-        return self.getBackgroundPaletteColor(attributeTable: attributeTable,
-                                              colorIndex: colorIndex,
-                                              tileX: nametableColumn,
-                                              tileY: nametableRow)
+        let tileData = self.currentTileData
+        let pixelData = tileData >> ((7 - self.currentFineX) * 4)
+        let colorIndex = Int(pixelData & 0x0F)
+        return colorIndex == 0 ? nil : NESColor.systemPalette[Int(self.paletteTable[colorIndex])]
+//        let scrollX = Int(self.scrollRegister.scrollX)
+//        let scrollY = Int(self.scrollRegister.scrollY)
+//
+//        let shiftX = x + scrollX
+//        let shiftY = y + scrollY
+//
+//        let startAddressOffset: UInt16 = switch (shiftX < Self.width, shiftY < Self.height) {
+//        case (true, true):
+//            0x0000
+//        case (false, true):
+//            0x0400
+//        case (true, false):
+//            0x0800
+//        case (false, false):
+//            0x0C00
+//        }
+//        let startAddress = self.controllerRegister.nametableAddress() + startAddressOffset
+//        let startIndex = self.vramIndex(from: startAddress)
+//        let nametable = self.vram[startIndex ..< startIndex + 0x0400]
+//
+//        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
+//
+//        let nametableX = shiftX % Self.width
+//        let nametableY = shiftY % Self.height
+//        let nametableColumn = nametableX/8
+//        let nametableRow = nametableY/8
+//        let nametableIndex = 32 * nametableRow + nametableColumn
+//
+//        let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
+//        let tilePixelX = nametableX % 8
+//        let tilePixelY = nametableY % 8
+//
+//        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
+//        let colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
+//                                                tileIndex: tileIndex,
+//                                                tilePixelX: tilePixelX,
+//                                                tilePixelY: tilePixelY)
+//
+//        return self.getBackgroundPaletteColor(attributeTable: attributeTable,
+//                                              colorIndex: colorIndex,
+//                                              tileX: nametableColumn,
+//                                              tileY: nametableRow)
     }
 
     private func getSpritePalette(paletteIndex: Int, colorIndex: Int) -> NESColor? {
@@ -509,6 +513,9 @@ extension PPU {
                UInt16(self.currentSharedAddress[.coarseY] / 4) << 3 |
                UInt16(self.currentSharedAddress[.coarseX] / 4)
     }
+    var currentTileData: UInt32 {
+        UInt32(self.currentAndNextTileData >> 32)
+    }
 
     private static func makeChrTileAddress(bankIndex: Bool, tileIndex: UInt8, bitPlaneIndex: Bool, fineY: UInt8) -> UInt16 {
         // The stucture of CHR pattern tile addresses is the following:
@@ -524,12 +531,13 @@ extension PPU {
         //    +----------------- bank index
         return (bankIndex ? 0x1000 : 0x0000) |
                UInt16(tileIndex) << 4 |
-               (bitPlaneIndex ? 0b1000 : 0b000) |
+               (bitPlaneIndex ? 0b1000 : 0b0000) |
                UInt16(fineY)
     }
 
     mutating private func cacheNametableByte() {
-        self.currentNametableByte = self.readByte(address: self.currentSharedAddress).result
+        let address = 0x2000 | (self.currentSharedAddress & 0x0FFF)
+        self.currentNametableByte = self.readByte(address: address).result
     }
 
     mutating private func cachePaletteIndex() {
@@ -618,7 +626,7 @@ extension PPU {
                                               bitPlaneIndex: true,
                                               fineY: self.currentSharedAddress[.fineY])
 
-        self.currentLowTileByte = self.readByte(address: address).result
+        self.currentHighTileByte = self.readByte(address: address).result
     }
 
     mutating private func cacheTileData() {
@@ -646,7 +654,7 @@ extension PPU {
             self.currentLowTileByte <<= 1
             self.currentHighTileByte <<= 1
         }
-        self.currentTileData |= UInt64(newTileData)
+        self.currentAndNextTileData |= UInt64(newTileData)
     }
 
     mutating private func copyX() {
@@ -677,7 +685,7 @@ extension PPU {
             // Reset fine Y
             self.currentSharedAddress[.fineY] = 0b000
 
-            if self.currentSharedAddress[.coarseY] == 0b1_1110 {
+            if self.currentSharedAddress[.coarseY] == 0b1_1101 {
                 // Reset coarse Y
                 self.currentSharedAddress[.coarseY] = 0b0_0000
                 // Toggle vertical nametable
@@ -851,26 +859,51 @@ extension PPU {
         return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
     }
 
-    mutating private func updateCaches() {
-        if self.scanline < Self.height || self.scanline == Self.scanlinesPerFrame {
-            if self.cycles < Self.width || (self.cycles >= 320 && self.cycles <= 335) {
-                switch self.cycles % 8 {
-                case 1:
-                    self.cacheNametableByte()
-                case 3:
-                    self.cachePaletteIndex()
-                case 5:
-                    self.cacheLowTileByte()
-                case 7:
-                    self.cacheHighTileByte()
-                case 0:
-                    self.incrementX()
-                    self.cacheTileData()
-                default:
-                    break
-                }
-            }
+    var isVisibleLine: Bool {
+        self.scanline < Self.height
+    }
+    var isPreLine: Bool {
+        self.scanline == Self.scanlinesPerFrame
+    }
+    var isRenderLine: Bool {
+        self.isVisibleLine || self.isPreLine
+    }
+    var isVisibleCycle: Bool {
+        self.cycles >= 0 && self.cycles < Self.width
+    }
+    var isPrefetchCycle: Bool {
+        self.cycles >= 320 && self.cycles <= 335
+    }
+    var isFetchCycle: Bool {
+        self.isVisibleCycle || self.isPrefetchCycle
+    }
 
+    mutating private func updateCaches() {
+        if self.isRenderLine && self.isFetchCycle {
+            self.currentAndNextTileData <<= 4
+
+            switch self.cycles % 8 {
+            case 1:
+                self.cacheNametableByte()
+            case 3:
+                self.cachePaletteIndex()
+            case 5:
+                self.cacheLowTileByte()
+            case 7:
+                self.cacheHighTileByte()
+            case 0:
+                self.incrementX()
+                self.cacheTileData()
+            default:
+                break
+            }
+        }
+
+        if self.isPreLine && self.cycles >= 279 && self.cycles <= 303 {
+            self.copyY()
+        }
+
+        if self.isRenderLine {
             if self.cycles == 255 {
                 self.incrementY()
             }
@@ -878,10 +911,6 @@ extension PPU {
             if self.cycles == 256 {
                 self.copyX()
             }
-        }
-
-        if self.scanline == Self.scanlinesPerFrame && self.cycles >= 279 && self.cycles <= 303 {
-            self.copyY()
         }
     }
 
@@ -895,7 +924,7 @@ extension PPU {
                 self.cacheSpriteIndices()
             }
 
-            if self.cycles < Self.width && self.scanline < Self.height {
+            if self.isVisibleLine && self.isVisibleCycle {
                 self.renderPixel(x: self.cycles, y: Int(self.scanline))
             }
 
