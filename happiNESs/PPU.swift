@@ -154,8 +154,8 @@ extension PPU {
         // a little more carefully here. If it's set to true, then we updated the low
         // byte and thus need to copy not only to self.nextSharedAddress but to
         // self.currentSharedAddress as well.
-        if self.addressRegister.highPointer {
-//        if !self.wRegister {
+//        if self.addressRegister.highPointer {
+        if !self.wRegister {
             self.nextSharedAddress[.highByte] = byte & 0x3F
         } else {
             self.nextSharedAddress[.lowByte] = byte
@@ -212,8 +212,8 @@ extension PPU {
         // of what is seen in other emulator codebases.
         let coarseBits = byte >> 3
         let fineBits = byte & 0b0000_0111
-        if self.scrollRegister.latch {
-//        if !self.wRegister {
+//        if self.scrollRegister.latch {
+        if !self.wRegister {
             self.nextSharedAddress[.coarseX] = coarseBits
             self.currentFineX = fineBits
         } else {
@@ -433,7 +433,7 @@ extension PPU {
         let tileData = self.currentTileData
         let pixelData = tileData >> ((7 - self.currentFineX) * 4)
         let colorIndex = Int(pixelData & 0x0F)
-        return colorIndex == 0 ? nil : NESColor.systemPalette[Int(self.paletteTable[colorIndex])]
+        return colorIndex.isMultiple(of: 4) ? nil : NESColor.systemPalette[Int(self.paletteTable[colorIndex])]
 //        let scrollX = Int(self.scrollRegister.scrollX)
 //        let scrollY = Int(self.scrollRegister.scrollY)
 //
