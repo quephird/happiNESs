@@ -67,6 +67,13 @@ public struct PPU {
     public var scrollRegister: ScrollRegister
     public var statusRegister: PPUStatusRegister
 
+    // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
+    private var nextSharedAddress: Address = 0
+    private var currentSharedAddress: Address = 0
+    private var ppuaddr: UInt8 = 0x00
+    private var ppuscroll: UInt8 = 0x00
+    private var wRegister: Bool = false
+
     public var cycles: Int
     public var scanline: UInt16
     public var nmiInterrupt: UInt8?
@@ -74,9 +81,6 @@ public struct PPU {
     private var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
     private var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
 
-    // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
-    private var nextSharedAddress: Address = 0
-    private var currentSharedAddress: Address = 0
     private var currentNametableByte: UInt8 = 0
     private var currentPaletteIndex: UInt8 = 0
     private var currentLowTileByte: UInt8 = 0
@@ -129,6 +133,7 @@ extension PPU {
         self.statusRegister[.verticalBlankStarted] = false
         self.addressRegister.resetLatch()
         self.scrollRegister.resetLatch()
+        self.wRegister = false
 
         return result
     }
@@ -150,11 +155,14 @@ extension PPU {
         // byte and thus need to copy not only to self.nextSharedAddress but to
         // self.currentSharedAddress as well.
         if self.addressRegister.highPointer {
-            self.nextSharedAddress[.highByte] = byte
+//        if !self.wRegister {
+            self.nextSharedAddress[.highByte] = byte & 0x3F
         } else {
             self.nextSharedAddress[.lowByte] = byte
             self.currentSharedAddress = self.nextSharedAddress
         }
+
+        self.wRegister.toggle()
     }
 
     mutating public func updateController(byte: UInt8) {
@@ -205,12 +213,15 @@ extension PPU {
         let coarseBits = byte >> 3
         let fineBits = byte & 0b0000_0111
         if self.scrollRegister.latch {
+//        if !self.wRegister {
             self.nextSharedAddress[.coarseX] = coarseBits
             self.currentFineX = fineBits
         } else {
             self.nextSharedAddress[.coarseY] = coarseBits
             self.nextSharedAddress[.fineY] = fineBits
         }
+
+        self.wRegister.toggle()
     }
 }
 
@@ -218,6 +229,7 @@ extension PPU {
     mutating public func incrementVramAddress() {
         let increment = self.controllerRegister.vramAddressIncrement()
         self.addressRegister.incrementAddress(value: increment)
+//        self.currentSharedAddress = (self.currentSharedAddress &+ UInt16(increment)) & 0b0011_1111_1111_1111
     }
 
     public func vramIndex(from address: UInt16) -> Int {
@@ -299,6 +311,7 @@ extension PPU {
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
     public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
         let address = self.addressRegister.getAddress()
+//        let address = self.currentSharedAddress
 
         let (result, shouldBuffer) = self.readByte(address: address)
         if shouldBuffer {
@@ -321,16 +334,18 @@ extension PPU {
 
     mutating public func writeByte(byte: UInt8) {
         let address = self.addressRegister.getAddress()
+//        let address = self.currentSharedAddress % 0x4000
 
         switch address {
         case 0x0000 ... 0x1FFF:
             self.cartridge!.writeChr(address: address, byte: byte)
-        case 0x2000 ... 0x2FFF:
+        case 0x2000 ... 0x3EFF:
             self.vram[self.vramIndex(from: address)] = byte
-        case 0x3000 ... 0x3EFF:
-            let message = String(format: "Address shouldn't be used in reality: %04X", address)
-            fatalError(message)
+//        case 0x3000 ... 0x3EFF:
+//            let message = String(format: "Address shouldn't be used in reality: %04X", address)
+//            fatalError(message)
         case 0x3F00 ... 0x3FFF:
+            // TODO: Make a helper function to resolve a palette index from an address
             let basePaletteIndex = Int((address & 0xFF) % 0x20)
             switch basePaletteIndex {
             case 0x10, 0x14, 0x18, 0x1C:
@@ -882,7 +897,8 @@ extension PPU {
         if self.isRenderLine && self.isFetchCycle {
             self.currentAndNextTileData <<= 4
 
-            switch self.cycles % 8 {
+            // TODO: Why do I have an off-by-one issue here?
+            switch (self.cycles+1) % 8 {
             case 1:
                 self.cacheNametableByte()
             case 3:
@@ -899,16 +915,16 @@ extension PPU {
             }
         }
 
-        if self.isPreLine && self.cycles >= 279 && self.cycles <= 303 {
+        if self.isPreLine && self.cycles >= 280 && self.cycles <= 304 {
             self.copyY()
         }
 
         if self.isRenderLine {
-            if self.cycles == 255 {
+            if self.cycles == 256 {
                 self.incrementY()
             }
 
-            if self.cycles == 256 {
+            if self.cycles == 257 {
                 self.copyX()
             }
         }
