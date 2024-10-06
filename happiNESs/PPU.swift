@@ -9,7 +9,7 @@ public struct PPU {
     public static let width = 256
     public static let height = 240
 
-    public static let scanlinesPerFrame = 262
+    public static let scanlinesPerFrame = 261
     public static let ppuCyclesPerScanline = 341
     public static let nmiInterruptScanline = 241
 
@@ -60,12 +60,18 @@ public struct PPU {
     public var vram: [UInt8]
     public var internalDataBuffer: UInt8
 
-    public var addressRegister: AddressRegister
     public var controllerRegister: ControllerRegister
     public var maskRegister: MaskRegister
     public var oamRegister: OAMRegister
-    public var scrollRegister: ScrollRegister
     public var statusRegister: PPUStatusRegister
+
+    // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
+    public var nextSharedAddress: Address = 0
+    public var currentSharedAddress: Address = 0
+    private var ppuaddr: UInt8 = 0x00
+    private var ppuscroll: UInt8 = 0x00
+    // This register is also shared by PPUADDR/PPUSCROLL
+    private var wRegister: Bool = false
 
     public var cycles: Int
     public var scanline: UInt16
@@ -74,25 +80,20 @@ public struct PPU {
     private var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
     private var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
 
-    // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
-    private var nextSharedAddress: Address = 0
-    private var currentSharedAddress: Address = 0
-    private var currentNametableByte: UInt8 = 0
-    private var currentPaletteIndex: UInt8 = 0
-    private var currentLowTileByte: UInt8 = 0
-    private var currentHighTileByte: UInt8 = 0
-    private var currentTileData: UInt64 = 0
-    private var currentFineX: UInt8 = 0
+    public var currentNametableByte: UInt8 = 0
+    public var currentPaletteIndex: UInt8 = 0
+    public var currentLowTileByte: UInt8 = 0
+    public var currentHighTileByte: UInt8 = 0
+    public var currentAndNextTileData: UInt64 = 0
+    public var currentFineX: UInt8 = 0
 
     public init() {
         self.internalDataBuffer = 0x00
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
-        self.addressRegister = AddressRegister()
         self.controllerRegister = ControllerRegister()
         self.maskRegister = MaskRegister()
         self.oamRegister = OAMRegister()
-        self.scrollRegister = ScrollRegister()
         self.statusRegister = PPUStatusRegister()
 
         self.cycles = 0
@@ -105,11 +106,9 @@ public struct PPU {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
 
-        self.addressRegister.reset()
         self.controllerRegister.reset()
         self.maskRegister.reset()
         self.oamRegister.reset()
-        self.scrollRegister.reset()
         self.statusRegister.reset()
 
         self.cycles = 0
@@ -127,34 +126,20 @@ extension PPU {
     mutating public func readStatus() -> UInt8 {
         let result = self.readStatusWithoutMutating()
         self.statusRegister[.verticalBlankStarted] = false
-        self.addressRegister.resetLatch()
-        self.scrollRegister.resetLatch()
+        self.wRegister = false
 
         return result
     }
 
-    // TODO: Think about getting rid of register abstractions and instead
-    // emulate the actual architecture of the NES in which 1) the PPUSCROLL
-    // and PPUADDR share a boolean flag to indicate which of two other states
-    // are being written to, and 2) not have AddressRegister maintain its own
-    // address word and instead only manage a single byte. This is going to
-    // require a _lot_ of careful thought and change, so for the time being
-    // we're gonna keep all of the registers as they are, and _slowly_ evolve
-    // the code to minimize damage.
     mutating public func updateAddress(byte: UInt8) {
-        self.addressRegister.updateAddress(byte: byte)
-
-        // NOTA BENE: Since we're updating the cached address _after_ we've written
-        // to the register, we need to check the state of the high pointer flag
-        // a little more carefully here. If it's set to true, then we updated the low
-        // byte and thus need to copy not only to self.nextSharedAddress but to
-        // self.currentSharedAddress as well.
-        if self.addressRegister.highPointer {
+        if !self.wRegister {
             self.nextSharedAddress[.highByte] = byte
         } else {
             self.nextSharedAddress[.lowByte] = byte
             self.currentSharedAddress = self.nextSharedAddress
         }
+
+        self.wRegister.toggle()
     }
 
     mutating public func updateController(byte: UInt8) {
@@ -192,32 +177,25 @@ extension PPU {
         }
     }
 
-    // TODO: As for the address register, we will need to eventually
-    // switch over to a shared latch between it and the scroll register,
-    // but for now are keeping things as they are.
     mutating public func writeScrollByte(byte: UInt8) {
-        self.scrollRegister.writeByte(byte: byte)
-
-        // NOTA BENE: As with updating the address register above, we are
-        // checking the state of the toggle flag in the scroll register _after_
-        // its state has been changed, and so the logic below is the reverse
-        // of what is seen in other emulator codebases.
         let coarseBits = byte >> 3
         let fineBits = byte & 0b0000_0111
-        if self.scrollRegister.latch {
+        if !self.wRegister {
             self.nextSharedAddress[.coarseX] = coarseBits
             self.currentFineX = fineBits
         } else {
             self.nextSharedAddress[.coarseY] = coarseBits
             self.nextSharedAddress[.fineY] = fineBits
         }
+
+        self.wRegister.toggle()
     }
 }
 
 extension PPU {
     mutating public func incrementVramAddress() {
         let increment = self.controllerRegister.vramAddressIncrement()
-        self.addressRegister.incrementAddress(value: increment)
+        self.currentSharedAddress = (self.currentSharedAddress &+ UInt16(increment)) & 0x3FFF
     }
 
     public func vramIndex(from address: UInt16) -> Int {
@@ -275,7 +253,7 @@ extension PPU {
         return actualNametableIndexStart + nameTableOffset
     }
 
-    private func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
+    public func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
         let mirroredAddress = address % 0x4000
         switch mirroredAddress {
         case 0x0000 ... 0x1FFF:
@@ -298,7 +276,7 @@ extension PPU {
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
     public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
-        let address = self.addressRegister.getAddress()
+        let address = self.currentSharedAddress
 
         let (result, shouldBuffer) = self.readByte(address: address)
         if shouldBuffer {
@@ -320,17 +298,15 @@ extension PPU {
     }
 
     mutating public func writeByte(byte: UInt8) {
-        let address = self.addressRegister.getAddress()
+        let address = self.currentSharedAddress % 0x4000
 
         switch address {
         case 0x0000 ... 0x1FFF:
             self.cartridge!.writeChr(address: address, byte: byte)
-        case 0x2000 ... 0x2FFF:
+        case 0x2000 ... 0x3EFF:
             self.vram[self.vramIndex(from: address)] = byte
-        case 0x3000 ... 0x3EFF:
-            let message = String(format: "Address shouldn't be used in reality: %04X", address)
-            fatalError(message)
         case 0x3F00 ... 0x3FFF:
+            // TODO: Make a helper function to resolve a palette index from an address
             let basePaletteIndex = Int((address & 0xFF) % 0x20)
             switch basePaletteIndex {
             case 0x10, 0x14, 0x18, 0x1C:
@@ -377,29 +353,6 @@ extension PPU {
         return NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
     }
 
-    private func getBackgroundPaletteColor(attributeTable: ArraySlice<UInt8>,
-                                           colorIndex: Int,
-                                           tileX: Int,
-                                           tileY: Int) -> NESColor? {
-        let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
-        let attributeByte = attributeTable[attributeTable.startIndex + attributeTableIndex]
-
-        let paletteIndexBase = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
-        case (0, 0):
-            attributeByte & 0b0000_0011
-        case (1, 0):
-            (attributeByte >> 2) & 0b0000_0011
-        case (0, 1):
-            (attributeByte >> 4) & 0b0000_0011
-        case (1, 1):
-            (attributeByte >> 6) & 0b0000_0011
-        default:
-            fatalError("Whoops! We should never get here!")
-        }
-
-        return getColorFromPalette(baseIndex: Int((paletteIndexBase * 4)), entryIndex: colorIndex)
-    }
-
     private func getTileColorIndex(bankIndex: Int,
                                    tileIndex: Int,
                                    tilePixelX: Int,
@@ -415,48 +368,10 @@ extension PPU {
     }
 
     private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
-        let scrollX = Int(self.scrollRegister.scrollX)
-        let scrollY = Int(self.scrollRegister.scrollY)
-
-        let shiftX = x + scrollX
-        let shiftY = y + scrollY
-
-        let startAddressOffset: UInt16 = switch (shiftX < Self.width, shiftY < Self.height) {
-        case (true, true):
-            0x0000
-        case (false, true):
-            0x0400
-        case (true, false):
-            0x0800
-        case (false, false):
-            0x0C00
-        }
-        let startAddress = self.controllerRegister.nametableAddress() + startAddressOffset
-        let startIndex = self.vramIndex(from: startAddress)
-        let nametable = self.vram[startIndex ..< startIndex + 0x0400]
-
-        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
-
-        let nametableX = shiftX % Self.width
-        let nametableY = shiftY % Self.height
-        let nametableColumn = nametableX/8
-        let nametableRow = nametableY/8
-        let nametableIndex = 32 * nametableRow + nametableColumn
-
-        let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
-        let tilePixelX = nametableX % 8
-        let tilePixelY = nametableY % 8
-
-        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
-        let colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
-                                                tileIndex: tileIndex,
-                                                tilePixelX: tilePixelX,
-                                                tilePixelY: tilePixelY)
-
-        return self.getBackgroundPaletteColor(attributeTable: attributeTable,
-                                              colorIndex: colorIndex,
-                                              tileX: nametableColumn,
-                                              tileY: nametableRow)
+        let tileData = self.currentTileData
+        let pixelData = tileData >> ((7 - self.currentFineX) * 4)
+        let colorIndex = Int(pixelData & 0x0F)
+        return colorIndex.isMultiple(of: 4) ? nil : NESColor.systemPalette[Int(self.paletteTable[colorIndex])]
     }
 
     private func getSpritePalette(paletteIndex: Int, colorIndex: Int) -> NESColor? {
@@ -467,234 +382,17 @@ extension PPU {
         return getColorFromPalette(baseIndex: paletteStartIndex, entryIndex: colorIndex)
     }
 
-    var tileWidth: Int { 8 }
-    var tileHeight: Int { 8 }
-    var spriteWidth: Int { tileWidth }
-    var spriteHeight: Int { self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight }
-
-    var tileAddress: UInt16 { 0x2000 | (0x0FFF & self.currentSharedAddress) }
-    var backgroundPatternBaseAddress: UInt16 { self.controllerRegister[.backgroundPatternBankIndex] ? 0x1000 : 0x0000 }
-    var currentAttributeAddress: UInt16 {
-        // The attribute table byte associated with any one tile is actually
-        // shared with all sixteen tiles for that tile's metatile block. The
-        // attribute table bytes start at byte 960 (or 0x03C0) after the current
-        // nametable beginning, further indexed by the metatile block index along
-        // Y and the metatile block index along X.
-        //
-        // The following shows how the tile //address maps to its attribute address:
-        // the first six bytes of each are the same; the top three bits of the
-        // coarse Y value (YYY) and the the top three bits of coarse X (XXX) designate
-        // the metatile block indices for each axis, and form the last six bits of
-        // the attribute address. The offset 0x03C0 corresponds with the middle four bits,
-        // all turned on.
-        //
-        //    Tile address            Attribute address
-        // 0010 NNYY YyyX XXxx  -->  0010 NN11 11YY YXXX
-        //
-        // You may be wondering if it is possible for these two addresses to be the
-        // same... and it turns out that they are never so! The reason is that
-        // the visible screen is 32 x 30 tiles. That means that the final tile address
-        // for a given nametable, correspondent with the 960th tile is:
-        //
-        // 0010 NN11 1011 1111
-        //
-        // ... where YYYyy is 11110 and XXXxx is 11111. However, the _first_ attribute
-        // tile address, correspondent with the 0th tile is:
-        //
-        // 0010 0011 1100 0000
-        //
-        // ... where YYY is 000 and XXX is 000. Quite ingenious!
-        return 0x23C0 |
-               UInt16(self.currentSharedAddress[.nametable]) << 10 |
-               UInt16(self.currentSharedAddress[.coarseY] / 4) << 3 |
-               UInt16(self.currentSharedAddress[.coarseX] / 4)
+    var tileWidth: Int {
+        8
     }
-
-    private static func makeChrTileAddress(bankIndex: Bool, tileIndex: UInt8, bitPlaneIndex: Bool, fineY: UInt8) -> UInt16 {
-        // The stucture of CHR pattern tile addresses is the following:
-        //
-        // 000b tttt tttt pyyy
-        //    | |||| |||| ||||
-        //    | |||| |||| |+++-- fine y offset within the tile
-        //    | |||| |||| |
-        //    | |||| |||| +----- bit plane index: 0 is low, 1 is high
-        //    | |||| ||||
-        //    | ++++-++++------- tile index
-        //    |
-        //    +----------------- bank index
-        return (bankIndex ? 0x1000 : 0x0000) |
-               UInt16(tileIndex) << 4 |
-               (bitPlaneIndex ? 0b1000 : 0b000) |
-               UInt16(fineY)
+    var tileHeight: Int {
+        8
     }
-
-    mutating private func cacheNametableByte() {
-        self.currentNametableByte = self.readByte(address: self.currentSharedAddress).result
+    var spriteWidth: Int {
+        tileWidth
     }
-
-    mutating private func cachePaletteIndex() {
-        // ACHTUNG! Think about what Becca said about this, but for now,
-        // we're gonna keep this implementation.
-        //
-        // Ultimately, the goal of this function is to compute and cache an
-        // index into the background palette for the currently cached values of
-        // coarse X and coarse Y.
-        //
-        // In the NES, a single attribute table byte is used to manage the palettes
-        // of a group of 4x4 tiles arranged in what is called a metatile block.
-        // Within that block, they are further subdivided into 2x2 blocks called
-        // metatiles. Each tile in the metatile block is effectively associated with a
-        // pair of bits that are used to index into the corresponding attribute table
-        // byte. The diagram below illustrates how those bit indices are associated
-        // with each tile in a metatile block:
-        //
-        //                   coarse X
-        //               0    1    2    3   ...
-        //             +----+----+----+----+
-        //          0  | 00 | 00 | 10 | 10 |
-        //             +----+----|----+----|
-        //          1  | 00 | 00 | 10 | 10 |
-        // coarse Y    +----+----|----+----|
-        //          2  | 01 | 01 | 11 | 11 |
-        //             +----+----|----+----|
-        //          3  | 01 | 01 | 11 | 11 |
-        //             +----+----+----+----|
-        //          .
-        //          .
-        //          .
-        //
-        // ... and below shows how those indices need to map to pairs of bits in the
-        // attribute table byte
-        //
-        // +----+----+----+----+
-        // | 11 | 01 | 10 | 00 |
-        // +----+----+----+----+
-
-        // First we need to grab the current coarse X and coarse Y values...
-        let coarseX = self.currentSharedAddress[.coarseX]
-        let coarseY = self.currentSharedAddress[.coarseY]
-
-        // ... then we need to convert them into a shift index into the corresponding
-        // attribute table byte. We do this by first doing modulo division on each
-        // by four to get the X and Y indices _within the given metatile block_, then
-        // dividing again by two to get the _metatile index within the 4x4 block_ ...
-        let metatileBlockIndexX = (coarseX % 4) / 2
-        let metatileBlockIndexY = (coarseY % 4) / 2
-
-        // We need to index into the corresponding attribute table byte and pluck out
-        // the two bits starting there, and so we need to map the metatile (X, Y) pairs
-        // to the attribute byte indices like below:
-        //
-        // (0, 0) -> 0
-        // (1, 0) -> 2
-        // (0, 1) -> 4
-        // (1, 1) -> 6
-        //
-        // To do this mapping, we form a two bit number by taking metatile block index Y as
-        // the two's bit and metatile block index X as the one's bit. Then we need
-        // to multiply that number by two because we need to index in _steps of two_,
-        // not one.
-        let paletteIndexShift = (metatileBlockIndexY << 1 | metatileBlockIndexX) * 2
-
-        // ... now actually grab the palette byte using the current attribute address...
-        let paletteByte = self.readByte(address: self.currentAttributeAddress).result
-
-        // ... finally, pluck out and cache the two bits representing the palette index
-        self.currentPaletteIndex = (paletteByte >> paletteIndexShift) & 0b0000_0011
-    }
-
-    mutating private func cacheLowTileByte() {
-        let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
-                                              tileIndex: self.currentNametableByte,
-                                              bitPlaneIndex: false,
-                                              fineY: self.currentSharedAddress[.fineY])
-
-        self.currentLowTileByte = self.readByte(address: address).result
-    }
-
-    mutating private func cacheHighTileByte() {
-        let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
-                                              tileIndex: self.currentNametableByte,
-                                              bitPlaneIndex: true,
-                                              fineY: self.currentSharedAddress[.fineY])
-
-        self.currentLowTileByte = self.readByte(address: address).result
-    }
-
-    mutating private func cacheTileData() {
-        // This function builds a new 32-bit integer which will contain 8 nibbles,
-        // each of which contains data for a pixel within the current tile.
-        // It will be structured like the following:
-        //
-        //   0    1    2    3    4    5    6    7
-        // pphl pphl pphl pphl pphl pphl pphl pphl
-        //
-        // ... where pp is the two bits for the palette index, h is the high tile bit,
-        // and l is the low tile bit, all associated with each pixel in the
-        // current tile.
-        //
-        // Once the new tile data are assembled, it is ORed onto the 64-bit cache,
-        // which has data for both the current _and_ next tiles.
-        var newTileData: UInt32 = 0
-        for _ in 0 ..< 8 {
-            let lowBit = (self.currentLowTileByte & 0b1000_0000) >> 7
-            let highBit = (self.currentHighTileByte & 0b1000_0000) >> 6
-            let paletteBits = self.currentPaletteIndex << 2
-            let newTileDataNibble = paletteBits | highBit | lowBit
-            newTileData <<= 4
-            newTileData |= UInt32(newTileDataNibble)
-            self.currentLowTileByte <<= 1
-            self.currentHighTileByte <<= 1
-        }
-        self.currentTileData |= UInt64(newTileData)
-    }
-
-    mutating private func copyX() {
-        self.currentSharedAddress[.coarseX] = self.nextSharedAddress[.coarseX]
-        self.currentSharedAddress[.nametableX] = self.nextSharedAddress[.nametableX]
-    }
-
-    mutating private func copyY() {
-        self.currentSharedAddress[.coarseY] = self.nextSharedAddress[.coarseY]
-        self.currentSharedAddress[.fineY] = self.nextSharedAddress[.fineY]
-        self.currentSharedAddress[.nametableY] = self.nextSharedAddress[.nametableY]
-    }
-
-    mutating private func incrementX() {
-        if self.currentSharedAddress[.coarseX] == 0b1_1111 {
-            // Reset coarse X
-            self.currentSharedAddress[.coarseX] = 0b0_0000
-            // Toggle horizontal nametable
-            self.currentSharedAddress[.nametable] ^= 0b01
-        } else {
-            // Just increment coarse X
-            self.currentSharedAddress[.coarseX] += 0b0_0001
-        }
-    }
-
-    mutating private func incrementY() {
-        if self.currentSharedAddress[.fineY] == 0b111 {
-            // Reset fine Y
-            self.currentSharedAddress[.fineY] = 0b000
-
-            if self.currentSharedAddress[.coarseY] == 0b1_1110 {
-                // Reset coarse Y
-                self.currentSharedAddress[.coarseY] = 0b0_0000
-                // Toggle vertical nametable
-                self.currentSharedAddress[.nametable] ^= 0b10
-            } else if self.currentSharedAddress[.coarseY] == 0b1_1111 {
-                // ACHTUNG! How would we ever get to this branch?
-                //
-                // Reset coarse Y
-                self.currentSharedAddress[.coarseY] = 0b0_0000
-            } else {
-                // Just increment coarse Y
-                self.currentSharedAddress[.coarseY] += 0b0_0001
-            }
-        } else {
-            // Just increment fine Y
-            self.currentSharedAddress[.fineY] += 0b001
-        }
+    var spriteHeight: Int {
+        self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight
     }
 
     private func getSpriteColor(spriteIndex: Int,
@@ -851,38 +549,44 @@ extension PPU {
         return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
     }
 
-    mutating private func updateCaches() {
-        if self.scanline < Self.height || self.scanline == Self.scanlinesPerFrame {
-            if self.cycles < Self.width || (self.cycles >= 320 && self.cycles <= 335) {
-                switch self.cycles % 8 {
-                case 1:
-                    self.cacheNametableByte()
-                case 3:
-                    self.cachePaletteIndex()
-                case 5:
-                    self.cacheLowTileByte()
-                case 7:
-                    self.cacheHighTileByte()
-                case 0:
-                    self.incrementX()
-                    self.cacheTileData()
-                default:
-                    break
-                }
-            }
-
-            if self.cycles == 255 {
-                self.incrementY()
-            }
-
-            if self.cycles == 256 {
-                self.copyX()
-            }
-        }
-
-        if self.scanline == Self.scanlinesPerFrame && self.cycles >= 279 && self.cycles <= 303 {
-            self.copyY()
-        }
+    var isRenderingEnabled: Bool {
+        self.maskRegister[.showBackground] || self.maskRegister[.showSprites]
+    }
+    var isVisibleLine: Bool {
+        self.scanline < Self.height
+    }
+    var isNmiScanline: Bool {
+        self.scanline == Self.nmiInterruptScanline
+    }
+    var isPreLine: Bool {
+        self.scanline == Self.scanlinesPerFrame
+    }
+    var isPastPreLine: Bool {
+        self.scanline > Self.scanlinesPerFrame
+    }
+    var isRenderLine: Bool {
+        self.isVisibleLine || self.isPreLine
+    }
+    var isVisibleCycle: Bool {
+        self.cycles >= 0 && self.cycles < Self.width
+    }
+    var isIncrementVerticalScrollCycle: Bool {
+        self.cycles == Self.width
+    }
+    var isCopyHorizontalScrollCycle: Bool {
+        self.cycles == Self.width + 1
+    }
+    var isCopyVerticalScrollCycle: Bool {
+        self.cycles >= 280 && self.cycles <= 304
+    }
+    var isPrefetchCycle: Bool {
+        self.cycles >= 320 && self.cycles <= 335
+    }
+    var isFetchCycle: Bool {
+        self.isVisibleCycle || self.isPrefetchCycle
+    }
+    var isPastLastCycle: Bool {
+        self.cycles > Self.ppuCyclesPerScanline
     }
 
     // The return value below ultimately reflects whether or not
@@ -895,15 +599,17 @@ extension PPU {
                 self.cacheSpriteIndices()
             }
 
-            if self.cycles < Self.width && self.scanline < Self.height {
+            if self.isVisibleLine && self.isVisibleCycle {
                 self.renderPixel(x: self.cycles, y: Int(self.scanline))
             }
 
-            self.updateCaches()
+            if self.isRenderingEnabled {
+                self.updateCaches()
+            }
 
             self.cycles += 1
 
-            if self.cycles >= Self.ppuCyclesPerScanline {
+            if self.isPastLastCycle {
                 if self.isSpriteZeroHit(cycles: self.cycles) {
                     self.statusRegister[.spriteZeroHit] = true
                 }
@@ -911,7 +617,7 @@ extension PPU {
                 self.cycles = 0
                 self.scanline += 1
 
-                if self.scanline == Self.nmiInterruptScanline {
+                if self.isNmiScanline {
                     self.statusRegister[.verticalBlankStarted] = true
 
                     if self.controllerRegister[.generateNmi] {
@@ -921,7 +627,7 @@ extension PPU {
                     redrawScreen = true
                 }
 
-                if self.scanline >= Self.scanlinesPerFrame {
+                if isPastPreLine {
                     self.scanline = 0
                     self.nmiInterrupt = nil
                     self.statusRegister[.verticalBlankStarted] = false
