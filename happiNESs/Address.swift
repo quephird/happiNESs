@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 9/29/24.
 //
 
-typealias Address = UInt16
+public typealias Address = UInt16
 
 // During the rendering phase, the shared address field in the PPU
 // has the following structure:

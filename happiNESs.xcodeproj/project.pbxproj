@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 870AABD72CB32FAA00E9F3B6 /* PPU+caching.swift */; };
 		87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D042C7028F10003D090 /* PPUStatusRegister.swift */; };
 		87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D092C7511F90003D090 /* MaskRegister.swift */; };
 		87184D0E2C756BEB0003D090 /* OAMRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D0D2C756BEB0003D090 /* OAMRegister.swift */; };
@@ -84,6 +85,7 @@
 
 /* Begin PBXFileReference section */
 		8709FF122C7FB36700EDF82F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		870AABD72CB32FAA00E9F3B6 /* PPU+caching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PPU+caching.swift"; sourceTree = "<group>"; };
 		87184D042C7028F10003D090 /* PPUStatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPUStatusRegister.swift; sourceTree = "<group>"; };
 		87184D092C7511F90003D090 /* MaskRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskRegister.swift; sourceTree = "<group>"; };
 		87184D0D2C756BEB0003D090 /* OAMRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAMRegister.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 				87184D0D2C756BEB0003D090 /* OAMRegister.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
+				870AABD72CB32FAA00E9F3B6 /* PPU+caching.swift */,
 				87184D042C7028F10003D090 /* PPUStatusRegister.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
@@ -426,6 +429,7 @@
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,
 				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
+				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
