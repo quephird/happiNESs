@@ -60,7 +60,6 @@ public struct PPU {
     public var vram: [UInt8]
     public var internalDataBuffer: UInt8
 
-    public var addressRegister: AddressRegister
     public var controllerRegister: ControllerRegister
     public var maskRegister: MaskRegister
     public var oamRegister: OAMRegister
@@ -92,7 +91,6 @@ public struct PPU {
         self.internalDataBuffer = 0x00
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
-        self.addressRegister = AddressRegister()
         self.controllerRegister = ControllerRegister()
         self.maskRegister = MaskRegister()
         self.oamRegister = OAMRegister()
@@ -109,7 +107,6 @@ public struct PPU {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
 
-        self.addressRegister.reset()
         self.controllerRegister.reset()
         self.maskRegister.reset()
         self.oamRegister.reset()
@@ -131,7 +128,6 @@ extension PPU {
     mutating public func readStatus() -> UInt8 {
         let result = self.readStatusWithoutMutating()
         self.statusRegister[.verticalBlankStarted] = false
-        self.addressRegister.resetLatch()
         self.scrollRegister.resetLatch()
         self.wRegister = false
 
@@ -147,14 +143,11 @@ extension PPU {
     // we're gonna keep all of the registers as they are, and _slowly_ evolve
     // the code to minimize damage.
     mutating public func updateAddress(byte: UInt8) {
-        self.addressRegister.updateAddress(byte: byte)
-
         // NOTA BENE: Since we're updating the cached address _after_ we've written
         // to the register, we need to check the state of the high pointer flag
         // a little more carefully here. If it's set to true, then we updated the low
         // byte and thus need to copy not only to self.nextSharedAddress but to
         // self.currentSharedAddress as well.
-//        if self.addressRegister.highPointer {
         if !self.wRegister {
             self.nextSharedAddress[.highByte] = byte & 0x3F
         } else {
@@ -212,7 +205,6 @@ extension PPU {
         // of what is seen in other emulator codebases.
         let coarseBits = byte >> 3
         let fineBits = byte & 0b0000_0111
-//        if self.scrollRegister.latch {
         if !self.wRegister {
             self.nextSharedAddress[.coarseX] = coarseBits
             self.currentFineX = fineBits
@@ -228,8 +220,7 @@ extension PPU {
 extension PPU {
     mutating public func incrementVramAddress() {
         let increment = self.controllerRegister.vramAddressIncrement()
-        self.addressRegister.incrementAddress(value: increment)
-//        self.currentSharedAddress = (self.currentSharedAddress &+ UInt16(increment)) & 0b0011_1111_1111_1111
+        self.currentSharedAddress = (self.currentSharedAddress &+ UInt16(increment)) & 0x3FFF
     }
 
     public func vramIndex(from address: UInt16) -> Int {
@@ -310,8 +301,7 @@ extension PPU {
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
     public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
-        let address = self.addressRegister.getAddress()
-//        let address = self.currentSharedAddress
+        let address = self.currentSharedAddress
 
         let (result, shouldBuffer) = self.readByte(address: address)
         if shouldBuffer {
@@ -333,17 +323,13 @@ extension PPU {
     }
 
     mutating public func writeByte(byte: UInt8) {
-        let address = self.addressRegister.getAddress()
-//        let address = self.currentSharedAddress % 0x4000
+        let address = self.currentSharedAddress % 0x4000
 
         switch address {
         case 0x0000 ... 0x1FFF:
             self.cartridge!.writeChr(address: address, byte: byte)
         case 0x2000 ... 0x3EFF:
             self.vram[self.vramIndex(from: address)] = byte
-//        case 0x3000 ... 0x3EFF:
-//            let message = String(format: "Address shouldn't be used in reality: %04X", address)
-//            fatalError(message)
         case 0x3F00 ... 0x3FFF:
             // TODO: Make a helper function to resolve a palette index from an address
             let basePaletteIndex = Int((address & 0xFF) % 0x20)
@@ -874,6 +860,9 @@ extension PPU {
         return (y == self.scanline) && x <= cycles && self.maskRegister[.showSprites]
     }
 
+    var isRenderingEnabled: Bool {
+        self.maskRegister[.showBackground] || self.maskRegister[.showSprites]
+    }
     var isVisibleLine: Bool {
         self.scanline < Self.height
     }
@@ -944,7 +933,9 @@ extension PPU {
                 self.renderPixel(x: self.cycles, y: Int(self.scanline))
             }
 
-            self.updateCaches()
+            if self.isRenderingEnabled {
+                self.updateCaches()
+            }
 
             self.cycles += 1
 
