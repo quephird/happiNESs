@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D042C7028F10003D090 /* PPUStatusRegister.swift */; };
 		87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D092C7511F90003D090 /* MaskRegister.swift */; };
-		87184D0C2C7522B80003D090 /* ScrollRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D0B2C7522B80003D090 /* ScrollRegister.swift */; };
 		87184D0E2C756BEB0003D090 /* OAMRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87184D0D2C756BEB0003D090 /* OAMRegister.swift */; };
 		871931F02C30BB2900A73C22 /* happiNESsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871931EF2C30BB2900A73C22 /* happiNESsApp.swift */; };
 		871931F22C30BB2900A73C22 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871931F12C30BB2900A73C22 /* ContentView.swift */; };
@@ -26,7 +25,6 @@
 		871F622D2C5C3C8A00132962 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 871F622C2C5C3C8900132962 /* nestest.nes */; };
 		871F622E2C5C3C8A00132962 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 871F622C2C5C3C8900132962 /* nestest.nes */; };
 		871F62302C62FE9E00132962 /* PPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F622F2C62FE9E00132962 /* PPU.swift */; };
-		871F62322C6314C900132962 /* AddressRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62312C6314C900132962 /* AddressRegister.swift */; };
 		871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62332C6541D300132962 /* UInt16+bytes.swift */; };
 		871F62362C65631F00132962 /* ControllerRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62352C65631F00132962 /* ControllerRegister.swift */; };
 		8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1762C1CB9B3001B44B5 /* happiNESs.docc */; };
@@ -88,7 +86,6 @@
 		8709FF122C7FB36700EDF82F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		87184D042C7028F10003D090 /* PPUStatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPUStatusRegister.swift; sourceTree = "<group>"; };
 		87184D092C7511F90003D090 /* MaskRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskRegister.swift; sourceTree = "<group>"; };
-		87184D0B2C7522B80003D090 /* ScrollRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollRegister.swift; sourceTree = "<group>"; };
 		87184D0D2C756BEB0003D090 /* OAMRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAMRegister.swift; sourceTree = "<group>"; };
 		871931ED2C30BB2900A73C22 /* happiNESsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = happiNESsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		871931EF2C30BB2900A73C22 /* happiNESsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = happiNESsApp.swift; sourceTree = "<group>"; };
@@ -104,7 +101,6 @@
 		871932132C3798B400A73C22 /* Cartridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cartridge.swift; sourceTree = "<group>"; };
 		871F622C2C5C3C8900132962 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
 		871F622F2C62FE9E00132962 /* PPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPU.swift; sourceTree = "<group>"; };
-		871F62312C6314C900132962 /* AddressRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressRegister.swift; sourceTree = "<group>"; };
 		871F62332C6541D300132962 /* UInt16+bytes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt16+bytes.swift"; sourceTree = "<group>"; };
 		871F62352C65631F00132962 /* ControllerRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerRegister.swift; sourceTree = "<group>"; };
 		8744B1722C1CB9B3001B44B5 /* happiNESs.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = happiNESs.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -217,7 +213,6 @@
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				878C69722CAA424400DA9BD4 /* Address.swift */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
-				871F62312C6314C900132962 /* AddressRegister.swift */,
 				8719320F2C372F6900A73C22 /* Bus.swift */,
 				871932132C3798B400A73C22 /* Cartridge.swift */,
 				871F62352C65631F00132962 /* ControllerRegister.swift */,
@@ -233,7 +228,6 @@
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
 				87184D042C7028F10003D090 /* PPUStatusRegister.swift */,
-				87184D0B2C7522B80003D090 /* ScrollRegister.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
 				871F62332C6541D300132962 /* UInt16+bytes.swift */,
@@ -412,7 +406,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */,
-				871F62322C6314C900132962 /* AddressRegister.swift in Sources */,
 				871F62302C62FE9E00132962 /* PPU.swift in Sources */,
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
 				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
@@ -430,7 +423,6 @@
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
 				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
 				87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */,
-				87184D0C2C7522B80003D090 /* ScrollRegister.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,
 				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
