@@ -63,7 +63,6 @@ public struct PPU {
     public var controllerRegister: ControllerRegister
     public var maskRegister: MaskRegister
     public var oamRegister: OAMRegister
-    public var scrollRegister: ScrollRegister
     public var statusRegister: PPUStatusRegister
 
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
@@ -94,7 +93,6 @@ public struct PPU {
         self.controllerRegister = ControllerRegister()
         self.maskRegister = MaskRegister()
         self.oamRegister = OAMRegister()
-        self.scrollRegister = ScrollRegister()
         self.statusRegister = PPUStatusRegister()
 
         self.cycles = 0
@@ -110,7 +108,6 @@ public struct PPU {
         self.controllerRegister.reset()
         self.maskRegister.reset()
         self.oamRegister.reset()
-        self.scrollRegister.reset()
         self.statusRegister.reset()
 
         self.cycles = 0
@@ -128,28 +125,14 @@ extension PPU {
     mutating public func readStatus() -> UInt8 {
         let result = self.readStatusWithoutMutating()
         self.statusRegister[.verticalBlankStarted] = false
-        self.scrollRegister.resetLatch()
         self.wRegister = false
 
         return result
     }
 
-    // TODO: Think about getting rid of register abstractions and instead
-    // emulate the actual architecture of the NES in which 1) the PPUSCROLL
-    // and PPUADDR share a boolean flag to indicate which of two other states
-    // are being written to, and 2) not have AddressRegister maintain its own
-    // address word and instead only manage a single byte. This is going to
-    // require a _lot_ of careful thought and change, so for the time being
-    // we're gonna keep all of the registers as they are, and _slowly_ evolve
-    // the code to minimize damage.
     mutating public func updateAddress(byte: UInt8) {
-        // NOTA BENE: Since we're updating the cached address _after_ we've written
-        // to the register, we need to check the state of the high pointer flag
-        // a little more carefully here. If it's set to true, then we updated the low
-        // byte and thus need to copy not only to self.nextSharedAddress but to
-        // self.currentSharedAddress as well.
         if !self.wRegister {
-            self.nextSharedAddress[.highByte] = byte & 0x3F
+            self.nextSharedAddress[.highByte] = byte
         } else {
             self.nextSharedAddress[.lowByte] = byte
             self.currentSharedAddress = self.nextSharedAddress
@@ -193,16 +176,7 @@ extension PPU {
         }
     }
 
-    // TODO: As for the address register, we will need to eventually
-    // switch over to a shared latch between it and the scroll register,
-    // but for now are keeping things as they are.
     mutating public func writeScrollByte(byte: UInt8) {
-        self.scrollRegister.writeByte(byte: byte)
-
-        // NOTA BENE: As with updating the address register above, we are
-        // checking the state of the toggle flag in the scroll register _after_
-        // its state has been changed, and so the logic below is the reverse
-        // of what is seen in other emulator codebases.
         let coarseBits = byte >> 3
         let fineBits = byte & 0b0000_0111
         if !self.wRegister {
