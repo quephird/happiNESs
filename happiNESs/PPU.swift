@@ -9,7 +9,7 @@ public struct PPU {
     public static let width = 256
     public static let height = 240
 
-    public static let scanlinesPerFrame = 262
+    public static let scanlinesPerFrame = 261
     public static let ppuCyclesPerScanline = 341
     public static let nmiInterruptScanline = 241
 
@@ -779,6 +779,9 @@ extension PPU {
     var isPreLine: Bool {
         self.scanline == Self.scanlinesPerFrame
     }
+    var isPastPreLine: Bool {
+        self.scanline > Self.scanlinesPerFrame
+    }
     var isRenderLine: Bool {
         self.isVisibleLine || self.isPreLine
     }
@@ -814,7 +817,7 @@ extension PPU {
             }
         }
 
-        if self.isPreLine && self.cycles >= 280 && self.cycles <= 304 {
+        if isPreLine && self.cycles >= 280 && self.cycles <= 304 {
             self.copyY()
         }
 
@@ -867,7 +870,7 @@ extension PPU {
                     redrawScreen = true
                 }
 
-                if self.scanline >= Self.scanlinesPerFrame {
+                if isPastPreLine {
                     self.scanline = 0
                     self.nmiInterrupt = nil
                     self.statusRegister[.verticalBlankStarted] = false
