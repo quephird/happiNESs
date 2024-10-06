@@ -70,6 +70,7 @@ public struct PPU {
     private var currentSharedAddress: Address = 0
     private var ppuaddr: UInt8 = 0x00
     private var ppuscroll: UInt8 = 0x00
+    // This register is also shared by PPUADDR/PPUSCROLL
     private var wRegister: Bool = false
 
     public var cycles: Int
@@ -352,29 +353,6 @@ extension PPU {
         return NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
     }
 
-    private func getBackgroundPaletteColor(attributeTable: ArraySlice<UInt8>,
-                                           colorIndex: Int,
-                                           tileX: Int,
-                                           tileY: Int) -> NESColor? {
-        let attributeTableIndex = ((tileY / 4) * 8) + (tileX / 4)
-        let attributeByte = attributeTable[attributeTable.startIndex + attributeTableIndex]
-
-        let paletteIndexBase = switch ((tileX % 4) / 2, (tileY % 4) / 2) {
-        case (0, 0):
-            attributeByte & 0b0000_0011
-        case (1, 0):
-            (attributeByte >> 2) & 0b0000_0011
-        case (0, 1):
-            (attributeByte >> 4) & 0b0000_0011
-        case (1, 1):
-            (attributeByte >> 6) & 0b0000_0011
-        default:
-            fatalError("Whoops! We should never get here!")
-        }
-
-        return getColorFromPalette(baseIndex: Int((paletteIndexBase * 4)), entryIndex: colorIndex)
-    }
-
     private func getTileColorIndex(bankIndex: Int,
                                    tileIndex: Int,
                                    tilePixelX: Int,
@@ -394,48 +372,6 @@ extension PPU {
         let pixelData = tileData >> ((7 - self.currentFineX) * 4)
         let colorIndex = Int(pixelData & 0x0F)
         return colorIndex.isMultiple(of: 4) ? nil : NESColor.systemPalette[Int(self.paletteTable[colorIndex])]
-//        let scrollX = Int(self.scrollRegister.scrollX)
-//        let scrollY = Int(self.scrollRegister.scrollY)
-//
-//        let shiftX = x + scrollX
-//        let shiftY = y + scrollY
-//
-//        let startAddressOffset: UInt16 = switch (shiftX < Self.width, shiftY < Self.height) {
-//        case (true, true):
-//            0x0000
-//        case (false, true):
-//            0x0400
-//        case (true, false):
-//            0x0800
-//        case (false, false):
-//            0x0C00
-//        }
-//        let startAddress = self.controllerRegister.nametableAddress() + startAddressOffset
-//        let startIndex = self.vramIndex(from: startAddress)
-//        let nametable = self.vram[startIndex ..< startIndex + 0x0400]
-//
-//        let attributeTable = nametable[(nametable.startIndex + Self.attributeTableOffset)...]
-//
-//        let nametableX = shiftX % Self.width
-//        let nametableY = shiftY % Self.height
-//        let nametableColumn = nametableX/8
-//        let nametableRow = nametableY/8
-//        let nametableIndex = 32 * nametableRow + nametableColumn
-//
-//        let tileIndex = Int(nametable[nametable.startIndex + nametableIndex])
-//        let tilePixelX = nametableX % 8
-//        let tilePixelY = nametableY % 8
-//
-//        let bankIndex = self.controllerRegister[.backgroundPatternBankIndex] ? 1 : 0
-//        let colorIndex = self.getTileColorIndex(bankIndex: bankIndex,
-//                                                tileIndex: tileIndex,
-//                                                tilePixelX: tilePixelX,
-//                                                tilePixelY: tilePixelY)
-//
-//        return self.getBackgroundPaletteColor(attributeTable: attributeTable,
-//                                              colorIndex: colorIndex,
-//                                              tileX: nametableColumn,
-//                                              tileY: nametableRow)
     }
 
     private func getSpritePalette(paletteIndex: Int, colorIndex: Int) -> NESColor? {
