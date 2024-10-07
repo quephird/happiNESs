@@ -194,6 +194,26 @@ extension PPU {
         self.currentAndNextTileData |= UInt64(newTileData)
     }
 
+    // This is partly a performance optimization and partly an emulation
+    // of what happens in the NES, whereby we cache the first eight sprites
+    // that lie on the current scanline.
+    mutating public func cacheSpriteIndices() {
+        let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
+        self.spriteIndicesForCurrentScanline = allSpriteIndices.filter({ oamIndex in
+            let tileY = Int(self.oamRegister.data[oamIndex])
+
+            // The sprite height property takes into account whether or not
+            // it is 8x8 or 8x16, and so we need to test to see if the current
+            // scanline intersects it anywhere vertically.
+            let deltaY = self.spriteHeight - 1
+            if self.scanline >= tileY && self.scanline <= tileY + deltaY {
+                return true
+            }
+
+            return false
+        }).prefix(8)
+    }
+
     mutating private func copyX() {
         self.currentSharedAddress[.coarseX] = self.nextSharedAddress[.coarseX]
         self.currentSharedAddress[.nametableX] = self.nextSharedAddress[.nametableX]

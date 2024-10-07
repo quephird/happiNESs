@@ -135,6 +135,6 @@ extension Bus {
     }
 
     mutating func pollNmiStatus() -> UInt8? {
-        return self.ppu.pollNMIInterrupt()
+        return self.ppu.pollNmiInterrupt()
     }
 }
