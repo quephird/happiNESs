@@ -13,10 +13,6 @@ extension PPU {
         return self.cartridge!.readTileFromChr(startAddress: startAddress)
     }
 
-    mutating private func setColorAt(x: Int, y: Int, to color: NESColor) {
-        self.screenBuffer[Self.width * y + x] = color
-    }
-
     private func getColorFromPalette(baseIndex: Int, entryIndex: Int) -> NESColor? {
         guard entryIndex != 0 else {
             return nil
@@ -183,8 +179,21 @@ extension PPU {
         }
     }
 
+    mutating private func setColorAt(x: Int, y: Int, to color: NESColor) {
+        self.screenBuffer[Self.width * y + x] = color
+    }
+
     mutating public func renderPixel(x: Int, y: Int) {
         let color = self.computeColorAt(x: x, y: y)
         setColorAt(x: x, y: y, to: color)
+    }
+
+    static public func makeEmptyScreenBuffer() -> [NESColor] {
+        [NESColor](repeating: .black, count: Self.width * Self.height)
+    }
+
+    // We are double buffering here to maximize performance.
+    mutating public func updateScreenBuffer(_ otherBuffer: inout [NESColor]) {
+        swap(&self.screenBuffer, &otherBuffer)
     }
 }

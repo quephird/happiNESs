@@ -79,6 +79,8 @@ public struct PPU {
 
     public var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
 
+    // These are all cached values that are refreshed during various stages
+    // of the rendering cycle.
     public var currentNametableByte: UInt8 = 0
     public var currentPaletteIndex: UInt8 = 0
     public var currentLowTileByte: UInt8 = 0
@@ -116,6 +118,7 @@ public struct PPU {
         self.nmiInterrupt = nil
     }
 
+    // Various computed properties used across multiple concerns
     var isRenderingEnabled: Bool {
         self.maskRegister[.showBackground] || self.maskRegister[.showSprites]
     }
@@ -160,17 +163,6 @@ public struct PPU {
         let y = self.oamRegister.data[0]
         let x = self.oamRegister.data[3]
         return (y == self.scanline) && x <= self.cycles && self.maskRegister[.showSprites]
-    }
-}
-
-extension PPU {
-    static public func makeEmptyScreenBuffer() -> [NESColor] {
-        [NESColor](repeating: .black, count: Self.width * Self.height)
-    }
-
-    // We effectively are doing double buffering here to maximize performance.
-    mutating public func updateScreenBuffer(_ otherBuffer: inout [NESColor]) {
-        swap(&self.screenBuffer, &otherBuffer)
     }
 
     mutating func pollNmiInterrupt() -> UInt8? {
