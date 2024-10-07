@@ -139,6 +139,54 @@ extension PPU {
         return actualNametableIndexStart + nameTableOffset
     }
 
+    private func paletteIndex(from address: Address) -> Int {
+        // The palette table is mapped to addresses in the following manner:
+        //
+        // +-----------------+--------------------------------------+
+        // | 0x3F00          | Universal background color           |
+        // +-----------------+--------------------------------------+
+        // | 0x3F01 – 0x3F03 | Background palette 0                 |
+        // +-----------------+--------------------------------------+
+        // | 0x3F04          | Unused color 1                       |
+        // +-----------------+--------------------------------------+
+        // | 0x3F05 – 0x3F07 | Background palette 1                 |
+        // +-----------------+--------------------------------------+
+        // | 0x3F08          | Unused color 2                       |
+        // +-----------------+--------------------------------------+
+        // | 0x3F09 – 0x3F0B | Background palette 2                 |
+        // +-----------------+--------------------------------------+
+        // | 0x3F0C          | Unused color 3                       |
+        // +-----------------+--------------------------------------+
+        // | 0x3F0D – 0x3F0F | Background palette 3                 |
+        // +-----------------+--------------------------------------+
+        // | 0x3F10          | Mirror of universal background color |
+        // +-----------------+--------------------------------------+
+        // | 0x3F11 – 0x3F13 | Sprite palette 0                     |
+        // +-----------------+--------------------------------------+
+        // | 0x3F14          | Mirror of unused color 1             |
+        // +-----------------+--------------------------------------+
+        // | 0x3F15 – 0x3F17 | Sprite palette 1                     |
+        // +-----------------+--------------------------------------+
+        // | 0x3F18          | Mirror of unused color 2             |
+        // +-----------------+--------------------------------------+
+        // | 0x3F19 – 0x3F1B | Sprite palette 2                     |
+        // +-----------------+--------------------------------------+
+        // | 0x3F1C          | Mirror of unused color 3             |
+        // +-----------------+--------------------------------------+
+        // | 0x3F1D – 0x3F1F | Sprite palette 3                     |
+        // +-----------------+--------------------------------------+
+        // | 0x3F20 – 0x3FFF | Mirrors of first 32 bytes            |
+        // +-----------------+--------------------------------------+
+        let basePaletteIndex = Int((address & 0xFF) % 0x20)
+
+        return switch basePaletteIndex {
+        case 0x10, 0x14, 0x18, 0x1C:
+            basePaletteIndex - 0x10
+        default:
+            basePaletteIndex
+        }
+    }
+
     // NOTA BENE: This method is _only_ used internally by the PPU
     public func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
         let mirroredAddress = address % 0x4000
@@ -148,13 +196,7 @@ extension PPU {
         case 0x2000 ... 0x3EFF:
             return (self.vram[self.vramIndex(from: mirroredAddress)], true)
         case 0x3F00 ... 0x3FFF:
-            let basePaletteIndex = Int((mirroredAddress & 0xFF) % 0x20)
-            switch basePaletteIndex {
-            case 0x10, 0x14, 0x18, 0x1C:
-                return (self.paletteTable[basePaletteIndex - 0x10], false)
-            default:
-                return (self.paletteTable[basePaletteIndex], false)
-            }
+            return (self.paletteTable[self.paletteIndex(from: mirroredAddress)], false)
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
@@ -193,14 +235,7 @@ extension PPU {
         case 0x2000 ... 0x3EFF:
             self.vram[self.vramIndex(from: address)] = byte
         case 0x3F00 ... 0x3FFF:
-            // TODO: Make a helper function to resolve a palette index from an address
-            let basePaletteIndex = Int((address & 0xFF) % 0x20)
-            switch basePaletteIndex {
-            case 0x10, 0x14, 0x18, 0x1C:
-                self.paletteTable[basePaletteIndex - 0x10] = byte
-            default:
-                self.paletteTable[basePaletteIndex] = byte
-            }
+            self.paletteTable[self.paletteIndex(from: address)] = byte
         default:
             let message = String(format: "Unexpected access to mirrored space: %04X", address)
             fatalError(message)
