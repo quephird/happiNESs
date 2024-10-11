@@ -36,7 +36,7 @@ public struct PPU {
     public var wRegister: Bool = false
 
     public var cycles: Int
-    public var scanline: UInt16
+    public var scanline: Int
     public var nmiInterrupt: UInt8?
 
     public var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
@@ -49,7 +49,8 @@ public struct PPU {
     public var currentHighTileByte: UInt8 = 0
     public var currentAndNextTileData: UInt64 = 0
     public var currentFineX: UInt8 = 0
-    public var spriteIndicesForCurrentScanline: ArraySlice<Int> = []
+    public var spriteIndicesForCurrentScanline: [Int] = []
+    public var currentSprites: [CachedSprite] = []
 
     public init() {
         self.internalDataBuffer = 0x00
