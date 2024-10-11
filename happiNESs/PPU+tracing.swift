@@ -23,10 +23,12 @@ extension PPU {
 
             let flipVertical = tileAttributes >> 7 & 1 == 1
             let flipHorizontal = tileAttributes >> 6 & 1 == 1
+            let isBackground = tileAttributes >> 5 & 1 == 1
             let paletteIndex = Int(tileAttributes & 0b11)
 
             print("- \(oamDataIndex / 4):", tileIndex, "@ \(tileX),\(tileY)",
                   (flipVertical ? "vflip" : ""), (flipHorizontal ? "hflip" : ""),
+                  (isBackground ? "bg" : ""),
                   "colored", paletteIndex)
         }
     }

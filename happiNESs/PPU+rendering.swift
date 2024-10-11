@@ -14,7 +14,7 @@ extension PPU {
     }
 
     private func getColorFromPalette(baseIndex: Int, entryIndex: Int) -> NESColor? {
-        guard entryIndex != 0 else {
+        guard !entryIndex.isMultiple(of: 4) else {
             return nil
         }
 
@@ -70,10 +70,13 @@ extension PPU {
         let tileAttributes = self.oamRegister.data[spriteIndex + 2]
         let tileX = Int(self.oamRegister.data[spriteIndex + 3])
         // Determine if the x coordinate falls inside the sprite
-        guard x >= tileX && x <= tileX + self.spriteWidth - 1 else {
+        guard x >= tileX && x < tileX + self.spriteWidth else {
             return nil
         }
-        let tileY = Int(self.oamRegister.data[spriteIndex])
+        // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
+        //
+        //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
+        let tileY = Int(self.oamRegister.data[spriteIndex]) + 1
 
         let flipVertical = tileAttributes >> 7 & 1 == 1
         let flipHorizontal = tileAttributes >> 6 & 1 == 1
@@ -155,14 +158,9 @@ extension PPU {
 
         switch (maybeSpriteColor, maybeBackgroundColor) {
         case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
-            // NOTA BENE: The following is commented out for the time being because
-            // we need to fix some fundamental things first before this will work.
-            // If we enabled it, Super Mario Bros. will eventually hang due to a bug
-            // somewhere in our computation of the background tile color.
-            //
-            // if spriteIndex == 0 {
-            //     self.statusRegister[.spriteZeroHit] = true
-            // }
+             if spriteIndex == 0 {
+                 self.statusRegister[.spriteZeroHit] = true
+             }
 
             switch backgroundPriority {
             case true:
