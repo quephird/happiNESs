@@ -200,13 +200,15 @@ extension PPU {
     mutating public func cacheSpriteIndices() {
         let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
         self.spriteIndicesForCurrentScanline = allSpriteIndices.filter({ oamIndex in
-            let tileY = Int(self.oamRegister.data[oamIndex])
+            // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
+            //
+            //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
+            let tileY = Int(self.oamRegister.data[oamIndex]) + 1
 
             // The sprite height property takes into account whether or not
             // it is 8x8 or 8x16, and so we need to test to see if the current
             // scanline intersects it anywhere vertically.
-            let deltaY = self.spriteHeight - 1
-            if self.scanline >= tileY && self.scanline <= tileY + deltaY {
+            if self.scanline >= tileY && self.scanline < tileY + self.spriteHeight {
                 return true
             }
 
@@ -286,7 +288,7 @@ extension PPU {
             }
         }
 
-        if self.isPreLine && self.isCopyVerticalScrollCycle {
+        if self.isPreRenderLine && self.isCopyVerticalScrollCycle {
             self.copyY()
         }
 

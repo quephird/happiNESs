@@ -32,8 +32,6 @@ public struct PPU {
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
     public var nextSharedAddress: Address = 0
     public var currentSharedAddress: Address = 0
-    private var ppuaddr: UInt8 = 0x00
-    private var ppuscroll: UInt8 = 0x00
     // This register is also shared by PPUADDR/PPUSCROLL
     public var wRegister: Bool = false
 
@@ -92,14 +90,14 @@ public struct PPU {
     var isNmiScanline: Bool {
         self.scanline == Self.nmiInterruptScanline
     }
-    var isPreLine: Bool {
+    var isPreRenderLine: Bool {
         self.scanline == Self.scanlinesPerFrame
     }
-    var isPastPreLine: Bool {
+    var isPastPreRenderLine: Bool {
         self.scanline > Self.scanlinesPerFrame
     }
     var isRenderLine: Bool {
-        self.isVisibleLine || self.isPreLine
+        self.isVisibleLine || self.isPreRenderLine
     }
     var isVisibleCycle: Bool {
         self.cycles >= 0 && self.cycles < Self.width
@@ -123,10 +121,7 @@ public struct PPU {
         self.cycles > Self.ppuCyclesPerScanline
     }
     var isSpriteZeroHit: Bool {
-        // TODO: This needs to be updated at some point!!!
-        let y = self.oamRegister.data[0]
-        let x = self.oamRegister.data[3]
-        return (y == self.scanline) && x <= self.cycles && self.maskRegister[.showSprites]
+        self.statusRegister[.spriteZeroHit]
     }
 
     mutating func pollNmiInterrupt() -> UInt8? {
@@ -141,28 +136,30 @@ public struct PPU {
         var redrawScreen = false
 
         for _ in 0 ..< cpuCycles * 3 {
-            if self.cycles == 0 {
-                self.cacheSpriteIndices()
-            }
-
-            if self.isVisibleLine && self.isVisibleCycle {
-                self.renderPixel(x: self.cycles, y: Int(self.scanline))
-            }
-
-            if self.isRenderingEnabled {
-                self.updateCaches()
-            }
-
             self.cycles += 1
 
             if self.isPastLastCycle {
-                if self.isSpriteZeroHit {
-                    self.statusRegister[.spriteZeroHit] = true
-                }
-
                 self.cycles = 0
                 self.scanline += 1
 
+                if self.isPastPreRenderLine {
+                    self.scanline = 0
+                }
+            }
+
+            if self.isRenderingEnabled {
+                if self.isVisibleLine && self.isVisibleCycle {
+                    self.renderPixel(x: self.cycles, y: Int(self.scanline))
+                }
+
+                self.updateCaches()
+
+                if self.isVisibleLine && self.cycles == 0 {
+                    self.cacheSpriteIndices()
+                }
+            }
+
+            if self.cycles == 0 {
                 if self.isNmiScanline {
                     self.statusRegister[.verticalBlankStarted] = true
 
@@ -173,8 +170,7 @@ public struct PPU {
                     redrawScreen = true
                 }
 
-                if isPastPreLine {
-                    self.scanline = 0
+                if self.isPreRenderLine {
                     self.nmiInterrupt = nil
                     self.statusRegister[.verticalBlankStarted] = false
                     self.statusRegister[.spriteZeroHit] = false
