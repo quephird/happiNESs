@@ -203,36 +203,36 @@ extension PPU {
 
         var bankIndex = self.controllerRegister[.spritePatternBankIndex]
         var tileIndex = self.oamRegister.data[oamIndex + 1]
-        var pixelY: Int = self.scanline - tileY
+        var spritePixelY: Int = self.scanline - tileY
         if self.controllerRegister[.spritesAre8x16] {
             if flipVertical {
-                pixelY = 15 - pixelY
+                spritePixelY = 15 - spritePixelY
             }
 
             bankIndex = tileIndex & 1 == 1
+            tileIndex &= 0b1111_1110
+
+            if spritePixelY > 7 {
+                tileIndex += 1
+                spritePixelY -= 8
+            }
         } else {
             if flipVertical {
-                pixelY = 7 - pixelY
-            }
-
-            tileIndex &= 0b1111_1110
-            if pixelY > 7 {
-                tileIndex += 1
-                pixelY -= 8
+                spritePixelY = 7 - spritePixelY
             }
         }
 
         let lowTileAddress = Self.makeChrTileAddress(bankIndex: bankIndex,
                                                      tileIndex: tileIndex,
                                                      bitPlaneIndex: false,
-                                                     fineY: UInt8(pixelY))
+                                                     fineY: UInt8(spritePixelY))
         let highTileAddress = Self.makeChrTileAddress(bankIndex: bankIndex,
                                                       tileIndex: tileIndex,
                                                       bitPlaneIndex: true,
-                                                      fineY: UInt8(pixelY))
+                                                      fineY: UInt8(spritePixelY))
         var lowTileByte = self.readByte(address: lowTileAddress).result
         var highTileByte = self.readByte(address: highTileAddress).result
-        let paletteBits = attributeByte & 0b11
+        let paletteBits = (attributeByte & 0b11) << 2
 
         var data: UInt32 = 0
         for _ in 0 ..< 8 {
@@ -243,7 +243,7 @@ extension PPU {
                 lowTileByte >>= 1
                 highTileByte >>= 1
             } else {
-                lowTileBit = lowTileByte & 0b1000_0000 >> 7
+                lowTileBit = (lowTileByte & 0b1000_0000) >> 7
                 highTileBit = (highTileByte & 0b1000_0000) >> 6
                 lowTileByte <<= 1
                 highTileByte <<= 1
@@ -264,27 +264,30 @@ extension PPU {
         var newCachedSprites: [CachedSprite] = []
 
         // Note that each sprite takes _four consecutive bytes_ in the OAM
-        for index in stride(from: 0, to: self.oamRegister.data.count, by: 4) {
+        for oamIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4) {
             // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
             //
             //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
-            let tileY = Int(self.oamRegister.data[index]) + 1
+            let tileY = Int(self.oamRegister.data[oamIndex]) + 1
 
-            // The sprite height property takes into account whether or not
-            // it is 8x8 or 8x16, and so we need to test to see if the current
+            let spritePixelY = self.scanline - tileY
+            // The sprite height property takes into account whether or not all
+            // sprites are 8x8 or 8x16, and so we need to test to see if the current
             // scanline intersects it anywhere vertically.
-            if self.scanline >= tileY && self.scanline < tileY + self.spriteHeight {
-                newSpriteIndices.append(index)
-
-                let data = self.getSpriteData(for: index)
-                let tileX = Int(self.oamRegister.data[index + 3])
-                let backgroundPriority = ((self.oamRegister.data[index + 2] >> 5) & 0b0000_0001) == 1
-                let newSprite = CachedSprite(data: data,
-                                             tileX: tileX,
-                                             backgroundPriority: backgroundPriority,
-                                             index: index)
-                newCachedSprites.append(newSprite)
+            if spritePixelY < 0 || spritePixelY >= self.spriteHeight {
+                continue
             }
+
+            newSpriteIndices.append(oamIndex)
+
+            let data = self.getSpriteData(for: oamIndex)
+            let tileX = Int(self.oamRegister.data[oamIndex + 3])
+            let backgroundPriority = ((self.oamRegister.data[oamIndex + 2] >> 5) & 0b0000_0001) == 1
+            let newSprite = CachedSprite(data: data,
+                                         tileX: tileX,
+                                         backgroundPriority: backgroundPriority,
+                                         index: oamIndex)
+            newCachedSprites.append(newSprite)
 
             if newSpriteIndices.count == 8 {
                 break

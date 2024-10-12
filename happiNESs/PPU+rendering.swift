@@ -139,15 +139,31 @@ extension PPU {
     }
 
     private func getSpriteColor(x: Int, y: Int) -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
-        for index in self.spriteIndicesForCurrentScanline {
-            if let color = self.getSpriteColor(spriteIndex: index,
-                                               x: x,
-                                               y: y) {
-                let tileAttributes = self.oamRegister.data[index + 2]
-                let backgroundPriority = tileAttributes >> 5 & 1 == 1
-                return (color, index, backgroundPriority)
+        for sprite in self.currentSprites {
+            let spritePixelX = self.cycles - sprite.tileX
+            if spritePixelX < 0 || spritePixelX > 7 {
+                continue
             }
+
+            let nibbleIndex = 7 - spritePixelX
+            let paletteIndex = Int((sprite.data >> (nibbleIndex * 4)) & 0b0000_1111) + 0x10
+            if paletteIndex.isMultiple(of: 4) {
+                continue
+            }
+
+            let color = NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
+            return (color, sprite.index, sprite.backgroundPriority)
         }
+
+//        for index in self.spriteIndicesForCurrentScanline {
+//            if let color = self.getSpriteColor(spriteIndex: index,
+//                                               x: x,
+//                                               y: y) {
+//                let tileAttributes = self.oamRegister.data[index + 2]
+//                let backgroundPriority = tileAttributes >> 5 & 1 == 1
+//                return (color, index, backgroundPriority)
+//            }
+//        }
 
         return nil
     }
