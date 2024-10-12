@@ -194,26 +194,122 @@ extension PPU {
         self.currentAndNextTileData |= UInt64(newTileData)
     }
 
-    // This is partly a performance optimization and partly an emulation
-    // of what happens in the NES, whereby we cache the first eight sprites
-    // that lie on the current scanline.
-    mutating public func cacheSpriteIndices() {
-        let allSpriteIndices = stride(from: 0, to: self.oamRegister.data.count, by: 4)
-        self.spriteIndicesForCurrentScanline = allSpriteIndices.filter({ oamIndex in
+    private func getSpriteData(for oamIndex: Int) -> UInt32 {
+        let tileY = Int(self.oamRegister.data[oamIndex]) + 1
+        let attributeByte = self.oamRegister.data[oamIndex + 2]
+
+        let flipVertical = ((attributeByte >> 7) & 1) == 1
+        let flipHorizontal = ((attributeByte >> 6) & 1) == 1
+
+        var bankIndex = self.controllerRegister[.spritePatternBankIndex]
+        var tileIndex = self.oamRegister.data[oamIndex + 1]
+        var spritePixelY: Int = self.scanline - tileY
+        if self.controllerRegister[.spritesAre8x16] {
+            if flipVertical {
+                spritePixelY = 15 - spritePixelY
+            }
+
+            // The bits in the tile index byte are arranged like 'tttttttb'.
+            // The first seven bits form the base for the tile index, where the
+            // top half of the sprite has tile index ttttttt0, and the bottom
+            // half has index ttttttt1. The last bit indicates which tile bank
+            // to use to fetch the tile; 0 means the starting address should be
+            // 0x0000, 1 means 0x1000. See the following for more details:
+            //
+            //     https://www.nesdev.org/wiki/PPU_OAM#Byte_1
+            bankIndex = tileIndex & 1 == 1
+            tileIndex &= 0b1111_1110
+
+            // The following test effectively checks to see if we're sampling
+            // from the top tile or the the bottom tile for an 8x16 sprite.
+            // If the sprite's pixel Y value is larger than the height of a tile, then
+            // we know that we're dealing with the bottom tile; otherwise, we're
+            // still in the top tile, and nothing else needs to be adjusted.
+            if spritePixelY > 7 {
+                // If we're here, then we know that we're handling the bottom tile
+                // of the sprite, in which case its tile index is one more than that for
+                // the top tile, and we need adjust the spritePixelY value such that
+                // it falls inside the tile.
+                tileIndex += 1
+                spritePixelY -= 8
+            }
+        } else {
+            if flipVertical {
+                spritePixelY = 7 - spritePixelY
+            }
+        }
+
+        let lowTileAddress = Self.makeChrTileAddress(bankIndex: bankIndex,
+                                                     tileIndex: tileIndex,
+                                                     bitPlaneIndex: false,
+                                                     fineY: UInt8(spritePixelY))
+        let highTileAddress = Self.makeChrTileAddress(bankIndex: bankIndex,
+                                                      tileIndex: tileIndex,
+                                                      bitPlaneIndex: true,
+                                                      fineY: UInt8(spritePixelY))
+        var lowTileByte = self.readByte(address: lowTileAddress).result
+        var highTileByte = self.readByte(address: highTileAddress).result
+        let paletteBits = (attributeByte & 0b11) << 2
+
+        // Here we're caching the palette information for the current sprite.
+        // We store the nibbles in one direction if there is no horizontal flip
+        // or in the other direction if there is. We accomplish this by either
+        // shifting the source bits from lowTileByte and highTileByte right or left.
+        var data: UInt32 = 0
+        for _ in 0 ..< 8 {
+            var lowTileBit, highTileBit: UInt8
+            if flipHorizontal {
+                lowTileBit = lowTileByte & 1
+                highTileBit = (highTileByte & 1) << 1
+                lowTileByte >>= 1
+                highTileByte >>= 1
+            } else {
+                lowTileBit = (lowTileByte & 0b1000_0000) >> 7
+                highTileBit = (highTileByte & 0b1000_0000) >> 6
+                lowTileByte <<= 1
+                highTileByte <<= 1
+            }
+            data <<= 4
+            let newDataNibble = paletteBits | highTileBit | lowTileBit
+            data |= UInt32(newDataNibble)
+        }
+
+        return data
+    }
+
+    mutating public func cacheSprites() {
+        var newCachedSprites: [CachedSprite] = []
+
+        // Note that each sprite takes _four consecutive bytes_ in the OAM
+        for oamIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4) {
             // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
             //
             //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
             let tileY = Int(self.oamRegister.data[oamIndex]) + 1
 
-            // The sprite height property takes into account whether or not
-            // it is 8x8 or 8x16, and so we need to test to see if the current
+            let spritePixelY = self.scanline - tileY
+            // The sprite height property takes into account whether or not all
+            // sprites are 8x8 or 8x16, and so we need to test to see if the current
             // scanline intersects it anywhere vertically.
-            if self.scanline >= tileY && self.scanline < tileY + self.spriteHeight {
-                return true
+            if spritePixelY < 0 || spritePixelY >= self.spriteHeight {
+                continue
             }
 
-            return false
-        }).prefix(8)
+            let data = self.getSpriteData(for: oamIndex)
+            let tileX = Int(self.oamRegister.data[oamIndex + 3])
+            let backgroundPriority = ((self.oamRegister.data[oamIndex + 2] >> 5) & 0b0000_0001) == 1
+            let newSprite = CachedSprite(data: data,
+                                         tileX: tileX,
+                                         backgroundPriority: backgroundPriority,
+                                         index: oamIndex)
+            newCachedSprites.append(newSprite)
+
+            if newCachedSprites.count == 8 {
+                break
+            }
+        }
+
+        self.currentSprites = newCachedSprites
     }
 
     mutating private func copyX() {
@@ -264,7 +360,7 @@ extension PPU {
         }
     }
 
-    mutating public func updateCaches() {
+    mutating public func cacheBackgroundTiles() {
         if self.isRenderLine && self.isFetchCycle {
             self.currentAndNextTileData <<= 4
 

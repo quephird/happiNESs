@@ -42,6 +42,7 @@
 		8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B18E2C1CBB46001B44B5 /* Opcode.swift */; };
 		8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1902C1CC0C4001B44B5 /* CPU.swift */; };
 		8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1922C1D6D59001B44B5 /* StatusRegister.swift */; };
+		874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51912CB9B51C00B12037 /* CachedSprite.swift */; };
 		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0662C386A2E006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
@@ -126,6 +127,7 @@
 		8744B18E2C1CBB46001B44B5 /* Opcode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opcode.swift; sourceTree = "<group>"; };
 		8744B1902C1CC0C4001B44B5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
 		8744B1922C1D6D59001B44B5 /* StatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRegister.swift; sourceTree = "<group>"; };
+		874F51912CB9B51C00B12037 /* CachedSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedSprite.swift; sourceTree = "<group>"; };
 		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 				878C69722CAA424400DA9BD4 /* Address.swift */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
 				8719320F2C372F6900A73C22 /* Bus.swift */,
+				874F51912CB9B51C00B12037 /* CachedSprite.swift */,
 				871932132C3798B400A73C22 /* Cartridge.swift */,
 				871F62352C65631F00132962 /* ControllerRegister.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
@@ -436,6 +439,7 @@
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
+				874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
