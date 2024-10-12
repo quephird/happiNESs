@@ -39,7 +39,7 @@ public struct PPU {
     public var scanline: Int
     public var nmiInterrupt: UInt8?
 
-    public var screenBuffer: [NESColor] = [NESColor](repeating: NESColor.black, count: Self.width * Self.height)
+    public var screenBuffer: [UInt8] = [UInt8](repeating: 0x00, count: Self.width * Self.height * 3)
 
     // These are all cached values that are refreshed during various stages
     // of the rendering cycle.

@@ -28,6 +28,7 @@ struct ContentView: View {
             Screen(screenBuffer: console.screenBuffer)
             .padding()
             .focusable()
+            .focusEffectDisabled()
             .focused($focused)
             .onAppear {
                 focused = true
