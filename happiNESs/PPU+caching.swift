@@ -360,7 +360,7 @@ extension PPU {
         }
     }
 
-    mutating public func updateCaches() {
+    mutating public func cacheBackgroundTiles() {
         if self.isRenderLine && self.isFetchCycle {
             self.currentAndNextTileData <<= 4
 

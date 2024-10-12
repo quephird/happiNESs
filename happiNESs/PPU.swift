@@ -152,7 +152,7 @@ public struct PPU {
                     self.renderPixel(x: self.cycles, y: Int(self.scanline))
                 }
 
-                self.updateCaches()
+                self.cacheBackgroundTiles()
 
                 if self.isVisibleLine && self.cycles == 0 {
                     self.cacheSprites()
