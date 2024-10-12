@@ -19,14 +19,14 @@ extension PPU {
         self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight
     }
 
-    private func getBackgroundTileColor(x: Int, y: Int) -> NESColor? {
+    private func getCurrentBackgroundTileColor() -> NESColor? {
         let tileData = self.currentTileData
         let pixelData = tileData >> ((7 - self.currentFineX) * 4)
         let colorIndex = Int(pixelData & 0x0F)
         return colorIndex.isMultiple(of: 4) ? nil : NESColor.systemPalette[Int(self.paletteTable[colorIndex])]
     }
 
-    private func getSpriteColor(x: Int, y: Int) -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
+    private func getCurrentSpriteColor() -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
         // Note that `currentSprites` is ordered from left to right by the OAM index,
         // with the first (zeroth) element being the so-called sprite zero. Furthermore,
         // the strategy here is to find the first sprite whose pixels intersect with the
@@ -54,9 +54,9 @@ extension PPU {
         return nil
     }
 
-    mutating private func computeColorAt(x: Int, y: Int) -> NESColor {
-        let maybeSpriteColor = self.getSpriteColor(x: x, y: y)
-        let maybeBackgroundColor = self.getBackgroundTileColor(x: x, y: y)
+    mutating private func getCurrentPixelColor() -> NESColor {
+        let maybeSpriteColor = self.getCurrentSpriteColor()
+        let maybeBackgroundColor = self.getCurrentBackgroundTileColor()
 
         switch (maybeSpriteColor, maybeBackgroundColor) {
         case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
@@ -79,13 +79,10 @@ extension PPU {
         }
     }
 
-    mutating private func setColorAt(x: Int, y: Int, to color: NESColor) {
-        self.screenBuffer[Self.width * y + x] = color
-    }
-
-    mutating public func renderPixel(x: Int, y: Int) {
-        let color = self.computeColorAt(x: x, y: y)
-        setColorAt(x: x, y: y, to: color)
+    mutating public func renderPixel() {
+        let color = self.getCurrentPixelColor()
+        let currentPixelIndex = Self.width * self.scanline + self.cycles
+        self.screenBuffer[currentPixelIndex] = color
     }
 
     static public func makeEmptyScreenBuffer() -> [NESColor] {

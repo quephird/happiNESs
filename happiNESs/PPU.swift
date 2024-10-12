@@ -149,7 +149,7 @@ public struct PPU {
 
             if self.isRenderingEnabled {
                 if self.isVisibleLine && self.isVisibleCycle {
-                    self.renderPixel(x: self.cycles, y: Int(self.scanline))
+                    self.renderPixel()
                 }
 
                 self.cacheBackgroundTiles()
