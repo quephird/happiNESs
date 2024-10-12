@@ -31,7 +31,7 @@ import SwiftUI
     // really interested in changes to `Console`'s state such that at least of the underlying
     // pixels has changed, namely any of the elements of  `screenBuffer`.
     @ObservationIgnored private var cpu: CPU
-    var screenBuffer: [NESColor] = PPU.makeEmptyScreenBuffer()
+    var screenBuffer: [UInt8] = PPU.makeEmptyScreenBuffer()
 
     internal init() throws {
         let bus = Bus()
@@ -49,7 +49,7 @@ import SwiftUI
         self.cpu.reset()
 
         // We need to do this to avoid keeping around previously registered timers
-        // and having them fire when we load on ROM file after another
+        // and having them fire when we load one ROM file after another
         self.displayTimer?.invalidate()
 
         // This sets up a timer which will call `runForOneFrame()` every time it fires.

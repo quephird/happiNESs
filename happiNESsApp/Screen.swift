@@ -22,29 +22,20 @@ extension CGBitmapInfo {
 struct Screen: View {
     static let width: Int = PPU.width
     static let height: Int = PPU.height
-    static let scale: Double = 2.0
+    static let scale: Double = 3.0
     static let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
     static let bitmapInfo: CGBitmapInfo = [
         CGBitmapInfo(alphaInfo: .none),
         CGBitmapInfo(byteOrderInfo: .orderDefault),
     ]
 
-    var screenBuffer: [NESColor]
+    var screenBuffer: [UInt8]
 
     var body: some View {
-        Canvas {graphicsContext, size in
+        Canvas(opaque: true) {graphicsContext, size in
             graphicsContext.withCGContext { cgContext in
-                // First we have to convert screenBuffer into a bitmap buffer of raw UInt8's
-                var bitmapBuffer = [UInt8]()
-                bitmapBuffer.reserveCapacity(Self.width * Self.height * 3)
-                for color in screenBuffer {
-                    bitmapBuffer.append(color.red)
-                    bitmapBuffer.append(color.green)
-                    bitmapBuffer.append(color.blue)
-                }
-
-                precondition(bitmapBuffer.count == Self.width * Self.height * 3)
-                bitmapBuffer.withUnsafeBytes { bufferPointer in
+                precondition(self.screenBuffer.count == Self.width * Self.height * 3)
+                self.screenBuffer.withUnsafeBytes { bufferPointer in
                     // Then we need to make a provider that instructs CGImage how to read in the bitmap buffer.
                     //
                     // NOTA BENE: bufferPointer.baseAddress will never be null in this context

@@ -82,15 +82,17 @@ extension PPU {
     mutating public func renderPixel() {
         let color = self.getCurrentPixelColor()
         let currentPixelIndex = Self.width * self.scanline + self.cycles
-        self.screenBuffer[currentPixelIndex] = color
+        self.screenBuffer[currentPixelIndex * 3] = color.red
+        self.screenBuffer[(currentPixelIndex * 3) + 1] = color.green
+        self.screenBuffer[(currentPixelIndex * 3) + 2] = color.blue
     }
 
-    static public func makeEmptyScreenBuffer() -> [NESColor] {
-        [NESColor](repeating: .black, count: Self.width * Self.height)
+    static public func makeEmptyScreenBuffer() -> [UInt8] {
+        [UInt8](repeating: 0x00, count: Self.width * Self.height * 3)
     }
 
     // We are double buffering here to maximize performance.
-    mutating public func updateScreenBuffer(_ otherBuffer: inout [NESColor]) {
+    mutating public func updateScreenBuffer(_ otherBuffer: inout [UInt8]) {
         swap(&self.screenBuffer, &otherBuffer)
     }
 }
