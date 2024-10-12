@@ -49,7 +49,6 @@ public struct PPU {
     public var currentHighTileByte: UInt8 = 0
     public var currentAndNextTileData: UInt64 = 0
     public var currentFineX: UInt8 = 0
-    public var spriteIndicesForCurrentScanline: [Int] = []
     public var currentSprites: [CachedSprite] = []
 
     public init() {
@@ -156,7 +155,7 @@ public struct PPU {
                 self.updateCaches()
 
                 if self.isVisibleLine && self.cycles == 0 {
-                    self.cacheSpriteIndices()
+                    self.cacheSprites()
                 }
             }
 

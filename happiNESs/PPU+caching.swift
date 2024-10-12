@@ -209,10 +209,27 @@ extension PPU {
                 spritePixelY = 15 - spritePixelY
             }
 
+            // The bits in the tile index byte are arranged like 'tttttttb'.
+            // The first seven bits form the base for the tile index, where the
+            // top half of the sprite has tile index ttttttt0, and the bottom
+            // half has index ttttttt1. The last bit indicates which tile bank
+            // to use to fetch the tile; 0 means the starting address should be
+            // 0x0000, 1 means 0x1000. See the following for more details:
+            //
+            //     https://www.nesdev.org/wiki/PPU_OAM#Byte_1
             bankIndex = tileIndex & 1 == 1
             tileIndex &= 0b1111_1110
 
+            // The following test effectively checks to see if we're sampling
+            // from the top tile or the the bottom tile for an 8x16 sprite.
+            // If the sprite's pixel Y value is larger than the height of a tile, then
+            // we know that we're dealing with the bottom tile; otherwise, we're
+            // still in the top tile, and nothing else needs to be adjusted.
             if spritePixelY > 7 {
+                // If we're here, then we know that we're handling the bottom tile
+                // of the sprite, in which case its tile index is one more than that for
+                // the top tile, and we need adjust the spritePixelY value such that
+                // it falls inside the tile.
                 tileIndex += 1
                 spritePixelY -= 8
             }
@@ -234,6 +251,10 @@ extension PPU {
         var highTileByte = self.readByte(address: highTileAddress).result
         let paletteBits = (attributeByte & 0b11) << 2
 
+        // Here we're caching the palette information for the current sprite.
+        // We store the nibbles in one direction if there is no horizontal flip
+        // or in the other direction if there is. We accomplish this by either
+        // shifting the source bits from lowTileByte and highTileByte right or left.
         var data: UInt32 = 0
         for _ in 0 ..< 8 {
             var lowTileBit, highTileBit: UInt8
@@ -256,11 +277,7 @@ extension PPU {
         return data
     }
 
-    // This is partly a performance optimization and partly an emulation
-    // of what happens in the NES, whereby we cache the first eight sprites
-    // that lie on the current scanline.
-    mutating public func cacheSpriteIndices() {
-        var newSpriteIndices: [Int] = []
+    mutating public func cacheSprites() {
         var newCachedSprites: [CachedSprite] = []
 
         // Note that each sprite takes _four consecutive bytes_ in the OAM
@@ -278,8 +295,6 @@ extension PPU {
                 continue
             }
 
-            newSpriteIndices.append(oamIndex)
-
             let data = self.getSpriteData(for: oamIndex)
             let tileX = Int(self.oamRegister.data[oamIndex + 3])
             let backgroundPriority = ((self.oamRegister.data[oamIndex + 2] >> 5) & 0b0000_0001) == 1
@@ -289,12 +304,11 @@ extension PPU {
                                          index: oamIndex)
             newCachedSprites.append(newSprite)
 
-            if newSpriteIndices.count == 8 {
+            if newCachedSprites.count == 8 {
                 break
             }
         }
 
-        self.spriteIndicesForCurrentScanline = newSpriteIndices
         self.currentSprites = newCachedSprites
     }
 
