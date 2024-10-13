@@ -61,9 +61,5 @@ struct Screen: View {
               orientation: .up,
               label: Text(verbatim: "Screen"))
         .interpolation(.none)
-        .frame(
-            maxWidth: CGFloat(Self.width) * self.scale,
-            maxHeight: CGFloat(Self.height) * self.scale)
-        .fixedSize()
     }
 }
