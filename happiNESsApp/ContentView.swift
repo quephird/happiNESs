@@ -24,21 +24,28 @@ struct ContentView: View {
     @FocusState private var focused: Bool
 
     var body: some View {
-        if self.console.cartridgeLoaded {
-            Screen(screenBuffer: console.screenBuffer)
-            .padding()
-            .focusable()
-            .focusEffectDisabled()
-            .focused($focused)
-            .onAppear {
-                focused = true
+        Group {
+            if self.console.cartridgeLoaded {
+                Screen(screenBuffer: console.screenBuffer,
+                       scale: console.scale)
+                .padding()
+                .focusable()
+                .focusEffectDisabled()
+                .focused($focused)
+                .onAppear {
+                    focused = true
+                }
+                .onKeyPress(phases: .all) { keyPress in
+                    return console.handleKey(keyPress) ? .handled : .ignored
+                }
+            } else {
+                Image("happiNESs")
             }
-            .onKeyPress(phases: .all) { keyPress in
-                return console.handleKey(keyPress) ? .handled : .ignored
-            }
-        } else {
-            Image("happiNESs").fixedSize()
         }
+        .frame(
+            maxWidth: CGFloat(Screen.width) * console.scale,
+            maxHeight: CGFloat(Screen.height) * console.scale)
+        .fixedSize()
     }
 }
 

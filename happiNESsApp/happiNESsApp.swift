@@ -29,6 +29,7 @@ struct happiNESsApp: App {
                 .alert(errorMessage, isPresented: $showAlert, actions: {})
                 .dialogSeverity(.critical)
         }
+        .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("Open ROM...") {
@@ -62,6 +63,11 @@ struct happiNESsApp: App {
                 }
                 Toggle("Toggle tracing", isOn: $console.tracingOn)
                 Divider()
+                Picker(selection: $console.scale, label: Text("Scale")) {
+                    Text("1x").tag(1.0)
+                    Text("2x").tag(2.0)
+                    Text("3x").tag(3.0)
+                }
             }
         }
     }
