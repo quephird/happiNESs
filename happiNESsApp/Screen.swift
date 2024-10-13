@@ -56,7 +56,7 @@ struct Screen: View {
 
     var body: some View {
         Image(self.image,
-              scale: 1/3.0,
+              scale: 1/Self.scale,
               orientation: .up,
               label: Text(verbatim: "Screen"))
         .interpolation(.none)
