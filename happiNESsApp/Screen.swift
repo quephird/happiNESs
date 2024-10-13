@@ -22,7 +22,6 @@ extension CGBitmapInfo {
 struct Screen: View {
     static let width: Int = PPU.width
     static let height: Int = PPU.height
-    static let scale: Double = 3.0
 
     static let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
     static let bitmapInfo: CGBitmapInfo = [
@@ -31,6 +30,8 @@ struct Screen: View {
     ]
 
     var screenBuffer: [UInt8]
+    var scale: Double
+
     var image: CGImage {
         self.screenBuffer.withUnsafeBytes { bufferPointer in
             // Creates a CFData instance with a copy of the data from the screen buffer
@@ -56,12 +57,13 @@ struct Screen: View {
 
     var body: some View {
         Image(self.image,
-              scale: 1/Self.scale,
+              scale: 1/self.scale,
               orientation: .up,
               label: Text(verbatim: "Screen"))
         .interpolation(.none)
         .frame(
-            width: CGFloat(Self.width) * Self.scale,
-            height: CGFloat(Self.height) * Self.scale)
+            maxWidth: CGFloat(Self.width) * self.scale,
+            maxHeight: CGFloat(Self.height) * self.scale)
+        .fixedSize()
     }
 }

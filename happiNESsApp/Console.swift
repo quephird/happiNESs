@@ -32,6 +32,7 @@ import SwiftUI
     // pixels has changed, namely any of the elements of  `screenBuffer`.
     @ObservationIgnored private var cpu: CPU
     var screenBuffer: [UInt8] = PPU.makeEmptyScreenBuffer()
+    var scale: Double = 2.0
 
     internal init() throws {
         let bus = Bus()
