@@ -12,15 +12,17 @@ public struct Bus {
     static let ppuRegistersMirrorsEnd: UInt16 = 0x3FFF;
 
     public var ppu: PPU
+    public var apu: APU
     var cartridge: Cartridge?
     var vram: [UInt8]
     var cycles: Int
     var joypad: Joypad
 
     public init() {
-        let ppu = PPU()
+        self.ppu = PPU()
+        // TODO: Need to explain this!!!
+        self.apu = APU(sampleRate: CPU.frequency / 44100.0)
 
-        self.ppu = ppu
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.cycles = 0
         self.joypad = Joypad()
@@ -79,6 +81,8 @@ extension Bus {
         case 0x2008...Self.ppuRegistersMirrorsEnd:
             let mirrorDownAddress = address & 0b0010_0000_0000_0111
             return self.readByte(address: mirrorDownAddress)
+        case 0x4015:
+            return self.apu.readByte(address: address)
         case 0x4016:
             return self.joypad.readByte()
         default:
@@ -116,6 +120,8 @@ extension Bus {
                 buffer[index] = self.readByte(address: baseAddress + UInt16(index))
             }
             self.ppu.writeOamBuffer(buffer: buffer)
+        case 0x4000 ... 0x4008, 0x400A ... 0x400C, 0x400E ... 0x4013, 0x4015, 0x4017:
+            self.apu.writeByte(address: address, byte: byte)
         case 0x4016:
             self.joypad.writeByte(byte: byte)
         case 0x8000 ... 0xFFFF:
@@ -131,6 +137,7 @@ extension Bus {
     mutating func tick(cycles: Int) -> Bool {
         self.cycles += cycles
 
+        self.apu.tick(cpuCycles: cycles)
         return self.ppu.tick(cpuCycles: cycles)
     }
 

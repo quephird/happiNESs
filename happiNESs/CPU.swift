@@ -6,6 +6,8 @@
 //
 
 public struct CPU {
+    static let frequency = 1789773.0
+
     static let nmiVectorAddress: UInt16 = 0xFFFA
     static let resetVectorAddress: UInt16 = 0xFFFC
     static let interruptVectorAddress: UInt16 = 0xFFFE
