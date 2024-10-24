@@ -106,7 +106,6 @@ extension APU {
             let sampleOld = Int(Double(cycleOld) / self.sampleRate)
             let sampleNew = Int(Double(cycleNew) / self.sampleRate)
             if sampleOld != sampleNew {
-//                print("Current cycle: \(self.cycles)")
                 self.sendSample()
             }
         }
@@ -170,10 +169,27 @@ extension APU {
 
     mutating private func sendSample() {
         // TODO: call the methods on the other channels once they're implemented
-        let sample = self.triangle.getSample()
+        let triangleSample = self.triangle.getSample()
+        let signal = mix(pulse1: 0, pulse2: 0, triangle: triangleSample, noise: 0, dmc: 0)
         if self.triangle.enabled {
-            print("Triangle sample: \(sample)")
+            print("Triangle signal: \(signal)")
         }
+    }
+
+    private func mixPulses(pulse1: UInt8, pulse2: UInt8) -> Float {
+        let denominator = (8128.0 / (Float(pulse1) + Float(pulse2))) + 100.0
+        return 95.88 /  denominator
+    }
+
+    private func mixTnd(triangle: UInt8, noise: UInt8, dmc: UInt8) -> Float {
+        let denominator = (Float(triangle) / 8227.0) + (Float(noise) / 12241.0) + (Float(dmc) / 22638.0)
+        return 159.79 / ((1 / denominator) + 100.0)
+    }
+
+    private func mix(pulse1: UInt8, pulse2: UInt8, triangle: UInt8, noise: UInt8, dmc: UInt8) -> Float {
+        let pulses = mixPulses(pulse1: pulse1, pulse2: pulse2)
+        let tnd = mixTnd(triangle: triangle, noise: noise, dmc: dmc)
+        return pulses + tnd
     }
 
     mutating private func generateIRQ() {
