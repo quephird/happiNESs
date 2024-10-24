@@ -71,8 +71,6 @@ extension TriangleChannel {
     }
 
     public func getSample() -> UInt8 {
-//        print("Duty index: \(self.dutyIndex)")
-//        print("Length counter: \(self.lengthCounterValue)")
         if !self.enabled {
             return 0
         }

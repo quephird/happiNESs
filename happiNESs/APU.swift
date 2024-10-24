@@ -146,6 +146,8 @@ extension APU {
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
+            case 4:
+                break
             default:
                 fatalError("Encountered frame counter value of \(self.frameCounter) with frame period \(self.framePeriod)")
             }
@@ -171,9 +173,7 @@ extension APU {
         // TODO: call the methods on the other channels once they're implemented
         let triangleSample = self.triangle.getSample()
         let signal = mix(pulse1: 0, pulse2: 0, triangle: triangleSample, noise: 0, dmc: 0)
-        if self.triangle.enabled {
-            print("Triangle signal: \(signal)")
-        }
+        self.buffer.append(value: signal)
     }
 
     private func mixPulses(pulse1: UInt8, pulse2: UInt8) -> Float {

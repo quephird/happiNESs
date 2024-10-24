@@ -11,11 +11,11 @@ import happiNESs
 
 struct Speaker {
     public var inputBuffer: AudioRingBuffer
+    private let engine = AVAudioEngine()
 
     init(inputBuffer: AudioRingBuffer) throws {
         self.inputBuffer = inputBuffer
 
-        let engine = AVAudioEngine()
         let mainMixer = engine.mainMixerNode
         let output = engine.outputNode
         let outputFormat = output.inputFormat(forBus: 0)
