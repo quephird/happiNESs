@@ -16,6 +16,10 @@ enum PulseControlFlag {
 }
 
 public struct PulseChannel {
+    // NOTA BENE: Table below is a modified version of the one from
+    // the Sequencer Behavior section in the following page:
+    //
+    //     https://www.nesdev.org/wiki/APU_Pulse
     static let dutyTable: [[Bool]] = [
         [false, true, false, false, false, false, false, false],
         [false, true, true, false, false, false, false, false],

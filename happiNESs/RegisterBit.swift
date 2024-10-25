@@ -36,7 +36,7 @@ enum RegisterBit {
     case apuStatusUnused2
     case apuStatusUnused3
 
-    // APU frame counter register flags
+    // APU frame sequencer register flags
     case apuFrameCounterUnused1
     case apuFrameCounterUnused2
     case apuFrameCounterUnused3
@@ -44,7 +44,7 @@ enum RegisterBit {
     case apuFrameCounterUnused5
     case apuFrameCounterUnused6
     case frameIrqInhibited
-    case frameSequencerMode
+    case sequencerMode
 
     var bitIndex: Int {
         switch self {
@@ -55,7 +55,7 @@ enum RegisterBit {
         case .break, .ppuStatusUnused5, .dmcEnabled, .apuFrameCounterUnused5: 4
         case .cpuStatusUnused, .spriteOverflow, .apuStatusUnused1, .apuFrameCounterUnused6: 5
         case .overflow, .spriteZeroHit, .apuStatusUnused2, .frameIrqInhibited: 6
-        case .negative, .verticalBlankStarted, .apuStatusUnused3, .frameSequencerMode: 7
+        case .negative, .verticalBlankStarted, .apuStatusUnused3, .sequencerMode: 7
         }
     }
 }

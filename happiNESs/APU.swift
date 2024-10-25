@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 10/15/24.
 //
 
-enum FramePeriod {
+enum SequencerMode {
     case four
     case five
 }
@@ -13,14 +13,16 @@ enum FramePeriod {
 public struct APU {
     static let frameCounterRate = CPU.frequency / 240.0
 
+    // Values for this table taken from:
+    //
+    //     https://www.nesdev.org/wiki/APU_Length_Counter
     static let lengthTable: [UInt8] = [
         10, 254, 20, 2, 40, 4, 80, 6, 160, 8, 60, 10, 14, 12, 26, 14,
         12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30,
     ]
 
     public var cycles: Int = 0
-    private var framePeriod: FramePeriod = .four
-    private var frameCounter: Int = 0
+    private var sequencerMode: SequencerMode = .four
     private var frameIrqInhibited: Bool = false
     public var sampleRate: Double
 
@@ -86,7 +88,7 @@ extension APU {
         case 0x4015:
             self.updateStatus(byte: byte)
         case 0x4017:
-            self.updateFrameCounter(byte: byte)
+            self.updateSequencer(byte: byte)
         default:
             // For now, this is a no-op for any other addresses
             break
@@ -116,11 +118,11 @@ extension APU {
         }
     }
 
-    mutating public func updateFrameCounter(byte: UInt8) {
-        self.framePeriod = byte[.frameSequencerMode] ? .five : .four
+    mutating public func updateSequencer(byte: UInt8) {
+        self.sequencerMode = byte[.sequencerMode] ? .five : .four
         self.frameIrqInhibited = byte[.frameIrqInhibited]
 
-        if self.framePeriod == .five {
+        if self.sequencerMode == .five {
             // TODO: Implement other steppers
             self.stepEnvelope()
             self.stepSweep()
@@ -130,31 +132,34 @@ extension APU {
 }
 
 extension APU {
+    var shouldSendSample: Bool {
+        let oldSampleNumber = Int(Double(self.cycles - 1) / self.sampleRate)
+        let newSampleNumber = Int(Double(self.cycles) / self.sampleRate)
+        return newSampleNumber != oldSampleNumber
+    }
+
     mutating public func tick(cpuCycles: Int) {
         for _ in 0 ..< cpuCycles {
-            let cycleOld = self.cycles
             self.cycles += 1
-            let cycleNew = self.cycles
 
             self.stepTimer()
+            self.stepSequencer()
 
-            let frameOld = Int(Double(cycleOld) / Self.frameCounterRate)
-            let frameNew = Int(Double(cycleNew) / Self.frameCounterRate)
-            if frameOld != frameNew {
-                self.stepFrameCounter()
-            }
-
-            let sampleOld = Int(Double(cycleOld) / self.sampleRate)
-            let sampleNew = Int(Double(cycleNew) / self.sampleRate)
-            if sampleOld != sampleNew {
+            if self.shouldSendSample {
                 self.sendSample()
             }
         }
     }
 
     mutating private func stepTimer() {
-        // TODO: call the methods on the other channels once they're implemented
+        // NOTA BENE: From the NESDev wiki:
+        //
+        //     "The triangle channel's timer is clocked on every CPU cycle,
+        //     but the pulse, noise, and DMC timers are clocked only on every
+        //     second CPU cycle and thus produce only even periods."
+
         if self.cycles % 2 == 0 {
+            // TODO: call the methods on the other channels once they're implemented
             self.pulse1.stepTimer()
             self.pulse2.stepTimer()
             self.noise.stepTimer()
@@ -163,43 +168,57 @@ extension APU {
         self.triangle.stepTimer()
     }
 
-    mutating private func stepFrameCounter() {
-        switch self.framePeriod {
+    mutating private func stepSequencer() {
+        // NOTA BENE: Constants used below taken from:
+        //
+        //     https://www.nesdev.org/wiki/APU_Frame_Counter
+        //
+        // Note that the figures are doubled here because the sequencer clocks
+        // at _half_ the rate of the CPU. Also, this is hardcoded to work with
+        // NTSC timings.
+        switch self.sequencerMode {
         case .four:
-            self.frameCounter = (self.frameCounter + 1) % 4
-
-            switch self.frameCounter {
-            case 0, 2:
+            switch self.cycles % 29830 {
+            case 0:
+                self.generateIRQ()
+            case 7457: // Step 1
                 self.stepEnvelope()
-            case 1:
+            case 14913: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 3:
+            case 22371: // Step 3
+                self.stepEnvelope()
+            case 29828:
+                self.generateIRQ()
+            case 29829: // Step 4
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
                 self.generateIRQ()
             default:
-                fatalError("Encountered frame counter value of \(self.frameCounter) with frame period \(self.framePeriod)")
+                break
             }
         case .five:
-            self.frameCounter = (self.frameCounter + 1) % 5
-
-            switch self.frameCounter {
-            case 0, 2:
+            switch self.cycles % 37282 {
+            case 7457: // Step 1
                 self.stepEnvelope()
-            case 1, 3:
+            case 14913: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 4:
+            case 22371: // Step 3
+                self.stepEnvelope()
+            case 29829: // Step 4
                 break
+            case 37281: // Step 5
+                self.stepEnvelope()
+                self.stepSweep()
+                self.stepLength()
             default:
-                fatalError("Encountered frame counter value of \(self.frameCounter) with frame period \(self.framePeriod)")
+                break
             }
         }
-
     }
 
     mutating private func stepEnvelope() {
@@ -238,6 +257,9 @@ extension APU {
         self.buffer.append(value: signal)
     }
 
+    // NOTA BENE: Coefficients for next two functions taken from:
+    //
+    //     https://www.nesdev.org/wiki/APU_Mixer
     private func mixPulses(pulse1: UInt8, pulse2: UInt8) -> Float {
         let denominator = (8128.0 / (Float(pulse1) + Float(pulse2))) + 100.0
         return 95.88 /  denominator
