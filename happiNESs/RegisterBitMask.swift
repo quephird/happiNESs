@@ -14,6 +14,15 @@ enum RegisterBitMask: Register {
     case triangleLengthCounter
     case triangleTimerHigh
 
+    case noiseControlFlag
+    case noiseConstantVolumeFlag
+    case noiseVolume
+
+    case noiseMode
+    case noisePeriod
+
+    case noiseLengthCounter
+
     case pulseSweepEnabled
     case pulsePeriod
     case pulseNegate
@@ -28,6 +37,15 @@ enum RegisterBitMask: Register {
 
         case .triangleLengthCounter:       0b1111_1000
         case .triangleTimerHigh:           0b0000_0111
+
+        case .noiseControlFlag:            0b0010_0000
+        case .noiseConstantVolumeFlag:     0b0001_0000
+        case .noiseVolume:                 0b0000_1111
+
+        case .noiseMode:                   0b1000_0000
+        case .noisePeriod:                 0b0000_1111
+
+        case .noiseLengthCounter:          0b1111_1000
 
         case .pulseSweepEnabled:           0b1000_0000
         case .pulsePeriod:                 0b0111_0000
@@ -48,7 +66,7 @@ extension Register {
         self = (self & ~(bitMask.maskValue)) | maskedBits
     }
 
-    subscript(index: RegisterBitMask) -> UInt8 {
+    subscript(_ index: RegisterBitMask) -> UInt8 {
         get {
             self.getBits(using: index)
         }

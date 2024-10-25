@@ -63,6 +63,7 @@
 		878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81472C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
+		878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
 		87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* Mapper.swift */; };
 /* End PBXBuildFile section */
@@ -153,6 +154,7 @@
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
+		878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseChannel.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
 		87D265162C9DECAF00C143B1 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -263,6 +265,7 @@
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				878D81462C815E760076ED30 /* NESError.swift */,
+				878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */,
 				87184D0D2C756BEB0003D090 /* OAMRegister.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
@@ -460,6 +463,7 @@
 				870AABE22CB381C100E9F3B6 /* CPU+memory.swift in Sources */,
 				871F62302C62FE9E00132962 /* PPU.swift in Sources */,
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
+				878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */,
 				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				874F51A92CBEEBA700B12037 /* APU.swift in Sources */,

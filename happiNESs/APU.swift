@@ -26,6 +26,7 @@ public struct APU {
 
     // TODO: Add the other channels
     public var triangle: TriangleChannel = TriangleChannel()
+    public var noise: NoiseChannel = NoiseChannel()
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
 
@@ -55,6 +56,15 @@ extension APU {
             self.triangle.updateRegister3(byte: byte)
         case 0x400B:
             self.triangle.updateRegister4(byte: byte)
+        case 0x400C:
+            self.noise.updateRegister1(byte: byte)
+        case 0x400D:
+            // Unused register
+            break
+        case 0x400E:
+            self.noise.updateRegister3(byte: byte)
+        case 0x400F:
+            self.noise.updateRegister4(byte: byte)
         case 0x4015:
             self.updateStatus(byte: byte)
         case 0x4017:
@@ -70,9 +80,13 @@ extension APU {
 
         // TODO: Handle the other channels when they are implemented
         self.triangle.enabled = self.status[.triangleEnabled]
+        self.noise.enabled = self.status[.noiseEnabled]
 
         if !self.triangle.enabled {
             self.triangle.lengthCounterValue = 0x00
+        }
+        if !self.noise.enabled {
+            self.noise.lengthCounterValue = 0x00
         }
     }
 
@@ -113,6 +127,10 @@ extension APU {
 
     mutating private func stepTimer() {
         // TODO: call the methods on the other channels once they're implemented
+        if self.cycles % 2 == 0 {
+            self.noise.stepTimer()
+        }
+
         self.triangle.stepTimer()
     }
 
@@ -158,6 +176,7 @@ extension APU {
     mutating private func stepEnvelope() {
         // TODO: call the methods on the other channels once they're implemented
         self.triangle.stepCounter()
+        self.noise.stepEnvelope()
     }
 
     mutating private func stepSweep() {
@@ -167,12 +186,18 @@ extension APU {
     mutating private func stepLength() {
         // TODO: call the methods on the other channels once they're implemented
         self.triangle.stepLength()
+        self.noise.stepLength()
     }
 
     mutating private func sendSample() {
         // TODO: call the methods on the other channels once they're implemented
         let triangleSample = self.triangle.getSample()
-        let signal = mix(pulse1: 0, pulse2: 0, triangle: triangleSample, noise: 0, dmc: 0)
+        let noiseSample = self.noise.getSample()
+        let signal = mix(pulse1: 0,
+                         pulse2: 0,
+                         triangle: triangleSample,
+                         noise: noiseSample,
+                         dmc: 0)
         self.buffer.append(value: signal)
     }
 

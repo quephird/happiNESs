@@ -1,0 +1,110 @@
+//
+//  NoiseChannel.swift
+//  happiNESs
+//
+//  Created by Danielle Kefford on 10/24/24.
+//
+
+public enum ControlFlag {
+    case lengthCounterEnabled
+    case envelopeLoop
+}
+
+public struct NoiseChannel {
+    static let timerPeriods: [UInt16] = [
+        4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068,
+    ]
+
+    // TODO: Need comments explaining all these fields!!!
+    public var enabled: Bool = false
+    public var controlFlag: ControlFlag = .lengthCounterEnabled
+    public var constantVolumeFlag: Bool = false
+    public var constantVolumeValue: UInt8 = 0x00
+    public var envelopeStart: Bool = false
+    public var envelopePeriod: UInt8 = 0x00
+    public var envelopeValue: UInt8 = 0x00
+    public var envelopeVolume: UInt8 = 0x00
+    public var mode: Int = 1
+    public var shiftRegister: UInt16 = 0x0001
+    public var timerPeriod: UInt16 = 0x0000
+    public var timerValue: UInt16 = 0x0000
+    public var lengthCounterValue: UInt8 = 0x00
+    public var dutyIndex: Int = 0
+}
+
+extension NoiseChannel {
+    mutating public func updateRegister1(byte: UInt8) {
+        self.controlFlag = byte[.noiseControlFlag] == 1 ? .envelopeLoop : .lengthCounterEnabled
+        self.constantVolumeFlag = byte[.noiseConstantVolumeFlag] != 0
+        self.envelopePeriod = byte[.noiseVolume]
+        self.constantVolumeValue = byte[.noiseVolume]
+        self.envelopeStart = true
+    }
+
+    mutating public func updateRegister3(byte: UInt8) {
+        self.mode = byte[.noiseMode] == 1 ? 6 : 1
+        self.timerPeriod = Self.timerPeriods[Int(byte[.noisePeriod])]
+    }
+
+    mutating public func updateRegister4(byte: UInt8) {
+        self.lengthCounterValue = APU.lengthTable[Int(byte[.noiseLengthCounter])]
+        self.envelopeStart = true
+    }
+
+    mutating public func stepTimer() {
+        if self.timerValue == 0 {
+            self.timerValue = self.timerPeriod
+
+            let bit1 = self.shiftRegister & 1
+            let bit2 = (self.shiftRegister >> self.mode) & 1
+            self.shiftRegister >>= 1
+            self.shiftRegister |= (bit1 ^ bit2) << 14
+        } else {
+            self.timerValue -= 1
+        }
+    }
+
+    mutating public func stepEnvelope() {
+        if self.envelopeStart {
+            self.envelopeVolume = 15
+            self.envelopeValue = self.envelopePeriod
+            self.envelopeStart = false
+        } else if self.envelopeValue > 0 {
+            self.envelopeValue -= 1
+        } else {
+            if self.envelopeVolume > 0 {
+                self.envelopeVolume -= 1
+            } else if self.controlFlag == .envelopeLoop {
+                self.envelopeVolume = 15
+            }
+
+            self.envelopeValue = self.envelopePeriod
+        }
+    }
+
+    mutating public func stepLength() {
+        if self.controlFlag == .lengthCounterEnabled && self.lengthCounterValue > 0 {
+            self.lengthCounterValue -= 1
+        }
+    }
+
+    public func getSample() -> UInt8 {
+        if !self.enabled {
+            return 0
+        }
+
+        if self.lengthCounterValue == 0 {
+            return 0
+        }
+
+        if self.shiftRegister & 1 == 1 {
+            return 0
+        }
+
+        if self.constantVolumeFlag {
+            return self.constantVolumeValue
+        } else {
+            return self.envelopeVolume
+        }
+    }
+}
