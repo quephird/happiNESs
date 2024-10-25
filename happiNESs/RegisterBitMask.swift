@@ -23,10 +23,18 @@ enum RegisterBitMask: Register {
 
     case noiseLengthCounter
 
+    case pulseDutyMode
+    case pulseControlFlag
+    case pulseConstantVolumeFlag
+    case pulseVolume
+
     case pulseSweepEnabled
-    case pulsePeriod
-    case pulseNegate
-    case pulseShift
+    case pulseSweepPeriod
+    case pulseSweepNegated
+    case pulseSweepShift
+
+    case pulseLengthCounter
+    case pulseTimerHigh
 
     var maskValue: UInt8 {
         switch self {
@@ -47,10 +55,18 @@ enum RegisterBitMask: Register {
 
         case .noiseLengthCounter:          0b1111_1000
 
+        case .pulseDutyMode:               0b1100_0000
+        case .pulseControlFlag:            0b0010_0000
+        case .pulseConstantVolumeFlag:     0b0001_0000
+        case .pulseVolume:                 0b0000_1111
+
         case .pulseSweepEnabled:           0b1000_0000
-        case .pulsePeriod:                 0b0111_0000
-        case .pulseNegate:                 0b0000_1000
-        case .pulseShift:                  0b0000_0111
+        case .pulseSweepPeriod:            0b0111_0000
+        case .pulseSweepNegated:           0b0000_1000
+        case .pulseSweepShift:             0b0000_0111
+
+        case .pulseLengthCounter:          0b1111_1000
+        case .pulseTimerHigh:              0b0000_0111
         }
     }
 }

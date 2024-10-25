@@ -25,6 +25,8 @@ public struct APU {
     public var sampleRate: Double
 
     // TODO: Add the other channels
+    public var pulse1: PulseChannel = PulseChannel(channel: .one)
+    public var pulse2: PulseChannel = PulseChannel(channel: .two)
     public var triangle: TriangleChannel = TriangleChannel()
     public var noise: NoiseChannel = NoiseChannel()
     public var status: Register = 0x00
@@ -47,6 +49,22 @@ extension APU {
 
     mutating public func writeByte(address: UInt16, byte: UInt8) {
         switch address {
+        case 0x4000:
+            self.pulse1.updateRegister1(byte: byte)
+        case 0x4001:
+            self.pulse1.updateRegister2(byte: byte)
+        case 0x4002:
+            self.pulse1.updateRegister3(byte: byte)
+        case 0x4003:
+            self.pulse1.updateRegister4(byte: byte)
+        case 0x4004:
+            self.pulse2.updateRegister1(byte: byte)
+        case 0x4005:
+            self.pulse2.updateRegister2(byte: byte)
+        case 0x4006:
+            self.pulse2.updateRegister3(byte: byte)
+        case 0x4007:
+            self.pulse2.updateRegister4(byte: byte)
         case 0x4008:
             self.triangle.updateRegister1(byte: byte)
         case 0x4009:
@@ -79,9 +97,17 @@ extension APU {
         self.status = byte
 
         // TODO: Handle the other channels when they are implemented
+        self.pulse1.enabled = self.status[.pulse1Enabled]
+        self.pulse2.enabled = self.status[.pulse2Enabled]
         self.triangle.enabled = self.status[.triangleEnabled]
         self.noise.enabled = self.status[.noiseEnabled]
 
+        if !self.pulse1.enabled {
+            self.pulse1.lengthCounterValue = 0x00
+        }
+        if !self.pulse2.enabled {
+            self.pulse2.lengthCounterValue = 0x00
+        }
         if !self.triangle.enabled {
             self.triangle.lengthCounterValue = 0x00
         }
@@ -97,6 +123,7 @@ extension APU {
         if self.framePeriod == .five {
             // TODO: Implement other steppers
             self.stepEnvelope()
+            self.stepSweep()
             self.stepLength()
         }
     }
@@ -128,6 +155,8 @@ extension APU {
     mutating private func stepTimer() {
         // TODO: call the methods on the other channels once they're implemented
         if self.cycles % 2 == 0 {
+            self.pulse1.stepTimer()
+            self.pulse2.stepTimer()
             self.noise.stepTimer()
         }
 
@@ -175,26 +204,34 @@ extension APU {
 
     mutating private func stepEnvelope() {
         // TODO: call the methods on the other channels once they're implemented
+        self.pulse1.stepEnvelope()
+        self.pulse2.stepEnvelope()
         self.triangle.stepCounter()
         self.noise.stepEnvelope()
     }
 
     mutating private func stepSweep() {
         // TODO: call the methods on the other channels once they're implemented
+        self.pulse1.stepSweep()
+        self.pulse2.stepSweep()
     }
 
     mutating private func stepLength() {
         // TODO: call the methods on the other channels once they're implemented
+        self.pulse1.stepLength()
+        self.pulse2.stepLength()
         self.triangle.stepLength()
         self.noise.stepLength()
     }
 
     mutating private func sendSample() {
         // TODO: call the methods on the other channels once they're implemented
+        let pulse1Sample = self.pulse1.getSample()
+        let pulse2Sample = self.pulse2.getSample()
         let triangleSample = self.triangle.getSample()
         let noiseSample = self.noise.getSample()
-        let signal = mix(pulse1: 0,
-                         pulse2: 0,
+        let signal = mix(pulse1: pulse1Sample,
+                         pulse2: pulse2Sample,
                          triangle: triangleSample,
                          noise: noiseSample,
                          dmc: 0)

@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 10/24/24.
 //
 
-public enum ControlFlag {
+enum NoiseControlFlag {
     case lengthCounterEnabled
     case envelopeLoop
 }
@@ -17,27 +17,27 @@ public struct NoiseChannel {
 
     // TODO: Need comments explaining all these fields!!!
     public var enabled: Bool = false
-    public var controlFlag: ControlFlag = .lengthCounterEnabled
-    public var constantVolumeFlag: Bool = false
-    public var constantVolumeValue: UInt8 = 0x00
-    public var envelopeStart: Bool = false
-    public var envelopePeriod: UInt8 = 0x00
-    public var envelopeValue: UInt8 = 0x00
-    public var envelopeVolume: UInt8 = 0x00
-    public var mode: Int = 1
-    public var shiftRegister: UInt16 = 0x0001
-    public var timerPeriod: UInt16 = 0x0000
-    public var timerValue: UInt16 = 0x0000
+    private var controlFlag: NoiseControlFlag = .lengthCounterEnabled
+    private var constantVolumeFlag: Bool = false
+    private var constantVolume: UInt8 = 0x00
+    private var envelopeStart: Bool = false
+    private var envelopePeriod: UInt8 = 0x00
+    private var envelopeValue: UInt8 = 0x00
+    private var envelopeVolume: UInt8 = 0x00
+    private var mode: Int = 1
+    private var shiftRegister: UInt16 = 0x0001
+    private var timerPeriod: UInt16 = 0x0000
+    private var timerValue: UInt16 = 0x0000
     public var lengthCounterValue: UInt8 = 0x00
-    public var dutyIndex: Int = 0
+    private var dutyIndex: Int = 0
 }
 
 extension NoiseChannel {
     mutating public func updateRegister1(byte: UInt8) {
         self.controlFlag = byte[.noiseControlFlag] == 1 ? .envelopeLoop : .lengthCounterEnabled
-        self.constantVolumeFlag = byte[.noiseConstantVolumeFlag] != 0
+        self.constantVolumeFlag = byte[.noiseConstantVolumeFlag] == 1
         self.envelopePeriod = byte[.noiseVolume]
-        self.constantVolumeValue = byte[.noiseVolume]
+        self.constantVolume = byte[.noiseVolume]
         self.envelopeStart = true
     }
 
@@ -102,7 +102,7 @@ extension NoiseChannel {
         }
 
         if self.constantVolumeFlag {
-            return self.constantVolumeValue
+            return self.constantVolume
         } else {
             return self.envelopeVolume
         }
