@@ -51,6 +51,7 @@
 		874F51B32CC0638500B12037 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B22CC0638500B12037 /* Speaker.swift */; };
 		874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B42CC1D05D00B12037 /* PulseChannel.swift */; };
 		874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */; };
+		875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */; };
 		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0662C386A2E006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
@@ -145,6 +146,7 @@
 		874F51B22CC0638500B12037 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		874F51B42CC1D05D00B12037 /* PulseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseChannel.swift; sourceTree = "<group>"; };
 		874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRingBuffer.swift; sourceTree = "<group>"; };
+		875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMCChannel.swift; sourceTree = "<group>"; };
 		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 				870AABE32CB382E000E9F3B6 /* CPU+execution.swift */,
 				870AABDF2CB37EA000E9F3B6 /* CPU+instructions.swift */,
 				870AABE12CB381C100E9F3B6 /* CPU+memory.swift */,
+				875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				87D265162C9DECAF00C143B1 /* Mapper.swift */,
@@ -467,6 +470,7 @@
 				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
 				874F51A92CBEEBA700B12037 /* APU.swift in Sources */,
+				875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */,
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
 				874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */,

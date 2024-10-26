@@ -31,6 +31,7 @@ public struct APU {
     public var pulse2: PulseChannel = PulseChannel(channelNumber: .two)
     public var triangle: TriangleChannel = TriangleChannel()
     public var noise: NoiseChannel = NoiseChannel()
+    public var dmc: DMCChannel = DMCChannel()
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
 
@@ -85,6 +86,14 @@ extension APU {
             self.noise.updateRegister3(byte: byte)
         case 0x400F:
             self.noise.updateRegister4(byte: byte)
+        case 0x4010:
+            self.dmc.updateRegister1(byte: byte)
+        case 0x4011:
+            self.dmc.updateRegister2(byte: byte)
+        case 0x4012:
+            self.dmc.updateRegister3(byte: byte)
+        case 0x4013:
+            self.dmc.updateRegister4(byte: byte)
         case 0x4015:
             self.updateStatus(byte: byte)
         case 0x4017:

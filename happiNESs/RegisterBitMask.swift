@@ -36,6 +36,12 @@ enum RegisterBitMask: Register {
     case pulseLengthCounter
     case pulseTimerHigh
 
+    case dmcIrqEnabled
+    case dmcLoopEnabled
+    case dmcPeriod
+
+    case dmcLoadCounter
+
     var maskValue: UInt8 {
         switch self {
         case .apuStatus:                   0b0001_1111
@@ -67,6 +73,12 @@ enum RegisterBitMask: Register {
 
         case .pulseLengthCounter:          0b1111_1000
         case .pulseTimerHigh:              0b0000_0111
+
+        case .dmcIrqEnabled:               0b1000_0000
+        case .dmcLoopEnabled:              0b0100_0000
+        case .dmcPeriod:                   0b0000_1111
+
+        case .dmcLoadCounter:              0b0111_1111
         }
     }
 }
