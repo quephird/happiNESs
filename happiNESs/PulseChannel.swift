@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 10/17/24.
 //
 
-public enum Channel {
+public enum ChannelNumber {
     case one
     case two
 }
@@ -28,7 +28,7 @@ public struct PulseChannel {
     ]
 
     public var enabled: Bool = false
-    public var channel: Channel
+    public var channelNumber: ChannelNumber
 
     private var dutyMode: Int = 0
     private var dutyIndex: Int = 0
@@ -52,8 +52,8 @@ public struct PulseChannel {
     private var timerValue: UInt16 = 0x0000
     private var counterReload: UInt8 = 0x00
 
-    public init(channel: Channel) {
-        self.channel = channel
+    public init(channelNumber: ChannelNumber) {
+        self.channelNumber = channelNumber
     }
 }
 
@@ -137,7 +137,7 @@ extension PulseChannel {
         if self.sweepNegated {
             self.timerPeriod &-= delta
 
-            if self.channel == .one {
+            if self.channelNumber == .one {
                 self.timerPeriod &-= 1
             }
         } else {

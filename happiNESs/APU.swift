@@ -27,8 +27,8 @@ public struct APU {
     public var sampleRate: Double
 
     // TODO: Add the other channels
-    public var pulse1: PulseChannel = PulseChannel(channel: .one)
-    public var pulse2: PulseChannel = PulseChannel(channel: .two)
+    public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
+    public var pulse2: PulseChannel = PulseChannel(channelNumber: .two)
     public var triangle: TriangleChannel = TriangleChannel()
     public var noise: NoiseChannel = NoiseChannel()
     public var status: Register = 0x00
