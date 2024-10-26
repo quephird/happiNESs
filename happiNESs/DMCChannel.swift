@@ -10,7 +10,7 @@ public struct DMCChannel {
         214, 190, 170, 160, 143, 127, 113, 107, 95, 80, 71, 64, 53, 42, 36, 27,
     ]
 
-    public var cpu: CPU? = nil
+    public var bus: Bus? = nil
     public var enabled: Bool = false
 
     private var irqEnabled: Bool = false
@@ -75,8 +75,7 @@ extension DMCChannel {
             // TODO: Figure out how best to do this
             // self.cpu.stall += 4
 
-            // TODO: Figure out how to pass in reference to CPU
-            self.shiftRegister = self.cpu!.readByteWithoutMutating(address: self.currentAddress)
+            self.shiftRegister = self.bus!.readByte(address: self.currentAddress)
             self.bitCount = 8
             self.currentAddress += 1
             if self.currentAddress == 0 {

@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 7/4/24.
 //
 
-public struct Bus {
+public class Bus {
     static let ramMirrorsBegin: UInt16 = 0x0000;
     static let ramMirrorsEnd: UInt16 = 0x1FFF;
     static let ppuRegistersMirrorsBegin: UInt16 = 0x2000;
@@ -26,14 +26,18 @@ public struct Bus {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.cycles = 0
         self.joypad = Joypad()
+
+        // NOTA BENE: We need to do this because there needs to be
+        // bidirectional communication between the bus and the APU.
+        self.apu.dmc.bus = self
     }
 
-    mutating public func loadCartridge(cartridge: Cartridge) {
+    public func loadCartridge(cartridge: Cartridge) {
         self.cartridge = cartridge
         self.ppu.cartridge = cartridge
     }
 
-    mutating public func reset() {
+    public func reset() {
         self.ppu.reset()
     }
 }
@@ -70,7 +74,7 @@ extension Bus {
         }
     }
 
-    mutating func readByte(address: UInt16) -> UInt8 {
+    func readByte(address: UInt16) -> UInt8 {
         switch address {
         case 0x2002:
             return self.ppu.readStatus()
@@ -90,7 +94,7 @@ extension Bus {
         }
     }
 
-    mutating func writeByte(address: UInt16, byte: UInt8) {
+    func writeByte(address: UInt16, byte: UInt8) {
         switch address {
         case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
@@ -134,14 +138,14 @@ extension Bus {
 }
 
 extension Bus {
-    mutating func tick(cycles: Int) -> Bool {
+    func tick(cycles: Int) -> Bool {
         self.cycles += cycles
 
         self.apu.tick(cpuCycles: cycles)
         return self.ppu.tick(cpuCycles: cycles)
     }
 
-    mutating func pollNmiStatus() -> UInt8? {
+    func pollNmiStatus() -> UInt8? {
         return self.ppu.pollNmiInterrupt()
     }
 }
