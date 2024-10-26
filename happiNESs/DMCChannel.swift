@@ -10,6 +10,7 @@ public struct DMCChannel {
         214, 190, 170, 160, 143, 127, 113, 107, 95, 80, 71, 64, 53, 42, 36, 27,
     ]
 
+    public var cpu: CPU? = nil
     public var enabled: Bool = false
 
     private var irqEnabled: Bool = false
@@ -21,7 +22,7 @@ public struct DMCChannel {
     private var sampleAddress: UInt16 = 0x0000
     private var currentAddress: UInt16 = 0x0000
     private var sampleLength: UInt16 = 0x0000
-    private var currentLength: UInt16 = 0x0000
+    public var currentLength: UInt16 = 0x0000
 
     private var shiftRegister: UInt8 = 0x00
     private var bitCount: Int = 0
@@ -49,7 +50,7 @@ extension DMCChannel {
 }
 
 extension DMCChannel {
-    mutating private func stepTimer() {
+    mutating public func stepTimer() {
         if !self.enabled {
             return
         }
@@ -64,7 +65,7 @@ extension DMCChannel {
         }
     }
 
-    mutating private func restart() {
+    mutating public func restart() {
         self.currentAddress = self.sampleAddress
         self.currentLength = self.sampleLength
     }
@@ -75,7 +76,7 @@ extension DMCChannel {
             // self.cpu.stall += 4
 
             // TODO: Figure out how to pass in reference to CPU
-            // self.shiftRegister = self.cpu.Read(self.currentAddress)
+            self.shiftRegister = self.cpu!.readByteWithoutMutating(address: self.currentAddress)
             self.bitCount = 8
             self.currentAddress += 1
             if self.currentAddress == 0 {
@@ -108,7 +109,7 @@ extension DMCChannel {
         self.bitCount -= 1
     }
 
-    private func getSample() -> UInt8 {
+    public func getSample() -> UInt8 {
         return self.sampleValue
     }
 }

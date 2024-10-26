@@ -112,6 +112,7 @@ extension APU {
         self.pulse2.enabled = self.status[.pulse2Enabled]
         self.triangle.enabled = self.status[.triangleEnabled]
         self.noise.enabled = self.status[.noiseEnabled]
+        self.dmc.enabled = self.status[.dmcEnabled]
 
         if !self.pulse1.enabled {
             self.pulse1.lengthCounterValue = 0x00
@@ -124,6 +125,13 @@ extension APU {
         }
         if !self.noise.enabled {
             self.noise.lengthCounterValue = 0x00
+        }
+        if !self.dmc.enabled {
+            self.dmc.currentLength = 0
+        } else {
+            if self.dmc.currentLength == 0 {
+                self.dmc.restart()
+            }
         }
     }
 
@@ -172,6 +180,7 @@ extension APU {
             self.pulse1.stepTimer()
             self.pulse2.stepTimer()
             self.noise.stepTimer()
+            self.dmc.stepTimer()
         }
 
         self.triangle.stepTimer()
@@ -258,11 +267,13 @@ extension APU {
         let pulse2Sample = self.pulse2.getSample()
         let triangleSample = self.triangle.getSample()
         let noiseSample = self.noise.getSample()
+        let dmcSample = self.dmc.getSample()
+
         let signal = mix(pulse1: pulse1Sample,
                          pulse2: pulse2Sample,
                          triangle: triangleSample,
                          noise: noiseSample,
-                         dmc: 0)
+                         dmc: dmcSample)
         self.buffer.append(value: signal)
     }
 
