@@ -24,7 +24,7 @@ public struct StatusRegister: OptionSet {
     //  +----------------- Negative Flag
     public static let carry = Self(rawValue: 1 << 0)
     public static let zero = Self(rawValue: 1 << 1)
-    public static let interrupt = Self(rawValue: 1 << 2)
+    public static let interruptsDisabled = Self(rawValue: 1 << 2)
     public static let decimalMode = Self(rawValue: 1 << 3)
     public static let `break` = Self(rawValue: 1 << 4)
     public static let unused = Self(rawValue: 1 << 5)

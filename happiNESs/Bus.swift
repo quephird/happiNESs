@@ -11,13 +11,13 @@ public class Bus {
     static let ppuRegistersMirrorsBegin: UInt16 = 0x2000;
     static let ppuRegistersMirrorsEnd: UInt16 = 0x3FFF;
 
+    public var cpu: CPU? = nil
     public var ppu: PPU
     public var apu: APU
     var cartridge: Cartridge?
     var vram: [UInt8]
     var cycles: Int
     var joypad: Joypad
-    public var interrupt: Interrupt = .none
 
     public init() {
         self.ppu = PPU()
@@ -33,6 +33,7 @@ public class Bus {
         // the PPU and APU.
         self.ppu.bus = self
         self.apu.dmc.bus = self
+        self.apu.bus = self
     }
 
     public func loadCartridge(cartridge: Cartridge) {
@@ -134,7 +135,6 @@ extension Bus {
         case 0x8000 ... 0xFFFF:
             self.cartridge!.writeByte(address: address, byte: byte)
         default:
-            // TODO: Implement memory writing to these addresses?
             break
         }
     }
@@ -146,5 +146,15 @@ extension Bus {
 
         self.apu.tick(cpuCycles: cycles)
         return self.ppu.tick(cpuCycles: cycles)
+    }
+
+    public func triggerNmi() {
+        self.cpu!.interrupt = .nmi
+    }
+
+    public func triggerIrq() {
+        if !self.cpu!.statusRegister[.interruptsDisabled] {
+            self.cpu!.interrupt = .irq
+        }
     }
 }

@@ -10,7 +10,7 @@ extension CPU {
         return (fromAddress & 0xFF00) != (toAddress & 0xFF00)
     }
 
-    mutating func getAbsoluteAddress(addressingMode: AddressingMode) -> (UInt16, Bool) {
+    func getAbsoluteAddress(addressingMode: AddressingMode) -> (UInt16, Bool) {
         let address = self.programCounter
 
         switch addressingMode {
@@ -139,13 +139,13 @@ extension CPU {
         }
     }
 
-    mutating func readWord(address: UInt16) -> UInt16 {
+    func readWord(address: UInt16) -> UInt16 {
         let lowByte = self.readByte(address: address)
         let highByte = self.readByte(address: address + 1)
         return UInt16(lowByte: lowByte, highByte: highByte)
     }
 
-    mutating func readByte(address: UInt16) -> UInt8 {
+    func readByte(address: UInt16) -> UInt8 {
         self.bus.readByte(address: address)
     }
 
@@ -161,11 +161,11 @@ extension CPU {
         return UInt16(lowByte: lowByte, highByte: highByte)
     }
 
-    mutating public func writeByte(address: UInt16, byte: UInt8) {
+    public func writeByte(address: UInt16, byte: UInt8) {
         self.bus.writeByte(address: address, byte: byte)
     }
 
-    mutating func writeWord(address: UInt16, word: UInt16) {
+    func writeWord(address: UInt16, word: UInt16) {
         self.writeByte(address: address, byte: word.lowByte);
         self.writeByte(address: address + 1, byte: word.highByte);
     }

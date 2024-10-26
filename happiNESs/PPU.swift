@@ -76,6 +76,10 @@ public struct PPU {
 
         self.cycles = 0
         self.scanline = 0
+
+        self.nextSharedAddress = 0x0000
+        self.currentSharedAddress = 0x0000
+        self.wRegister = false
     }
 
     // Various computed properties used across multiple concerns
@@ -156,14 +160,13 @@ public struct PPU {
                     self.statusRegister[.verticalBlankStarted] = true
 
                     if self.controllerRegister[.generateNmi] {
-                        self.bus!.interrupt = .nmi
+                        self.bus!.triggerNmi()
                     }
 
                     redrawScreen = true
                 }
 
                 if self.isPreRenderLine {
-                    self.bus!.interrupt = .none
                     self.statusRegister[.verticalBlankStarted] = false
                     self.statusRegister[.spriteZeroHit] = false
                 }

@@ -21,6 +21,7 @@ public struct APU {
         12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30,
     ]
 
+    public var bus: Bus? = nil
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
     private var frameIrqInhibited: Bool = false
@@ -107,7 +108,6 @@ extension APU {
     mutating public func updateStatus(byte: UInt8) {
         self.status = byte
 
-        // TODO: Handle the other channels when they are implemented
         self.pulse1.enabled = self.status[.pulse1Enabled]
         self.pulse2.enabled = self.status[.pulse2Enabled]
         self.triangle.enabled = self.status[.triangleEnabled]
@@ -140,7 +140,6 @@ extension APU {
         self.frameIrqInhibited = byte[.frameIrqInhibited]
 
         if self.sequencerMode == .five {
-            // TODO: Implement other steppers
             self.stepEnvelope()
             self.stepSweep()
             self.stepLength()
@@ -176,7 +175,6 @@ extension APU {
         //     second CPU cycle and thus produce only even periods."
 
         if self.cycles % 2 == 0 {
-            // TODO: call the methods on the other channels once they're implemented
             self.pulse1.stepTimer()
             self.pulse2.stepTimer()
             self.noise.stepTimer()
@@ -297,6 +295,6 @@ extension APU {
     }
 
     mutating private func generateIRQ() {
-        // TODO!!!
+        self.bus!.triggerIrq()
     }
 }
