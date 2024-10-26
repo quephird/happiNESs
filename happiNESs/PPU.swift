@@ -6,6 +6,7 @@
 //
 
 public struct PPU {
+    public var bus: Bus? = nil
     public static let width = 256
     public static let height = 240
 
@@ -37,7 +38,6 @@ public struct PPU {
 
     public var cycles: Int
     public var scanline: Int
-    public var nmiInterrupt: UInt8?
 
     public var screenBuffer: [UInt8] = [UInt8](repeating: 0x00, count: Self.width * Self.height * 3)
 
@@ -62,7 +62,6 @@ public struct PPU {
 
         self.cycles = 0
         self.scanline = 0
-        self.nmiInterrupt = nil
     }
 
     mutating public func reset() {
@@ -77,7 +76,6 @@ public struct PPU {
 
         self.cycles = 0
         self.scanline = 0
-        self.nmiInterrupt = nil
     }
 
     // Various computed properties used across multiple concerns
@@ -124,12 +122,6 @@ public struct PPU {
         self.statusRegister[.spriteZeroHit]
     }
 
-    mutating func pollNmiInterrupt() -> UInt8? {
-        let result = self.nmiInterrupt
-        self.nmiInterrupt = nil
-        return result
-    }
-
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     mutating func tick(cpuCycles: Int) -> Bool {
@@ -164,14 +156,14 @@ public struct PPU {
                     self.statusRegister[.verticalBlankStarted] = true
 
                     if self.controllerRegister[.generateNmi] {
-                        self.nmiInterrupt = 1
+                        self.bus!.interrupt = .nmi
                     }
 
                     redrawScreen = true
                 }
 
                 if self.isPreRenderLine {
-                    self.nmiInterrupt = nil
+                    self.bus!.interrupt = .none
                     self.statusRegister[.verticalBlankStarted] = false
                     self.statusRegister[.spriteZeroHit] = false
                 }

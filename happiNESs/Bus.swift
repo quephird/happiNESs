@@ -17,6 +17,7 @@ public class Bus {
     var vram: [UInt8]
     var cycles: Int
     var joypad: Joypad
+    public var interrupt: Interrupt = .none
 
     public init() {
         self.ppu = PPU()
@@ -28,7 +29,9 @@ public class Bus {
         self.joypad = Joypad()
 
         // NOTA BENE: We need to do this because there needs to be
-        // bidirectional communication between the bus and the APU.
+        // bidirectional communication between the bus and both
+        // the PPU and APU.
+        self.ppu.bus = self
         self.apu.dmc.bus = self
     }
 
@@ -143,9 +146,5 @@ extension Bus {
 
         self.apu.tick(cpuCycles: cycles)
         return self.ppu.tick(cpuCycles: cycles)
-    }
-
-    func pollNmiStatus() -> UInt8? {
-        return self.ppu.pollNmiInterrupt()
     }
 }

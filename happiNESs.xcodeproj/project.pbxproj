@@ -58,6 +58,7 @@
 		8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* RomTests.swift */; };
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
+		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
 		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
 		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
 		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
@@ -152,6 +153,7 @@
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
+		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
 		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 				870AABDF2CB37EA000E9F3B6 /* CPU+instructions.swift */,
 				870AABE12CB381C100E9F3B6 /* CPU+memory.swift */,
 				875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */,
+				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				87D265162C9DECAF00C143B1 /* Mapper.swift */,
@@ -483,6 +486,7 @@
 				870AABE42CB382E000E9F3B6 /* CPU+execution.swift in Sources */,
 				87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */,
 				870AABE02CB37EA000E9F3B6 /* CPU+instructions.swift in Sources */,
+				8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */,
 				87184D0E2C756BEB0003D090 /* OAMRegister.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,

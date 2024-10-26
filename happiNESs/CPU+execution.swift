@@ -34,8 +34,12 @@ extension CPU {
     // This method returns the value from the call to Bus.tick()
     // which represents whether or not the screen needs to be redrawn
     mutating func executeInstruction() -> Bool {
-        if let _ = self.bus.pollNmiStatus() {
+        switch self.bus.interrupt {
+        case .nmi:
             self.handleNmiInterrupt()
+            self.bus.interrupt = .none
+        default:
+            break
         }
 
         if self.tracingOn {
