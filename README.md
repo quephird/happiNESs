@@ -138,6 +138,8 @@ For the time being, the unit tests are primarily focused on the implementations 
   <a href="https://www.nesdev.org/wiki/Emulator_tests">https://www.nesdev.org/wiki/Emulator_tests</a>
 - A page with the diassembled source code for Super Mario Bros.  
   <a href="https://6502disassembly.com/nes-smb/SuperMarioBros.html">https://6502disassembly.com/nes-smb/SuperMarioBros.html</a>
+- A Go implementation of an NES emulator  
+  <a href="https://github.com/fogleman/nes">https://github.com/fogleman/nes</a>
 - A page on Apple's Developer web site with an example project that you can download and experiment with to learn how to use part of the AVFAudio framework.  
   <a href="https://developer.apple.com/documentation/avfaudio/audio_engine/building_a_signal_generator">https://developer.apple.com/documentation/avfaudio/audio\_engine/building\_a\_signal\_generator</a>
 - GitHub repo with a ROM that comprehensively exercises the APU's sound capabilities.  
