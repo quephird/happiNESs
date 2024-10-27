@@ -12,11 +12,11 @@ public enum StopCondition {
 
 extension CPU {
     // NOTA BENE: This method is only ever called from unit tests.
-    mutating public func executeInstructions(stoppingAfter: Int) {
+    public func executeInstructions(stoppingAfter: Int) {
         executeInstructions(stoppingAfter: .instructions(stoppingAfter))
     }
 
-    mutating public func executeInstructions(stoppingAfter: StopCondition) {
+    public func executeInstructions(stoppingAfter: StopCondition) {
         switch stoppingAfter {
         case .instructions(let count):
             (0..<count).forEach { i in
@@ -33,9 +33,16 @@ extension CPU {
 
     // This method returns the value from the call to Bus.tick()
     // which represents whether or not the screen needs to be redrawn
-    mutating func executeInstruction() -> Bool {
-        if let _ = self.bus.pollNmiStatus() {
-            self.handleNmiInterrupt()
+    func executeInstruction() -> Bool {
+        switch self.interrupt {
+        case .nmi:
+            self.handleNmi()
+            self.interrupt = .none
+        case .irq:
+            self.handleIrq()
+            self.interrupt = .none
+        default:
+            break
         }
 
         if self.tracingOn {

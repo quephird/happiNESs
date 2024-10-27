@@ -31,8 +31,6 @@ You can also specify the scale of the screen between 1x, 2x, and 3x through the 
 
 <img src="./images/set_scale.png" />
 
-It should be noted that at this time there is no sound emulation; hopefully, that will be coming soon!
-
 # Supported games
 
 So far, the following mappers and associated games have been tested in this emulator and are largely playable:
@@ -51,6 +49,8 @@ So far, the following mappers and associated games have been tested in this emul
 - 003
   - Gradius
   - Tiger Heli
+
+Also, this emulator now supports sound! Games should play and sound _pretty_ close to the original, however certain things like timings and IRQ interrupt handling may not be quite right and will need some work to correct.
 
 # Design
 
@@ -74,7 +74,7 @@ The strategy in the Rust version renders all background tiles and all sprites on
 
 There were also issues regarding properly handling sprites that were supposed to be appear to be rendered _behind_ the background tiles. In the Rust version, all sprites were rendered on top of the background tiles, but in the NES, each sprite has a so-called background priority bit that specifies whether it should effectively rendered on top of a background tile of behind it. Because all sprites were simply rendered regardless of this bit and _after_ the background was already rendered, certain aspects of the game looked odd, such as power-up mushrooms appeared in front of the block instead of looking like it emanted from within it, or at the end of world 1-1,  Mario looks like he stops in front of the pipe instead of actually entering it.
 
-In short, The NES actually renders graphics in the following way:
+This was all rewritten to be more congruent with the operation of an actual NES, namely that
 
 - For each visible scanline of the screen:
    - Determine which sprites intersect with the scanline and cache them
@@ -84,7 +84,7 @@ In short, The NES actually renders graphics in the following way:
        - If there is a first _background_ sprite with a non-transparent color, set the pixel's color accordingly
        - If we haven't found any of the above, set the pixel to the main background color
 
-And so, this emulator uses that strategy as a more faithful emulation. There are more fine-grained things that I have yet to properly emulate, such as true sprite zero hit detection, but this is a pretty good start.
+Sprite zero hit detection now happens _while evaluating pixels_ instead of waiting until just before rendering the screen buffer as the implemenation in the Rust tutorial does.
 
 ### Usage of enums instead of class hierarchies
 
@@ -136,3 +136,11 @@ For the time being, the unit tests are primarily focused on the implementations 
   <a href="https://nesdir.github.io/">https://nesdir.github.io/</a>
 - A page listing various test ROMS  
   <a href="https://www.nesdev.org/wiki/Emulator_tests">https://www.nesdev.org/wiki/Emulator_tests</a>
+- A page with the diassembled source code for Super Mario Bros.  
+  <a href="https://6502disassembly.com/nes-smb/SuperMarioBros.html">https://6502disassembly.com/nes-smb/SuperMarioBros.html</a>
+- A Go implementation of an NES emulator  
+  <a href="https://github.com/fogleman/nes">https://github.com/fogleman/nes</a>
+- A page on Apple's Developer web site with an example project that you can download and experiment with to learn how to use part of the AVFAudio framework.  
+  <a href="https://developer.apple.com/documentation/avfaudio/audio_engine/building_a_signal_generator">https://developer.apple.com/documentation/avfaudio/audio\_engine/building\_a\_signal\_generator</a>
+- GitHub repo with a ROM that comprehensively exercises the APU's sound capabilities.  
+  <a href="https://github.com/nesdoug/NES_SOUND">https://github.com/nesdoug/NES_SOUND</a>

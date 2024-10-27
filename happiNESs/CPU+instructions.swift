@@ -6,7 +6,7 @@
 //
 
 extension CPU {
-    mutating func adc(addressingMode: AddressingMode) -> (Bool, Int) {
+    func adc(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
@@ -20,7 +20,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func and(addressingMode: AddressingMode) -> (Bool, Int) {
+    func and(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         self.accumulator &= value
@@ -29,7 +29,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func asl(addressingMode: AddressingMode) -> (Bool, Int) {
+    func asl(addressingMode: AddressingMode) -> (Bool, Int) {
         if addressingMode == .accumulator {
             self.statusRegister[.carry] = self.accumulator >> 7 == 1
             self.accumulator <<= 1
@@ -46,19 +46,19 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func bcc() -> (Bool, Int) {
+    func bcc() -> (Bool, Int) {
         return self.branch(condition: !self.statusRegister[.carry])
     }
 
-    mutating func bcs() -> (Bool, Int) {
+    func bcs() -> (Bool, Int) {
         return self.branch(condition: self.statusRegister[.carry])
     }
 
-    mutating func beq() -> (Bool, Int) {
+    func beq() -> (Bool, Int) {
         return self.branch(condition: self.statusRegister[.zero])
     }
 
-    mutating private func branch(condition: Bool) -> (Bool, Int) {
+    private func branch(condition: Bool) -> (Bool, Int) {
         if condition {
             let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: .relative)
             self.programCounter = address
@@ -69,7 +69,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func bit(addressingMode: AddressingMode) -> (Bool, Int) {
+    func bit(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         let result = self.accumulator & value;
@@ -80,19 +80,19 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func bmi() -> (Bool, Int) {
+    func bmi() -> (Bool, Int) {
         return self.branch(condition: self.statusRegister[.negative])
     }
 
-    mutating func bne() -> (Bool, Int) {
+    func bne() -> (Bool, Int) {
         return self.branch(condition: !self.statusRegister[.zero])
     }
 
-    mutating func bpl() -> (Bool, Int) {
+    func bpl() -> (Bool, Int) {
         return self.branch(condition: !self.statusRegister[.negative])
     }
 
-    mutating func brk() -> (Bool, Int) {
+    func brk() -> (Bool, Int) {
         let currentStatus = self.statusRegister.rawValue
         // NOTA BENE: We've already advanced the program counter upon consuming the
         // `BRK` byte; now we need to advance it one more time since the byte after
@@ -103,48 +103,48 @@ extension CPU {
         self.pushStack(word: self.programCounter)
         self.pushStack(byte: currentStatus)
         self.programCounter = self.readWord(address: Self.interruptVectorAddress)
-        self.statusRegister[.interrupt] = true
+        self.statusRegister[.interruptsDisabled] = true
 
         return (true, 0)
     }
 
-    mutating func bvc() -> (Bool, Int) {
+    func bvc() -> (Bool, Int) {
         return self.branch(condition: !self.statusRegister[.overflow])
     }
 
-    mutating func bvs() -> (Bool, Int) {
+    func bvs() -> (Bool, Int) {
         return self.branch(condition: self.statusRegister[.overflow])
     }
 
-    mutating private func clearBit(bit: StatusRegister.Element) {
+    func clearBit(bit: StatusRegister.Element) {
         self.statusRegister[bit] = false
     }
 
-    mutating func clc() -> (Bool, Int) {
+    func clc() -> (Bool, Int) {
         self.clearBit(bit: .carry)
 
         return (false, 0)
     }
 
-    mutating func cld() -> (Bool, Int) {
+    func cld() -> (Bool, Int) {
         self.clearBit(bit: .decimalMode)
 
         return (false, 0)
     }
 
-    mutating func cli() -> (Bool, Int) {
-        self.clearBit(bit: .interrupt)
+    func cli() -> (Bool, Int) {
+        self.clearBit(bit: .interruptsDisabled)
 
         return (false, 0)
     }
 
-    mutating func clv() -> (Bool, Int) {
+    func clv() -> (Bool, Int) {
         self.clearBit(bit: .overflow)
 
         return (false, 0)
     }
 
-    mutating private func compareMemory(addressingMode: AddressingMode, to registerValue: UInt8) -> Bool {
+    private func compareMemory(addressingMode: AddressingMode, to registerValue: UInt8) -> Bool {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let memoryValue = self.readByte(address: address)
 
@@ -154,25 +154,25 @@ extension CPU {
         return pageCrossed
     }
 
-    mutating func cmp(addressingMode: AddressingMode) -> (Bool, Int) {
+    func cmp(addressingMode: AddressingMode) -> (Bool, Int) {
         let pageCrossed = self.compareMemory(addressingMode: addressingMode, to: self.accumulator)
 
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func cpx(addressingMode: AddressingMode) -> (Bool, Int) {
+    func cpx(addressingMode: AddressingMode) -> (Bool, Int) {
         let _ = self.compareMemory(addressingMode: addressingMode, to: self.xRegister)
 
         return (false, 0)
     }
 
-    mutating func cpy(addressingMode: AddressingMode) -> (Bool, Int) {
+    func cpy(addressingMode: AddressingMode) -> (Bool, Int) {
         let _ = self.compareMemory(addressingMode: addressingMode, to: self.yRegister)
 
         return (false, 0)
     }
 
-    mutating func dcp(addressingMode: AddressingMode) -> (Bool, Int) {
+    func dcp(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
 
@@ -184,7 +184,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func dec(addressingMode: AddressingMode) -> (Bool, Int) {
+    func dec(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value &- 1)
@@ -193,14 +193,14 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func dex() -> (Bool, Int) {
+    func dex() -> (Bool, Int) {
         self.xRegister = self.xRegister &- 1
         self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return (false, 0)
     }
 
-    mutating func dey() -> (Bool, Int) {
+    func dey() -> (Bool, Int) {
         self.yRegister = self.yRegister &- 1
         self.updateZeroAndNegativeFlags(result: self.yRegister)
 
@@ -208,7 +208,7 @@ extension CPU {
     }
 
 
-    mutating func eor(addressingMode: AddressingMode) -> (Bool, Int) {
+    func eor(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode);
         let value = self.readByte(address: address);
         self.accumulator ^= value;
@@ -217,7 +217,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func inc(addressingMode: AddressingMode) -> (Bool, Int) {
+    func inc(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value &+ 1)
@@ -226,21 +226,21 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func inx() -> (Bool, Int) {
+    func inx() -> (Bool, Int) {
         self.xRegister = self.xRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return (false, 0)
     }
 
-    mutating func iny() -> (Bool, Int) {
+    func iny() -> (Bool, Int) {
         self.yRegister = self.yRegister &+ 1
         self.updateZeroAndNegativeFlags(result: self.yRegister)
 
         return (false, 0)
     }
 
-    mutating func isb(addressingMode: AddressingMode) -> (Bool, Int) {
+    func isb(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         self.writeByte(address: address, byte: self.readByte(address: address) &+ 1)
 
@@ -249,14 +249,14 @@ extension CPU {
         return (programCounterMutated, 0)
     }
 
-    mutating func jmp(addressingMode: AddressingMode) -> (Bool, Int) {
+    func jmp(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         self.programCounter = address
 
         return (true, 0)
     }
 
-    mutating func jsr() -> (Bool, Int) {
+    func jsr() -> (Bool, Int) {
         let (subroutineAddress, _) = self.getAbsoluteAddress(addressingMode: .absolute);
         // ACHTUNG!!! Note that this is pointing to the last byte of the `JSR` instruction!
         let returnAddress = self.programCounter + 2 - 1
@@ -266,7 +266,7 @@ extension CPU {
         return (true, 0)
     }
 
-    mutating func lax(addressingMode: AddressingMode) -> (Bool, Int) {
+    func lax(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address);
 
@@ -277,7 +277,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func lda(addressingMode: AddressingMode) -> (Bool, Int) {
+    func lda(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address);
         self.accumulator = value;
@@ -286,7 +286,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func ldx(addressingMode: AddressingMode) -> (Bool, Int) {
+    func ldx(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address);
         self.xRegister = value;
@@ -295,7 +295,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func ldy(addressingMode: AddressingMode) -> (Bool, Int) {
+    func ldy(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address);
         self.yRegister = value;
@@ -304,7 +304,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func lsr(addressingMode: AddressingMode) -> (Bool, Int) {
+    func lsr(addressingMode: AddressingMode) -> (Bool, Int) {
         if addressingMode == .accumulator {
             self.statusRegister[.carry] = self.accumulator & 0b0000_0001 == 1
             self.accumulator >>= 1
@@ -321,7 +321,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func nop(addressingMode: AddressingMode) -> (Bool, Int) {
+    func nop(addressingMode: AddressingMode) -> (Bool, Int) {
         if addressingMode == .implicit {
             return (false, 0)
         }
@@ -330,7 +330,7 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating func ora(addressingMode: AddressingMode) -> (Bool, Int) {
+    func ora(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address);
         self.accumulator |= value;
@@ -339,29 +339,29 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating public func pushStack(byte: UInt8) {
+    public func pushStack(byte: UInt8) {
         self.writeByte(address: Self.stackBottomMemoryAddress + UInt16(self.stackPointer), byte: byte)
         self.stackPointer = self.stackPointer &- 1
     }
 
-    mutating public func pushStack(word: UInt16) {
+    public func pushStack(word: UInt16) {
         self.pushStack(byte: word.highByte)
         self.pushStack(byte: word.lowByte)
     }
 
-    mutating private func popStack() -> UInt8 {
+    private func popStack() -> UInt8 {
         self.stackPointer = self.stackPointer &+ 1
         let byte = self.readByte(address: Self.stackBottomMemoryAddress + UInt16(self.stackPointer))
         return byte
     }
 
-    mutating func pha() -> (Bool, Int) {
+    func pha() -> (Bool, Int) {
         self.pushStack(byte: self.accumulator)
 
         return (false, 0)
     }
 
-    mutating func php() -> (Bool, Int) {
+    func php() -> (Bool, Int) {
         // NOTA BENE: We need to set the so-called B flag upon a push to the stack:
         //
         //    https://www.nesdev.org/wiki/Status_flags#The_B_flag
@@ -370,14 +370,14 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func pla() -> (Bool, Int) {
+    func pla() -> (Bool, Int) {
         self.accumulator = self.popStack()
         self.updateZeroAndNegativeFlags(result: self.accumulator)
 
         return (false, 0)
     }
 
-    mutating func plp() -> (Bool, Int) {
+    func plp() -> (Bool, Int) {
         self.statusRegister.rawValue = self.popStack()
         self.statusRegister[.break] = false
         self.statusRegister[.unused] = true
@@ -385,7 +385,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func rla(addressingMode: AddressingMode) -> (Bool, Int) {
+    func rla(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
@@ -397,7 +397,7 @@ extension CPU {
         return (programCounterMutated, 0)
     }
 
-    mutating func rol(addressingMode: AddressingMode) -> (Bool, Int) {
+    func rol(addressingMode: AddressingMode) -> (Bool, Int) {
         let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
 
         if addressingMode == .accumulator {
@@ -419,7 +419,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func ror(addressingMode: AddressingMode) -> (Bool, Int) {
+    func ror(addressingMode: AddressingMode) -> (Bool, Int) {
         let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
 
         if addressingMode == .accumulator {
@@ -444,7 +444,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func rra(addressingMode: AddressingMode) -> (Bool, Int) {
+    func rra(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let oldCarry: UInt8 = self.statusRegister[.carry] ? 1 : 0
@@ -456,7 +456,7 @@ extension CPU {
         return (programCounterMutated, 0)
     }
 
-    mutating func rti() -> (Bool, Int) {
+    func rti() -> (Bool, Int) {
         self.statusRegister.rawValue = self.popStack()
         self.statusRegister[.break] = false
         self.statusRegister[.unused] = true
@@ -469,7 +469,7 @@ extension CPU {
         return (true, 0)
     }
 
-    mutating func rts() -> (Bool, Int) {
+    func rts() -> (Bool, Int) {
         let addressLow = self.popStack()
         let addressHigh = self.popStack()
         // ACHTUNG!!! Note that this only works in conjunction with the `JSR` instruction!
@@ -479,14 +479,14 @@ extension CPU {
         return (true, 0)
     }
 
-    mutating func sax(addressingMode: AddressingMode) -> (Bool, Int) {
+    func sax(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         self.writeByte(address: address, byte: self.accumulator & self.xRegister)
 
         return (false, 0)
     }
 
-    mutating func sbc(addressingMode: AddressingMode) -> (Bool, Int) {
+    func sbc(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         let carry: UInt8 = self.statusRegister[.carry] ? 0x01 : 0x00
@@ -500,29 +500,29 @@ extension CPU {
         return (false, pageCrossed ? 1 : 0)
     }
 
-    mutating private func setBit(bit: StatusRegister.Element) {
+    private func setBit(bit: StatusRegister.Element) {
         self.statusRegister[bit] = true
     }
 
-    mutating func sec() -> (Bool, Int) {
+    func sec() -> (Bool, Int) {
         self.setBit(bit: .carry)
 
         return (false, 0)
     }
 
-    mutating func sed() -> (Bool, Int) {
+    func sed() -> (Bool, Int) {
         self.setBit(bit: .decimalMode)
 
         return (false, 0)
     }
 
-    mutating func sei() -> (Bool, Int) {
-        self.setBit(bit: .interrupt)
+    func sei() -> (Bool, Int) {
+        self.setBit(bit: .interruptsDisabled)
 
         return (false, 0)
     }
 
-    mutating func sha(addressingMode: AddressingMode) -> (Bool, Int) {
+    func sha(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let result = self.accumulator & self.xRegister & address.highByte
         self.writeByte(address: address, byte: result)
@@ -530,7 +530,7 @@ extension CPU {
         return (false, 0)
     }
 
-    mutating func slo(addressingMode: AddressingMode) -> (Bool, Int) {
+    func slo(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let oldValue = self.readByte(address: address)
         self.writeByte(address: address, byte: oldValue << 1)
@@ -541,7 +541,7 @@ extension CPU {
         return (programCounterMutated, 0)
     }
 
-    mutating func sre(addressingMode: AddressingMode) -> (Bool, Int) {
+    func sre(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         let value = self.readByte(address: address)
         self.writeByte(address: address, byte: value >> 1)
@@ -552,69 +552,69 @@ extension CPU {
         return (programCounterMutated, 0)
     }
 
-    mutating func sta(addressingMode: AddressingMode) -> (Bool, Int) {
+    func sta(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode)
         self.writeByte(address: address, byte: self.accumulator)
 
         return (false, 0)
     }
 
-    mutating func stx(addressingMode: AddressingMode) -> (Bool, Int) {
+    func stx(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.xRegister);
 
         return (false, 0)
     }
 
-    mutating func sty(addressingMode: AddressingMode) -> (Bool, Int) {
+    func sty(addressingMode: AddressingMode) -> (Bool, Int) {
         let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode);
         self.writeByte(address: address, byte: self.yRegister);
 
         return (false, 0)
     }
 
-    mutating func tax() -> (Bool, Int) {
+    func tax() -> (Bool, Int) {
         self.xRegister = self.accumulator;
         self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return (false, 0)
     }
 
-    mutating func tay() -> (Bool, Int) {
+    func tay() -> (Bool, Int) {
         self.yRegister = self.accumulator;
         self.updateZeroAndNegativeFlags(result: self.yRegister)
 
         return (false, 0)
     }
 
-    mutating func tsx() -> (Bool, Int) {
+    func tsx() -> (Bool, Int) {
         self.xRegister = self.stackPointer;
         self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return (false, 0)
     }
 
-    mutating func txa() -> (Bool, Int) {
+    func txa() -> (Bool, Int) {
         self.accumulator = self.xRegister;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
 
         return (false, 0)
     }
 
-    mutating func txs() -> (Bool, Int) {
+    func txs() -> (Bool, Int) {
         self.stackPointer = self.xRegister;
 
         return (false, 0)
     }
 
-    mutating func tya() -> (Bool, Int) {
+    func tya() -> (Bool, Int) {
         self.accumulator = self.yRegister;
         self.updateZeroAndNegativeFlags(result: self.accumulator)
 
         return (false, 0)
     }
 
-    mutating private func updateZeroAndNegativeFlags(result: UInt8) {
+    private func updateZeroAndNegativeFlags(result: UInt8) {
         self.statusRegister[.zero] = result == 0
         self.statusRegister[.negative] = (result & 0b1000_0000) != 0
     }

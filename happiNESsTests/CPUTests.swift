@@ -417,7 +417,7 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(!cpu.statusRegister[.interrupt])
+        XCTAssertTrue(!cpu.statusRegister[.interruptsDisabled])
     }
 
     func testClv() {
@@ -1176,7 +1176,7 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(cpu.statusRegister[.negative])
         XCTAssertTrue(cpu.statusRegister[.overflow])
         XCTAssertTrue(!cpu.statusRegister[.break])
-        XCTAssertTrue(cpu.statusRegister[.interrupt])
+        XCTAssertTrue(cpu.statusRegister[.interruptsDisabled])
         XCTAssertTrue(cpu.statusRegister[.zero])
         XCTAssertTrue(cpu.statusRegister[.carry])
     }
@@ -1469,7 +1469,7 @@ final class CPUTests: XCTestCase {
         var cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(cpu.statusRegister[.interrupt])
+        XCTAssertTrue(cpu.statusRegister[.interruptsDisabled])
     }
 
     func testStaZeroPage() {

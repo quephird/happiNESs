@@ -36,7 +36,7 @@ extension PPU {
         let nmiAfter = self.controllerRegister[.generateNmi]
 
         if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
-            self.nmiInterrupt = 1
+            self.bus!.triggerNmi()
         }
 
         let nametableBits = self.controllerRegister.rawValue & 0b0000_0011

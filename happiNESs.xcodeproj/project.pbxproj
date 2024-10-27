@@ -43,18 +43,29 @@
 		8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1902C1CC0C4001B44B5 /* CPU.swift */; };
 		8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1922C1D6D59001B44B5 /* StatusRegister.swift */; };
 		874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51912CB9B51C00B12037 /* CachedSprite.swift */; };
+		874F51A92CBEEBA700B12037 /* APU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51A82CBEEBA700B12037 /* APU.swift */; };
+		874F51AB2CBF036600B12037 /* RegisterBit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51AA2CBF036600B12037 /* RegisterBit.swift */; };
+		874F51AD2CBF05BC00B12037 /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51AC2CBF05BC00B12037 /* Register.swift */; };
+		874F51AF2CBF10DA00B12037 /* TriangleChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51AE2CBF10DA00B12037 /* TriangleChannel.swift */; };
+		874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B02CC03F1500B12037 /* RegisterBitMask.swift */; };
+		874F51B32CC0638500B12037 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B22CC0638500B12037 /* Speaker.swift */; };
+		874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B42CC1D05D00B12037 /* PulseChannel.swift */; };
+		874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */; };
+		875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */; };
 		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0662C386A2E006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
 		8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* RomTests.swift */; };
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
+		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
 		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
 		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
 		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81472C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
+		878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
 		87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* Mapper.swift */; };
 /* End PBXBuildFile section */
@@ -128,15 +139,26 @@
 		8744B1902C1CC0C4001B44B5 /* CPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPU.swift; sourceTree = "<group>"; };
 		8744B1922C1D6D59001B44B5 /* StatusRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusRegister.swift; sourceTree = "<group>"; };
 		874F51912CB9B51C00B12037 /* CachedSprite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedSprite.swift; sourceTree = "<group>"; };
+		874F51A82CBEEBA700B12037 /* APU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APU.swift; sourceTree = "<group>"; };
+		874F51AA2CBF036600B12037 /* RegisterBit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterBit.swift; sourceTree = "<group>"; };
+		874F51AC2CBF05BC00B12037 /* Register.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Register.swift; sourceTree = "<group>"; };
+		874F51AE2CBF10DA00B12037 /* TriangleChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriangleChannel.swift; sourceTree = "<group>"; };
+		874F51B02CC03F1500B12037 /* RegisterBitMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterBitMask.swift; sourceTree = "<group>"; };
+		874F51B22CC0638500B12037 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
+		874F51B42CC1D05D00B12037 /* PulseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseChannel.swift; sourceTree = "<group>"; };
+		874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRingBuffer.swift; sourceTree = "<group>"; };
+		875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMCChannel.swift; sourceTree = "<group>"; };
 		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
+		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
 		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
+		878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseChannel.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
 		87D265162C9DECAF00C143B1 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -176,6 +198,7 @@
 				8719320A2C3366A900A73C22 /* Console.swift */,
 				871931F12C30BB2900A73C22 /* ContentView.swift */,
 				8763D06B2C39E528006C1B4F /* Screen.swift */,
+				874F51B22CC0638500B12037 /* Speaker.swift */,
 				871931F32C30BB2C00A73C22 /* Assets.xcassets */,
 				871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */,
 				871931F52C30BB2C00A73C22 /* Preview Content */,
@@ -229,6 +252,8 @@
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				878C69722CAA424400DA9BD4 /* Address.swift */,
 				8744B18C2C1CB9F4001B44B5 /* AddressingMode.swift */,
+				874F51A82CBEEBA700B12037 /* APU.swift */,
+				874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */,
 				8719320F2C372F6900A73C22 /* Bus.swift */,
 				874F51912CB9B51C00B12037 /* CachedSprite.swift */,
 				871932132C3798B400A73C22 /* Cartridge.swift */,
@@ -237,6 +262,8 @@
 				870AABE32CB382E000E9F3B6 /* CPU+execution.swift */,
 				870AABDF2CB37EA000E9F3B6 /* CPU+instructions.swift */,
 				870AABE12CB381C100E9F3B6 /* CPU+memory.swift */,
+				875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */,
+				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				87D265162C9DECAF00C143B1 /* Mapper.swift */,
@@ -244,6 +271,7 @@
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				878D81462C815E760076ED30 /* NESError.swift */,
+				878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */,
 				87184D0D2C756BEB0003D090 /* OAMRegister.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
@@ -252,8 +280,13 @@
 				870AABD92CB34E3000E9F3B6 /* PPU+tracing.swift */,
 				870AABDB2CB3533700E9F3B6 /* PPU+IO.swift */,
 				87184D042C7028F10003D090 /* PPUStatusRegister.swift */,
+				874F51B42CC1D05D00B12037 /* PulseChannel.swift */,
+				874F51AC2CBF05BC00B12037 /* Register.swift */,
+				874F51AA2CBF036600B12037 /* RegisterBit.swift */,
+				874F51B02CC03F1500B12037 /* RegisterBitMask.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
+				874F51AE2CBF10DA00B12037 /* TriangleChannel.swift */,
 				871F62332C6541D300132962 /* UInt16+bytes.swift */,
 				87D265142C9146F400C143B1 /* ViewPort.swift */,
 			);
@@ -420,6 +453,7 @@
 				8763D06C2C39E528006C1B4F /* Screen.swift in Sources */,
 				8719320C2C3366B000A73C22 /* Console.swift in Sources */,
 				878D81482C815E760076ED30 /* NESError.swift in Sources */,
+				874F51B32CC0638500B12037 /* Speaker.swift in Sources */,
 				871931F22C30BB2900A73C22 /* ContentView.swift in Sources */,
 				871931F02C30BB2900A73C22 /* happiNESsApp.swift in Sources */,
 			);
@@ -435,22 +469,29 @@
 				870AABE22CB381C100E9F3B6 /* CPU+memory.swift in Sources */,
 				871F62302C62FE9E00132962 /* PPU.swift in Sources */,
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
+				878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */,
 				871F62362C65631F00132962 /* ControllerRegister.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
+				874F51A92CBEEBA700B12037 /* APU.swift in Sources */,
+				875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */,
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
 				874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */,
+				874F51AD2CBF05BC00B12037 /* Register.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
+				874F51AB2CBF036600B12037 /* RegisterBit.swift in Sources */,
 				870AABE42CB382E000E9F3B6 /* CPU+execution.swift in Sources */,
 				87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */,
 				870AABE02CB37EA000E9F3B6 /* CPU+instructions.swift in Sources */,
+				8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */,
 				87184D0E2C756BEB0003D090 /* OAMRegister.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
+				874F51AF2CBF10DA00B12037 /* TriangleChannel.swift in Sources */,
 				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
 				87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
@@ -459,6 +500,9 @@
 				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
+				874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */,
+				874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */,
+				874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

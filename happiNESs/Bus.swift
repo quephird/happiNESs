@@ -5,33 +5,43 @@
 //  Created by Danielle Kefford on 7/4/24.
 //
 
-public struct Bus {
+public class Bus {
     static let ramMirrorsBegin: UInt16 = 0x0000;
     static let ramMirrorsEnd: UInt16 = 0x1FFF;
     static let ppuRegistersMirrorsBegin: UInt16 = 0x2000;
     static let ppuRegistersMirrorsEnd: UInt16 = 0x3FFF;
 
+    public var cpu: CPU? = nil
     public var ppu: PPU
+    public var apu: APU
     var cartridge: Cartridge?
     var vram: [UInt8]
     var cycles: Int
     var joypad: Joypad
 
     public init() {
-        let ppu = PPU()
+        self.ppu = PPU()
+        // TODO: Need to explain this!!!
+        self.apu = APU(sampleRate: CPU.frequency / 44100.0)
 
-        self.ppu = ppu
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.cycles = 0
         self.joypad = Joypad()
+
+        // NOTA BENE: We need to do this because there needs to be
+        // bidirectional communication between the bus and both
+        // the PPU and APU.
+        self.ppu.bus = self
+        self.apu.dmc.bus = self
+        self.apu.bus = self
     }
 
-    mutating public func loadCartridge(cartridge: Cartridge) {
+    public func loadCartridge(cartridge: Cartridge) {
         self.cartridge = cartridge
         self.ppu.cartridge = cartridge
     }
 
-    mutating public func reset() {
+    public func reset() {
         self.ppu.reset()
     }
 }
@@ -68,7 +78,7 @@ extension Bus {
         }
     }
 
-    mutating func readByte(address: UInt16) -> UInt8 {
+    func readByte(address: UInt16) -> UInt8 {
         switch address {
         case 0x2002:
             return self.ppu.readStatus()
@@ -79,6 +89,8 @@ extension Bus {
         case 0x2008...Self.ppuRegistersMirrorsEnd:
             let mirrorDownAddress = address & 0b0010_0000_0000_0111
             return self.readByte(address: mirrorDownAddress)
+        case 0x4015:
+            return self.apu.readByte(address: address)
         case 0x4016:
             return self.joypad.readByte()
         default:
@@ -86,7 +98,7 @@ extension Bus {
         }
     }
 
-    mutating func writeByte(address: UInt16, byte: UInt8) {
+    func writeByte(address: UInt16, byte: UInt8) {
         switch address {
         case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
@@ -116,25 +128,33 @@ extension Bus {
                 buffer[index] = self.readByte(address: baseAddress + UInt16(index))
             }
             self.ppu.writeOamBuffer(buffer: buffer)
+        case 0x4000 ... 0x4008, 0x400A ... 0x400C, 0x400E ... 0x4013, 0x4015, 0x4017:
+            self.apu.writeByte(address: address, byte: byte)
         case 0x4016:
             self.joypad.writeByte(byte: byte)
         case 0x8000 ... 0xFFFF:
             self.cartridge!.writeByte(address: address, byte: byte)
         default:
-            // TODO: Implement memory writing to these addresses?
             break
         }
     }
 }
 
 extension Bus {
-    mutating func tick(cycles: Int) -> Bool {
+    func tick(cycles: Int) -> Bool {
         self.cycles += cycles
 
+        self.apu.tick(cpuCycles: cycles)
         return self.ppu.tick(cpuCycles: cycles)
     }
 
-    mutating func pollNmiStatus() -> UInt8? {
-        return self.ppu.pollNmiInterrupt()
+    public func triggerNmi() {
+        self.cpu!.interrupt = .nmi
+    }
+
+    public func triggerIrq() {
+        if !self.cpu!.statusRegister[.interruptsDisabled] {
+            self.cpu!.interrupt = .irq
+        }
     }
 }

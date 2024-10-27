@@ -23,6 +23,7 @@ import SwiftUI
         KeyEquivalent("s") : .buttonB,
     ]
 
+    private var speaker: Speaker
     var cartridgeLoaded: Bool = false
     var displayTimer: Timer!
 
@@ -38,6 +39,8 @@ import SwiftUI
         let bus = Bus()
         let cpu = CPU(bus: bus, tracingOn: false)
         self.cpu = cpu
+
+        self.speaker = try Speaker(inputBuffer: cpu.bus.apu.buffer)
     }
 
     public func runGame(fileUrl: URL) throws {
