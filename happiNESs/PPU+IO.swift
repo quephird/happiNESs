@@ -128,9 +128,9 @@ extension PPU {
         // From there, we can add the nametable offset to get the actual address.
         // (For now, this emulator only handles vertical and horizontal mirroring.)
         let actualNametableIndexStart = switch (self.cartridge!.mirroring, nameTableIndex) {
-        case (_, 0), (.horizontal, 1), (.vertical, 2):
-            0
-        case (.horizontal, 2), (.vertical, 1), (_, 3):
+        case (_, 0), (.horizontal, 1), (.vertical, 2), (.singleScreen0, _):
+            0x0000
+        case (.horizontal, 2), (.vertical, 1), (_, 3), (.singleScreen1, _):
             0x0400
         default:
             fatalError("Invalid nametable index")
