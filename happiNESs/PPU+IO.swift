@@ -192,7 +192,7 @@ extension PPU {
         let mirroredAddress = address % 0x4000
         switch mirroredAddress {
         case 0x0000 ... 0x1FFF:
-            return (self.cartridge!.readChr(address: mirroredAddress), true)
+            return (self.cartridge!.readByte(address: mirroredAddress), true)
         case 0x2000 ... 0x3EFF:
             return (self.vram[self.vramIndex(from: mirroredAddress)], true)
         case 0x3F00 ... 0x3FFF:

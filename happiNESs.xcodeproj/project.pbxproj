@@ -248,6 +248,7 @@
 		8744B1742C1CB9B3001B44B5 /* happiNESs */ = {
 			isa = PBXGroup;
 			children = (
+				8771BFA92CD03E6200306E13 /* Mappers */,
 				8744B1752C1CB9B3001B44B5 /* happiNESs.h */,
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				878C69722CAA424400DA9BD4 /* Address.swift */,
@@ -301,6 +302,13 @@
 				8763D0692C39B719006C1B4F /* RomTests.swift */,
 			);
 			path = happiNESsTests;
+			sourceTree = "<group>";
+		};
+		8771BFA92CD03E6200306E13 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Mappers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

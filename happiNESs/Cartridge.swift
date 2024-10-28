@@ -61,6 +61,18 @@ public class Cartridge {
         self.chrBankIndex = 0
     }
 
+    public func readByte(address: UInt16) -> UInt8 {
+        switch address {
+        case 0x0000 ... 0x1FFF:
+            return mapper.readChr(address: address, cartridge: self)
+        case 0x8000 ... 0xFFFF:
+            return mapper.readPrg(address: address, cartridge: self)
+        default:
+            print("Attempted to read cartridge at address: \(address)")
+            return 0x00
+        }
+    }
+
     public func writeByte(address: UInt16, byte: UInt8) {
         switch self.mapper {
         case .nrom:
@@ -76,17 +88,17 @@ public class Cartridge {
         }
     }
 
-    public func readPrg(address: UInt16) -> UInt8 {
-        mapper.readPrg(address: address, cartridge: self)
-    }
+//    public func readPrg(address: UInt16) -> UInt8 {
+//        mapper.readPrg(address: address, cartridge: self)
+//    }
 
     public func writePrg(address: UInt16, byte: UInt8) {
         mapper.writePrg(address: address, byte: byte, cartridge: self)
     }
 
-    public func readChr(address: UInt16) -> UInt8 {
-        mapper.readChr(address: address, cartridge: self)
-    }
+//    public func readChr(address: UInt16) -> UInt8 {
+//        mapper.readChr(address: address, cartridge: self)
+//    }
 
     public func readTileFromChr(startAddress: UInt16) -> ArraySlice<UInt8> {
         mapper.readTileFromChr(startAddress: startAddress, cartridge: self)
