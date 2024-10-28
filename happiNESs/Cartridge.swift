@@ -69,6 +69,10 @@ public class Cartridge {
             self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
         case .cnrom:
             self.mapper.setChrBankIndex(byte: byte, cartridge: self)
+        case .axrom:
+            let mirrorBit = (byte & 0b0001_0000) >> 4
+            self.mirroring = mirrorBit == 1 ? .singleScreen1 : .singleScreen0
+            self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
         }
     }
 

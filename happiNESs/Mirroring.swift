@@ -8,5 +8,7 @@
 public enum Mirroring {
     case vertical
     case horizontal
+    case singleScreen0
+    case singleScreen1
     case fourScreen
 }
