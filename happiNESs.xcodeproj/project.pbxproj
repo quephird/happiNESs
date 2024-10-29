@@ -67,7 +67,12 @@
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
-		87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* Mapper.swift */; };
+		87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* MapperNumber.swift */; };
+		87E981472CD076660090A200 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981462CD076660090A200 /* Mapper.swift */; };
+		87E981492CD0772A0090A200 /* Nrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981482CD0772A0090A200 /* Nrom.swift */; };
+		87E9814B2CD0916A0090A200 /* Cnrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814A2CD0916A0090A200 /* Cnrom.swift */; };
+		87E9814D2CD098680090A200 /* Uxrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814C2CD098680090A200 /* Uxrom.swift */; };
+		87E9814F2CD09BF70090A200 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814E2CD09BF70090A200 /* Axrom.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -160,7 +165,12 @@
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
 		878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseChannel.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
-		87D265162C9DECAF00C143B1 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
+		87D265162C9DECAF00C143B1 /* MapperNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapperNumber.swift; sourceTree = "<group>"; };
+		87E981462CD076660090A200 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
+		87E981482CD0772A0090A200 /* Nrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nrom.swift; sourceTree = "<group>"; };
+		87E9814A2CD0916A0090A200 /* Cnrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cnrom.swift; sourceTree = "<group>"; };
+		87E9814C2CD098680090A200 /* Uxrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uxrom.swift; sourceTree = "<group>"; };
+		87E9814E2CD09BF70090A200 /* Axrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -267,7 +277,8 @@
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
-				87D265162C9DECAF00C143B1 /* Mapper.swift */,
+				87E981462CD076660090A200 /* Mapper.swift */,
+				87D265162C9DECAF00C143B1 /* MapperNumber.swift */,
 				87184D092C7511F90003D090 /* MaskRegister.swift */,
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
@@ -307,6 +318,10 @@
 		8771BFA92CD03E6200306E13 /* Mappers */ = {
 			isa = PBXGroup;
 			children = (
+				87E9814E2CD09BF70090A200 /* Axrom.swift */,
+				87E9814A2CD0916A0090A200 /* Cnrom.swift */,
+				87E981482CD0772A0090A200 /* Nrom.swift */,
+				87E9814C2CD098680090A200 /* Uxrom.swift */,
 			);
 			path = Mappers;
 			sourceTree = "<group>";
@@ -472,6 +487,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */,
+				87E9814D2CD098680090A200 /* Uxrom.swift in Sources */,
 				870AABDC2CB3533700E9F3B6 /* PPU+IO.swift in Sources */,
 				870AABDE2CB36D4100E9F3B6 /* PPU+rendering.swift in Sources */,
 				870AABE22CB381C100E9F3B6 /* CPU+memory.swift in Sources */,
@@ -490,6 +506,7 @@
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
+				87E981472CD076660090A200 /* Mapper.swift in Sources */,
 				874F51AB2CBF036600B12037 /* RegisterBit.swift in Sources */,
 				870AABE42CB382E000E9F3B6 /* CPU+execution.swift in Sources */,
 				87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */,
@@ -501,16 +518,19 @@
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
 				874F51AF2CBF10DA00B12037 /* TriangleChannel.swift in Sources */,
 				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
-				87D265172C9DECAF00C143B1 /* Mapper.swift in Sources */,
+				87E981492CD0772A0090A200 /* Nrom.swift in Sources */,
+				87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,
 				870AABDA2CB34E3000E9F3B6 /* PPU+tracing.swift in Sources */,
 				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
+				87E9814B2CD0916A0090A200 /* Cnrom.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 				874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */,
 				874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */,
 				874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */,
+				87E9814F2CD09BF70090A200 /* Axrom.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

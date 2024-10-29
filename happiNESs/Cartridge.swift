@@ -36,10 +36,10 @@ public class Cartridge {
         }
 
         let mapperNumber = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
-        guard let mapper = Mapper(rawValue: mapperNumber) else {
+        guard let mapperNumber = MapperNumber(rawValue: mapperNumber) else {
             throw NESError.mapperNotSupported(Int(mapperNumber))
         }
-        self.mapper = mapper
+        self.mapper = mapperNumber.makeMapper()
 
         let prgRomSize = Int(bytes[4]) * Self.prgMemoryPageSize
         let chrRomSize = Int(bytes[5]) * Self.chrMemoryPageSize
@@ -54,44 +54,19 @@ public class Cartridge {
         }
 
         self.mirroring = mirroring
-        self.mapper = mapper
         self.prgMemory = prgMemory
         self.prgBankIndex = 0
         self.chrMemory = chrMemory
         self.chrBankIndex = 0
+
+        self.mapper.cartridge = self
     }
 
     public func readByte(address: UInt16) -> UInt8 {
-        switch address {
-        case 0x0000 ... 0x1FFF:
-            return mapper.readChr(address: address, cartridge: self)
-        case 0x8000 ... 0xFFFF:
-            return mapper.readPrg(address: address, cartridge: self)
-        default:
-            print("Attempted to read cartridge at address: \(address)")
-            return 0x00
-        }
+        return self.mapper.readByte(address: address)
     }
 
     public func writeByte(address: UInt16, byte: UInt8) {
-        switch address {
-        case 0x0000 ... 0x1FFF:
-            self.mapper.writeChr(address: address, byte: byte, cartridge: self)
-        case 0x8000 ... 0xFFFF:
-            switch self.mapper {
-            case .nrom:
-                break
-            case .uxrom:
-                self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
-            case .cnrom:
-                self.mapper.setChrBankIndex(byte: byte, cartridge: self)
-            case .axrom:
-                self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
-                let mirrorBit = (byte & 0b0001_0000) >> 4
-                self.mirroring = mirrorBit == 1 ? .singleScreen1 : .singleScreen0
-            }
-        default:
-            print("Attempted to write to cartridge at address: \(address)")
-        }
+        self.mapper.writeByte(address: address, byte: byte)
     }
 }
