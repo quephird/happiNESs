@@ -69,13 +69,6 @@ public enum Mapper: UInt8 {
         }
     }
 
-    public func writePrg(address: UInt16, byte: UInt8, cartridge: Cartridge) {
-        switch self {
-        case .nrom, .uxrom, .cnrom, .axrom:
-            logIgnoredWrite(address: address, byte: byte, inChr: false)
-        }
-    }
-
     private func chrMemoryIndex(for address: UInt16, cartridge: Cartridge) -> Int {
         switch self {
         case .nrom, .uxrom, .axrom:
@@ -100,11 +93,6 @@ public enum Mapper: UInt8 {
     public func readChr(address: UInt16, cartridge: Cartridge) -> UInt8 {
         let memoryIndex = self.chrMemoryIndex(for: address, cartridge: cartridge)
         return cartridge.chrMemory[memoryIndex]
-    }
-
-    public func readTileFromChr(startAddress: UInt16, cartridge: Cartridge) -> ArraySlice<UInt8> {
-        let startMemoryIndex = self.chrMemoryIndex(for: startAddress, cartridge: cartridge)
-        return cartridge.chrMemory[startMemoryIndex ..< startMemoryIndex + 16]
     }
 
     public func writeChr(address: UInt16, byte: UInt8, cartridge: Cartridge) {

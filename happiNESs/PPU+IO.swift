@@ -231,7 +231,7 @@ extension PPU {
 
         switch address {
         case 0x0000 ... 0x1FFF:
-            self.cartridge!.writeChr(address: address, byte: byte)
+            self.cartridge!.writeByte(address: address, byte: byte)
         case 0x2000 ... 0x3EFF:
             self.vram[self.vramIndex(from: address)] = byte
         case 0x3F00 ... 0x3FFF:

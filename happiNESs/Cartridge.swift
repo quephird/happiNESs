@@ -74,37 +74,24 @@ public class Cartridge {
     }
 
     public func writeByte(address: UInt16, byte: UInt8) {
-        switch self.mapper {
-        case .nrom:
-            break
-        case .uxrom:
-            self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
-        case .cnrom:
-            self.mapper.setChrBankIndex(byte: byte, cartridge: self)
-        case .axrom:
-            let mirrorBit = (byte & 0b0001_0000) >> 4
-            self.mirroring = mirrorBit == 1 ? .singleScreen1 : .singleScreen0
-            self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
+        switch address {
+        case 0x0000 ... 0x1FFF:
+            self.mapper.writeChr(address: address, byte: byte, cartridge: self)
+        case 0x8000 ... 0xFFFF:
+            switch self.mapper {
+            case .nrom:
+                break
+            case .uxrom:
+                self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
+            case .cnrom:
+                self.mapper.setChrBankIndex(byte: byte, cartridge: self)
+            case .axrom:
+                self.mapper.setPrgBankIndex(byte: byte, cartridge: self)
+                let mirrorBit = (byte & 0b0001_0000) >> 4
+                self.mirroring = mirrorBit == 1 ? .singleScreen1 : .singleScreen0
+            }
+        default:
+            print("Attempted to write to cartridge at address: \(address)")
         }
-    }
-
-//    public func readPrg(address: UInt16) -> UInt8 {
-//        mapper.readPrg(address: address, cartridge: self)
-//    }
-
-    public func writePrg(address: UInt16, byte: UInt8) {
-        mapper.writePrg(address: address, byte: byte, cartridge: self)
-    }
-
-//    public func readChr(address: UInt16) -> UInt8 {
-//        mapper.readChr(address: address, cartridge: self)
-//    }
-
-    public func readTileFromChr(startAddress: UInt16) -> ArraySlice<UInt8> {
-        mapper.readTileFromChr(startAddress: startAddress, cartridge: self)
-    }
-
-    public func writeChr(address: UInt16, byte: UInt8) {
-        mapper.writeChr(address: address, byte: byte, cartridge: self)
     }
 }
