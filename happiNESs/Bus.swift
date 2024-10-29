@@ -47,10 +47,6 @@ public class Bus {
 }
 
 extension Bus {
-    private func readPrg(address: UInt16) -> UInt8 {
-        return self.cartridge!.readPrg(address: address)
-    }
-
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
     func readByteWithoutMutating(address: UInt16) -> UInt8 {
         switch address {
@@ -71,7 +67,7 @@ extension Bus {
         case 0x4016:
             return self.joypad.readByteWithoutMutating()
         case 0x8000 ... 0xFFFF:
-            return self.readPrg(address: address)
+            return self.cartridge!.readByte(address: address)
         default:
             // TODO: Implement memory reading from these addresses?
             return 0x00
