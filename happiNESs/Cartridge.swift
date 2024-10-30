@@ -11,7 +11,8 @@ public class Cartridge {
     static let chrMemoryPageSize: Int = 8192
 
     public var mirroring: Mirroring
-    public var mapper: Mapper
+    public var mapperNumber: MapperNumber
+    public var mapper: Mapper?
     public var prgMemory: [UInt8]
     public var prgBankIndex: Int
     public var chrMemory: [UInt8]
@@ -35,11 +36,11 @@ public class Cartridge {
         case (false, false): .horizontal
         }
 
-        let mapperNumber = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
-        guard let mapperNumber = MapperNumber(rawValue: mapperNumber) else {
-            throw NESError.mapperNotSupported(Int(mapperNumber))
+        let mapperByte = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
+        guard let mapperNumber = MapperNumber(rawValue: mapperByte) else {
+            throw NESError.mapperNotSupported(Int(mapperByte))
         }
-        self.mapper = mapperNumber.makeMapper()
+        self.mapperNumber = mapperNumber
 
         let prgRomSize = Int(bytes[4]) * Self.prgMemoryPageSize
         let chrRomSize = Int(bytes[5]) * Self.chrMemoryPageSize
@@ -58,15 +59,13 @@ public class Cartridge {
         self.prgBankIndex = 0
         self.chrMemory = chrMemory
         self.chrBankIndex = 0
-
-        self.mapper.cartridge = self
     }
 
     public func readByte(address: UInt16) -> UInt8 {
-        return self.mapper.readByte(address: address)
+        return self.mapper!.readByte(address: address)
     }
 
     public func writeByte(address: UInt16, byte: UInt8) {
-        self.mapper.writeByte(address: address, byte: byte)
+        self.mapper!.writeByte(address: address, byte: byte)
     }
 }

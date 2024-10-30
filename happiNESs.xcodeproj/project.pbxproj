@@ -73,6 +73,7 @@
 		87E9814B2CD0916A0090A200 /* Cnrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814A2CD0916A0090A200 /* Cnrom.swift */; };
 		87E9814D2CD098680090A200 /* Uxrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814C2CD098680090A200 /* Uxrom.swift */; };
 		87E9814F2CD09BF70090A200 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814E2CD09BF70090A200 /* Axrom.swift */; };
+		87E981512CD0C45A0090A200 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981502CD0C45A0090A200 /* Mmc1.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +172,7 @@
 		87E9814A2CD0916A0090A200 /* Cnrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cnrom.swift; sourceTree = "<group>"; };
 		87E9814C2CD098680090A200 /* Uxrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uxrom.swift; sourceTree = "<group>"; };
 		87E9814E2CD09BF70090A200 /* Axrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
+		87E981502CD0C45A0090A200 /* Mmc1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -320,6 +322,7 @@
 			children = (
 				87E9814E2CD09BF70090A200 /* Axrom.swift */,
 				87E9814A2CD0916A0090A200 /* Cnrom.swift */,
+				87E981502CD0C45A0090A200 /* Mmc1.swift */,
 				87E981482CD0772A0090A200 /* Nrom.swift */,
 				87E9814C2CD098680090A200 /* Uxrom.swift */,
 			);
@@ -519,6 +522,7 @@
 				874F51AF2CBF10DA00B12037 /* TriangleChannel.swift in Sources */,
 				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
 				87E981492CD0772A0090A200 /* Nrom.swift in Sources */,
+				87E981512CD0C45A0090A200 /* Mmc1.swift in Sources */,
 				87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,

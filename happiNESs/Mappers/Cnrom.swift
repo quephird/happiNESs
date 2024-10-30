@@ -6,22 +6,22 @@
 //
 
 struct Cnrom: Mapper {
-    public var cartridge: Cartridge? = nil
+    public var cartridge: Cartridge
 
     public func readByte(address: UInt16) -> UInt8 {
         switch address {
         case 0x0000 ... 0x1FFF:
-            let memoryIndex = cartridge!.chrBankIndex * 0x2000 + Int(address)
-            return cartridge!.chrMemory[memoryIndex]
+            let memoryIndex = self.cartridge.chrBankIndex * 0x2000 + Int(address)
+            return self.cartridge.chrMemory[memoryIndex]
         case 0x8000 ... 0xFFFF:
             var memoryIndex = address - 0x8000
 
             // Mirror if needed
-            if cartridge!.prgMemory.count == 0x4000 {
+            if self.cartridge.prgMemory.count == 0x4000 {
                 memoryIndex = memoryIndex % 0x4000
             }
 
-            return cartridge!.prgMemory[Int(memoryIndex)]
+            return self.cartridge.prgMemory[Int(memoryIndex)]
         default:
             print("Attempted to read cartridge at address: \(address)")
             return 0x00
@@ -34,7 +34,7 @@ struct Cnrom: Mapper {
             break
         case 0x8000 ... 0xFFFF:
             let bankIndex = byte & 0b0000_0011
-            self.cartridge!.chrBankIndex = Int(bankIndex)
+            self.cartridge.chrBankIndex = Int(bankIndex)
         default:
             print("Attempted to write to NROM cartridge at address: \(address)")
         }
