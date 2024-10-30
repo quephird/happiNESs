@@ -12,11 +12,12 @@ public class Cartridge {
 
     public var mirroring: Mirroring
     public var mapperNumber: MapperNumber
-    public var mapper: Mapper?
     public var prgMemory: [UInt8]
     public var prgBankIndex: Int
     public var chrMemory: [UInt8]
     public var chrBankIndex: Int
+
+    public lazy var mapper: Mapper = mapperNumber.makeMapper(cartridge: self)
 
     public init(bytes: [UInt8]) throws {
         if Array(bytes[0..<4]) != Self.nesTag {
@@ -62,10 +63,10 @@ public class Cartridge {
     }
 
     public func readByte(address: UInt16) -> UInt8 {
-        return self.mapper!.readByte(address: address)
+        return self.mapper.readByte(address: address)
     }
 
     public func writeByte(address: UInt16, byte: UInt8) {
-        self.mapper!.writeByte(address: address, byte: byte)
+        self.mapper.writeByte(address: address, byte: byte)
     }
 }

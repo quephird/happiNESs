@@ -47,8 +47,6 @@ import SwiftUI
         let data: Data = try Data(contentsOf: fileUrl)
         let romBytes = [UInt8](data)
         let cartridge = try Cartridge(bytes: romBytes)
-        let mapper = cartridge.mapperNumber.makeMapper(cartridge: cartridge)
-        cartridge.mapper = mapper
 
         self.cpu.loadCartridge(cartridge: cartridge)
         self.cartridgeLoaded = true
