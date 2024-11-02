@@ -154,29 +154,28 @@ public struct PPU {
     }
 
     mutating func updateCycles() {
-        // NOTA BENE: Per this section of the NESDev wiki, we need to skip
-        // a cycle every other frame
-        //
-        //     https://www.nesdev.org/wiki/PPU_frame_timing#Even/Odd_Frames
-        if self.isBackgroundEnabled {
-            if self.isOddFrame && self.isPreRenderLine && self.isJustBeforeLastCycle {
+        switch (self.isOddFrame, self.isPreRenderLine, self.cycles) {
+        case (true, true, 339):
+            // NOTA BENE: Per this section of the NESDev wiki, we need to skip
+            // a cycle every other frame
+            //
+            //     https://www.nesdev.org/wiki/PPU_frame_timing#Even/Odd_Frames
+            if self.isBackgroundEnabled {
                 self.cycles = 0
                 self.scanline = 0
                 self.isOddFrame = !self.isOddFrame
-                return
+            } else {
+                self.cycles += 1
             }
-        }
-
-        self.cycles += 1
-
-        if self.isPastLastCycle {
+        case (_, true, 340):
+            self.cycles = 0
+            self.scanline = 0
+            self.isOddFrame = !self.isOddFrame
+        case (_, _, 340):
             self.cycles = 0
             self.scanline += 1
-
-            if self.isPastPreRenderLine {
-                self.scanline = 0
-                self.isOddFrame = !self.isOddFrame
-            }
+        default:
+            self.cycles += 1
         }
     }
 
