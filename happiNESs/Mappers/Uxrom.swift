@@ -6,7 +6,7 @@
 //
 
 struct Uxrom: Mapper {
-    public var cartridge: Cartridge
+    public unowned var cartridge: Cartridge
 
     public func readByte(address: UInt16) -> UInt8 {
         switch address {
