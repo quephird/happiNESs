@@ -41,7 +41,7 @@ extension PPU {
         //
         //     https://www.nesdev.org/wiki/NMI#Operation
         if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
-            self.bus!.triggerNmi()
+            self.queueNmi()
         }
 
         let nametableBits = self.controllerRegister.rawValue & 0b0000_0011

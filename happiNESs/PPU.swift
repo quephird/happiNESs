@@ -37,6 +37,7 @@ public struct PPU {
     public var wRegister: Bool = false
 
     public var isEvenFrame: Bool = true
+    public var nmiDelay: Int = 0
     public var cycles: Int
     public var scanline: Int
 
@@ -77,6 +78,7 @@ public struct PPU {
 
         self.cycles = 0
         self.scanline = 0
+        self.nmiDelay = 0
 
         self.nextSharedAddress = 0x0000
         self.currentSharedAddress = 0x0000
@@ -130,6 +132,24 @@ public struct PPU {
         self.statusRegister[.spriteZeroHit]
     }
 
+    // NOTA BENE: The NMI needs to be fired only after the _following_
+    // instruction is completed, simulating the delay in the actual
+    // NES hardware. In other words, the PPU doesn't directly and immediately
+    // trigger an NMI in the CPU. This corresponds with two calls
+    // to PPU's `tick()` function.
+    mutating func queueNmi() {
+        self.nmiDelay = 2
+    }
+
+    mutating func checkNmiQueue() {
+        if self.nmiDelay > 0 {
+            self.nmiDelay -= 1
+            if self.nmiDelay == 0 {
+                self.bus!.triggerNmi()
+            }
+        }
+    }
+
     mutating func updateCycles() {
         // NOTA BENE: Per this section of the NESDev wiki, we need to skip
         // a cycle every other frame
@@ -164,6 +184,8 @@ public struct PPU {
     mutating func tick(cpuCycles: Int) -> Bool {
         var redrawScreen = false
 
+        self.checkNmiQueue()
+
         for _ in 0 ..< cpuCycles * 3 {
             self.updateCycles()
 
@@ -184,7 +206,7 @@ public struct PPU {
                     self.statusRegister[.verticalBlankStarted] = true
 
                     if self.controllerRegister[.generateNmi] {
-                        self.bus!.triggerNmi()
+                        self.queueNmi()
                     }
 
                     redrawScreen = true
