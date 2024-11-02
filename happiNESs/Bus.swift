@@ -124,6 +124,11 @@ extension Bus {
                 buffer[index] = self.readByte(address: baseAddress + UInt16(index))
             }
             self.ppu.writeOamBuffer(buffer: buffer)
+
+            self.cpu!.stall += 513
+            if self.cycles%2 == 1 {
+                self.cpu!.stall += 1
+            }
         case 0x4000 ... 0x4008, 0x400A ... 0x400C, 0x400E ... 0x4013, 0x4015, 0x4017:
             self.apu.writeByte(address: address, byte: byte)
         case 0x4016:

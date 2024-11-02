@@ -23,6 +23,7 @@ public class CPU {
     public var programCounter: UInt16
     public var bus: Bus
     public var interrupt: Interrupt = .none
+    public var stall: Int = 0
 
     public var tracingOn: Bool
 
@@ -51,6 +52,7 @@ public class CPU {
         self.stackPointer = Self.resetStackPointerValue
         self.programCounter = self.readWord(address: Self.resetVectorAddress)
         self.interrupt = .none
+        self.stall = 0
 
         self.bus.reset()
         // TODO: Look more deeply into whether or not this is the best strategy
