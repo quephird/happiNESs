@@ -122,8 +122,8 @@ public struct PPU {
     var isFetchCycle: Bool {
         self.isVisibleCycle || self.isPrefetchCycle
     }
-    var isOnLastCycle: Bool {
-        self.cycles == Self.ppuCyclesPerScanline
+    var isJustBeforeLastCycle: Bool {
+        self.cycles == Self.ppuCyclesPerScanline - 1
     }
     var isPastLastCycle: Bool {
         self.cycles > Self.ppuCyclesPerScanline
@@ -156,7 +156,7 @@ public struct PPU {
         //
         //     https://www.nesdev.org/wiki/PPU_frame_timing#Even/Odd_Frames
         if self.isRenderingEnabled {
-            if self.isEvenFrame && self.isPreRenderLine && self.isOnLastCycle {
+            if self.isEvenFrame && self.isPreRenderLine && self.isJustBeforeLastCycle {
                 self.cycles = 0
                 self.scanline = 0
                 self.isEvenFrame = !self.isEvenFrame
