@@ -36,7 +36,7 @@ public struct PPU {
     // This register is also shared by PPUADDR/PPUSCROLL
     public var wRegister: Bool = false
 
-    public var isEvenFrame: Bool = true
+    public var isOddFrame: Bool = false
     public var nmiDelay: Int = 0
     public var cycles: Int
     public var scanline: Int
@@ -88,6 +88,9 @@ public struct PPU {
     // Various computed properties used across multiple concerns
     var isRenderingEnabled: Bool {
         self.maskRegister[.showBackground] || self.maskRegister[.showSprites]
+    }
+    var isBackgroundEnabled: Bool {
+        self.maskRegister[.showBackground]
     }
     var isVisibleLine: Bool {
         self.scanline < Self.height
@@ -155,11 +158,11 @@ public struct PPU {
         // a cycle every other frame
         //
         //     https://www.nesdev.org/wiki/PPU_frame_timing#Even/Odd_Frames
-        if self.isRenderingEnabled {
-            if self.isEvenFrame && self.isPreRenderLine && self.isJustBeforeLastCycle {
+        if self.isBackgroundEnabled {
+            if self.isOddFrame && self.isPreRenderLine && self.isJustBeforeLastCycle {
                 self.cycles = 0
                 self.scanline = 0
-                self.isEvenFrame = !self.isEvenFrame
+                self.isOddFrame = !self.isOddFrame
                 return
             }
         }
@@ -172,7 +175,7 @@ public struct PPU {
 
             if self.isPastPreRenderLine {
                 self.scanline = 0
-                self.isEvenFrame = !self.isEvenFrame
+                self.isOddFrame = !self.isOddFrame
             }
         }
     }
