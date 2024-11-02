@@ -74,8 +74,8 @@ public class CPU {
         self.pushStack(byte: copy.rawValue)
         self.statusRegister[.interruptsDisabled] = true
 
-        let _ = self.bus.tick(cycles: 2)
         self.programCounter = self.readWord(address: Self.nmiVectorAddress)
+        let _ = self.bus.tick(cycles: 7)
     }
 
     public func handleIrq() {
@@ -88,7 +88,7 @@ public class CPU {
         self.pushStack(byte: copy.rawValue)
         self.statusRegister[.interruptsDisabled] = true
 
-        let _ = self.bus.tick(cycles: 2)
         self.programCounter = self.readWord(address: Self.interruptVectorAddress)
+        let _ = self.bus.tick(cycles: 7)
     }
 }
