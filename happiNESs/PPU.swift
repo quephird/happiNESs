@@ -36,6 +36,7 @@ public struct PPU {
     // This register is also shared by PPUADDR/PPUSCROLL
     public var wRegister: Bool = false
 
+    public var isEvenFrame: Bool = true
     public var cycles: Int
     public var scanline: Int
 
@@ -119,6 +120,9 @@ public struct PPU {
     var isFetchCycle: Bool {
         self.isVisibleCycle || self.isPrefetchCycle
     }
+    var isOnLastCycle: Bool {
+        self.cycles == Self.ppuCyclesPerScanline
+    }
     var isPastLastCycle: Bool {
         self.cycles > Self.ppuCyclesPerScanline
     }
@@ -126,22 +130,42 @@ public struct PPU {
         self.statusRegister[.spriteZeroHit]
     }
 
+    mutating func updateCycles() {
+        // NOTA BENE: Per this section of the NESDev wiki, we need to skip
+        // a cycle every other frame
+        //
+        //     https://www.nesdev.org/wiki/PPU_frame_timing#Even/Odd_Frames
+        if self.isRenderingEnabled {
+            if self.isEvenFrame && self.isPreRenderLine && self.isOnLastCycle {
+                self.cycles = 0
+                self.scanline = 0
+                self.isEvenFrame = !self.isEvenFrame
+                return
+            }
+        }
+
+        self.cycles += 1
+
+        if self.isPastLastCycle {
+            self.cycles = 0
+            self.scanline += 1
+
+            if self.isPastPreRenderLine {
+                self.scanline = 0
+                self.isEvenFrame = !self.isEvenFrame
+            }
+        }
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
+    //
+    // TODO: Need to rename this function and the one in APU as well
     mutating func tick(cpuCycles: Int) -> Bool {
         var redrawScreen = false
 
         for _ in 0 ..< cpuCycles * 3 {
-            self.cycles += 1
-
-            if self.isPastLastCycle {
-                self.cycles = 0
-                self.scanline += 1
-
-                if self.isPastPreRenderLine {
-                    self.scanline = 0
-                }
-            }
+            self.updateCycles()
 
             if self.isRenderingEnabled {
                 if self.isVisibleLine && self.isVisibleCycle {
