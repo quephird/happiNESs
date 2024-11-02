@@ -35,6 +35,11 @@ extension PPU {
         self.controllerRegister.update(byte: byte)
         let nmiAfter = self.controllerRegister[.generateNmi]
 
+        // NOTA BENE: Per what is stated in this section on the NESDev wiki,
+        // if the NMI enabled flag is toggled when VBL is set, then we need to
+        // generate an NMI interrupt.
+        //
+        //     https://www.nesdev.org/wiki/NMI#Operation
         if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
             self.bus!.triggerNmi()
         }
