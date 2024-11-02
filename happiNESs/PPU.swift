@@ -11,7 +11,7 @@ public struct PPU {
     public static let height = 240
 
     public static let scanlinesPerFrame = 261
-    public static let ppuCyclesPerScanline = 341
+    public static let ppuCyclesPerScanline = 340
     public static let nmiInterruptScanline = 241
 
     public static let ppuAddressSpaceStart: UInt16 = 0x2000
