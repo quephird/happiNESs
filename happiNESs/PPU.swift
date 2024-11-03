@@ -136,12 +136,13 @@ public struct PPU {
     }
 
     // NOTA BENE: The NMI needs to be fired only after the _following_
-    // instruction is completed, simulating the delay in the actual
+    // CPU instruction is completed, simulating the delay in the actual
     // NES hardware. In other words, the PPU doesn't directly and immediately
-    // trigger an NMI in the CPU. This corresponds with two calls
-    // to PPU's `tick()` function.
+    // trigger an NMI in the CPU. This delay corresponds roughly with the
+    // execution of two CPU instructions, namely the current one and the
+    // next one.
     mutating func queueNmi() {
-        self.nmiDelay = 2
+        self.nmiDelay = 14
     }
 
     mutating func checkNmiQueue() {
@@ -186,9 +187,8 @@ public struct PPU {
     mutating func tick(cpuCycles: Int) -> Bool {
         var redrawScreen = false
 
-        self.checkNmiQueue()
-
         for _ in 0 ..< cpuCycles * 3 {
+            self.checkNmiQueue()
             self.updateCycles()
 
             if self.isRenderingEnabled {
