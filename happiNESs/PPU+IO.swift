@@ -16,6 +16,14 @@ extension PPU {
         self.statusRegister[.verticalBlankStarted] = false
         self.wRegister = false
 
+        // ACHTUNG! This implementation is taken from a thread on the NESDev forums
+        // on the topic of suppression of VBL under certain circumstances:
+        //
+        //     https://forums.nesdev.org/viewtopic.php?p=120121
+        if self.isNmiScanline && self.cycles == 1 {
+            self.suppressVerticalBlank = true
+        }
+
         return result
     }
 

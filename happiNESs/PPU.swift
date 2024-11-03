@@ -29,6 +29,7 @@ public struct PPU {
     public var maskRegister: MaskRegister
     public var oamRegister: OAMRegister
     public var statusRegister: PPUStatusRegister
+    public var suppressVerticalBlank: Bool = false
 
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
     public var nextSharedAddress: Address = 0
@@ -77,6 +78,7 @@ public struct PPU {
         self.maskRegister.reset()
         self.oamRegister.reset()
         self.statusRegister.reset()
+        self.suppressVerticalBlank = false
 
         self.cycles = 0
         self.scanline = 0
@@ -177,6 +179,7 @@ public struct PPU {
                 self.handleNewFrame()
             } else {
                 self.cycles += 1
+                self.frameCycles += 1
             }
         case (_, true, 340):
             self.handleNewFrame()
@@ -215,7 +218,11 @@ public struct PPU {
 
             if self.cycles == 1 {
                 if self.isNmiScanline {
-                    self.statusRegister[.verticalBlankStarted] = true
+                    if self.suppressVerticalBlank {
+                        self.suppressVerticalBlank = false
+                    } else {
+                        self.statusRegister[.verticalBlankStarted] = true
+                    }
 
                     if self.controllerRegister[.generateNmi] {
                         self.queueNmi()
