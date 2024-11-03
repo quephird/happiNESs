@@ -108,19 +108,19 @@ public struct PPU {
         self.isVisibleLine || self.isPreRenderLine
     }
     var isVisibleCycle: Bool {
-        self.cycles >= 0 && self.cycles < Self.width
+        self.cycles >= 1 && self.cycles <= Self.width
     }
     var isIncrementVerticalScrollCycle: Bool {
-        self.cycles == Self.width
+        self.cycles == Self.width + 1
     }
     var isCopyHorizontalScrollCycle: Bool {
-        self.cycles == Self.width + 1
+        self.cycles == Self.width + 2
     }
     var isCopyVerticalScrollCycle: Bool {
         self.cycles >= 280 && self.cycles <= 304
     }
     var isPrefetchCycle: Bool {
-        self.cycles >= 320 && self.cycles <= 335
+        self.cycles >= 321 && self.cycles <= 336
     }
     var isFetchCycle: Bool {
         self.isVisibleCycle || self.isPrefetchCycle
@@ -198,12 +198,13 @@ public struct PPU {
 
                 self.cacheBackgroundTiles()
 
+                // TODO: Revisit this because sprites should be cached for the _next_ line
                 if self.isVisibleLine && self.cycles == 0 {
                     self.cacheSprites()
                 }
             }
 
-            if self.cycles == 0 {
+            if self.cycles == 1 {
                 if self.isNmiScanline {
                     self.statusRegister[.verticalBlankStarted] = true
 
