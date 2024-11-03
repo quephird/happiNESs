@@ -40,6 +40,8 @@ public struct PPU {
     public var nmiDelay: Int = 0
     public var cycles: Int
     public var scanline: Int
+    public var frameCycles: Int = 0
+    public var frameCount: Int = 0
 
     public var screenBuffer: [UInt8] = [UInt8](repeating: 0x00, count: Self.width * Self.height * 3)
 
@@ -79,6 +81,8 @@ public struct PPU {
         self.cycles = 0
         self.scanline = 0
         self.nmiDelay = 0
+        self.frameCycles = 0
+        self.frameCount = 0
 
         self.nextSharedAddress = 0x0000
         self.currentSharedAddress = 0x0000
@@ -154,6 +158,14 @@ public struct PPU {
         }
     }
 
+    mutating func handleNewFrame() {
+        self.frameCycles = 0
+        self.frameCount += 1
+        self.cycles = 0
+        self.scanline = 0
+        self.isOddFrame = !self.isOddFrame
+    }
+
     mutating func updateCycles() {
         switch (self.isOddFrame, self.isPreRenderLine, self.cycles) {
         case (true, true, 339):
@@ -162,21 +174,19 @@ public struct PPU {
             //
             //     https://www.nesdev.org/wiki/PPU_frame_timing#Even/Odd_Frames
             if self.isBackgroundEnabled {
-                self.cycles = 0
-                self.scanline = 0
-                self.isOddFrame = !self.isOddFrame
+                self.handleNewFrame()
             } else {
                 self.cycles += 1
             }
         case (_, true, 340):
-            self.cycles = 0
-            self.scanline = 0
-            self.isOddFrame = !self.isOddFrame
+            self.handleNewFrame()
         case (_, _, 340):
             self.cycles = 0
+            self.frameCycles += 1
             self.scanline += 1
         default:
             self.cycles += 1
+            self.frameCycles += 1
         }
     }
 
@@ -189,7 +199,6 @@ public struct PPU {
 
         for _ in 0 ..< cpuCycles * 3 {
             self.checkNmiQueue()
-            self.updateCycles()
 
             if self.isRenderingEnabled {
                 if self.isVisibleLine && self.isVisibleCycle {
@@ -220,6 +229,8 @@ public struct PPU {
                     self.statusRegister[.spriteZeroHit] = false
                 }
             }
+
+            self.updateCycles()
         }
 
         return redrawScreen
