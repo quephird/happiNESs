@@ -51,13 +51,20 @@ extension PPU {
         self.controllerRegister.update(byte: byte)
         let nmiAfter = self.controllerRegister[.generateNmi]
 
-        // NOTA BENE: Per what is stated in this section on the NESDev wiki,
-        // if the NMI enabled flag is toggled when VBL is set, then we need to
-        // generate an NMI interrupt.
+        // NOTA BENE: This is another thing that I gleaned from another NES emulator,
+        // to suppress queueing up an NMI if we're at the scanline & cycle at which
+        // VBL is cleared.
         //
-        //     https://www.nesdev.org/wiki/NMI#Operation
-        if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
-            self.nmiDelayState.scheduleNmi()
+        //     https://github.com/donqustix/emunes/blob/master/src/nes/emulator/ppu.h#L143
+        if !(self.isPreRenderLine && self.cycles == 1) {
+            // NOTA BENE: Per what is stated in this section on the NESDev wiki,
+            // if the NMI enabled flag is toggled when VBL is set, then we need to
+            // generate an NMI interrupt.
+            //
+            //     https://www.nesdev.org/wiki/NMI#Operation
+            if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
+                self.nmiDelayState.scheduleNmi()
+            }
         }
 
         let nametableBits = self.controllerRegister.rawValue & 0b0000_0011
