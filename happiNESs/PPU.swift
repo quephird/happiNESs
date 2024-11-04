@@ -38,7 +38,7 @@ public struct PPU {
     public var wRegister: Bool = false
 
     public var isOddFrame: Bool = false
-    public var nmiDelay: Int = 0
+    public var nmiDelayState: NMIDelayState = .none
     public var cycles: Int
     public var scanline: Int
     public var frameCycles: Int = 0
@@ -82,7 +82,7 @@ public struct PPU {
 
         self.cycles = 0
         self.scanline = 0
-        self.nmiDelay = 0
+        self.nmiDelayState = .none
         self.frameCycles = 0
         self.frameCount = 0
 
@@ -141,25 +141,6 @@ public struct PPU {
         self.statusRegister[.spriteZeroHit]
     }
 
-    // NOTA BENE: The NMI needs to be fired only after the _following_
-    // CPU instruction is completed, simulating the delay in the actual
-    // NES hardware. In other words, the PPU doesn't directly and immediately
-    // trigger an NMI in the CPU. This delay corresponds roughly with the
-    // execution of two CPU instructions, namely the current one and the
-    // next one.
-    mutating func queueNmi() {
-        self.nmiDelay = 14
-    }
-
-    mutating func checkNmiQueue() {
-        if self.nmiDelay > 0 {
-            self.nmiDelay -= 1
-            if self.nmiDelay == 0 {
-                self.bus!.triggerNmi()
-            }
-        }
-    }
-
     mutating func handleNewFrame() {
         self.frameCycles = 0
         self.frameCount += 1
@@ -193,6 +174,14 @@ public struct PPU {
         }
     }
 
+    mutating private func checkNmiState() {
+        self.nmiDelayState.decrement()
+
+        if self.nmiDelayState.shouldTriggerNmi() {
+            self.bus!.triggerNmi()
+        }
+    }
+
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     //
@@ -201,7 +190,7 @@ public struct PPU {
         var redrawScreen = false
 
         for _ in 0 ..< cpuCycles * 3 {
-            self.checkNmiQueue()
+            self.checkNmiState()
 
             if self.isRenderingEnabled {
                 if self.isVisibleLine && self.isVisibleCycle {
@@ -225,7 +214,7 @@ public struct PPU {
                     }
 
                     if self.controllerRegister[.generateNmi] {
-                        self.queueNmi()
+                        self.nmiDelayState.scheduleNmi()
                     }
 
                     redrawScreen = true
@@ -239,6 +228,8 @@ public struct PPU {
 
             self.updateCycles()
         }
+
+        self.nmiDelayState.uncancel()
 
         return redrawScreen
     }

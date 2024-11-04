@@ -24,6 +24,14 @@ extension PPU {
             self.suppressVerticalBlank = true
         }
 
+        // NOTA BENE: This is Yet Another Hack, this time taken from another NES
+        // emulator, and which allows for blargg's 06-suppression test to pass:
+        //
+        //     https://github.com/donqustix/emunes/blob/master/src/nes/emulator/ppu.h#L204
+        if self.isNmiScanline && (self.cycles >= 1 && self.cycles <= 3) {
+            self.nmiDelayState = .canceled
+        }
+
         return result
     }
 
@@ -49,7 +57,7 @@ extension PPU {
         //
         //     https://www.nesdev.org/wiki/NMI#Operation
         if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
-            self.queueNmi()
+            self.nmiDelayState.scheduleNmi()
         }
 
         let nametableBits = self.controllerRegister.rawValue & 0b0000_0011

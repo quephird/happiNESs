@@ -74,6 +74,7 @@
 		87E9814D2CD098680090A200 /* Uxrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814C2CD098680090A200 /* Uxrom.swift */; };
 		87E9814F2CD09BF70090A200 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814E2CD09BF70090A200 /* Axrom.swift */; };
 		87E981512CD0C45A0090A200 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981502CD0C45A0090A200 /* Mmc1.swift */; };
+		87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981522CD8B5990090A200 /* NMIDelayState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -173,6 +174,7 @@
 		87E9814C2CD098680090A200 /* Uxrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uxrom.swift; sourceTree = "<group>"; };
 		87E9814E2CD09BF70090A200 /* Axrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
 		87E981502CD0C45A0090A200 /* Mmc1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
+		87E981522CD8B5990090A200 /* NMIDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NMIDelayState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -285,6 +287,7 @@
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				878D81462C815E760076ED30 /* NESError.swift */,
+				87E981522CD8B5990090A200 /* NMIDelayState.swift */,
 				878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */,
 				87184D0D2C756BEB0003D090 /* OAMRegister.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
@@ -507,6 +510,7 @@
 				874F51AD2CBF05BC00B12037 /* Register.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
+				87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				87E981472CD076660090A200 /* Mapper.swift in Sources */,
