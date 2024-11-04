@@ -51,12 +51,26 @@ extension PPU {
         self.controllerRegister.update(byte: byte)
         let nmiAfter = self.controllerRegister[.generateNmi]
 
-        // NOTA BENE: This is another thing that I gleaned from another NES emulator,
-        // to suppress queueing up an NMI if we're at the scanline & cycle at which
-        // VBL is cleared.
-        //
-        //     https://github.com/donqustix/emunes/blob/master/src/nes/emulator/ppu.h#L143
-        if !(self.isPreRenderLine && self.cycles == 1) {
+        switch (self.scanline, self.cycles) {
+        case (Self.nmiInterruptScanline, 1...3):
+            // NOTA BENE: This is a hack to get the last pesky test ROM to pass,
+            // namely 08-nmi_timing_off, to pass. Inspired by code that I saw from
+            // a Rust NES implementation:
+            //
+            //     https://github.com/razielgn/nes/blob/master/src/nes/ppu.rs#L697
+            if self.isNmiScanline && (self.cycles >= 1 && self.cycles <= 3) {
+                if nmiBefore && !nmiAfter {
+                    self.nmiDelayState = .canceled
+                }
+            }
+        case (Self.scanlinesPerFrame, 1):
+            // NOTA BENE: This is another thing that I gleaned from another NES emulator,
+            // to suppress queueing up an NMI if we're at the scanline & cycle at which
+            // VBL is cleared.
+            //
+            //     https://github.com/donqustix/emunes/blob/master/src/nes/emulator/ppu.h#L143
+            break
+        default:
             // NOTA BENE: Per what is stated in this section on the NESDev wiki,
             // if the NMI enabled flag is toggled when VBL is set, then we need to
             // generate an NMI interrupt.
