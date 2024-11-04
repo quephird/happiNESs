@@ -57,7 +57,21 @@ extension PPU {
     }
 
     mutating public func updateMask(byte: UInt8) {
+        let showBitsBefore = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
         self.maskRegister.update(byte: byte)
+        let showBitsAfter = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
+
+        // ACHTUNG! This is yet another apparent hack discovered in the thread
+        // below which gets the tenth of blargg's PPU test ROMs to pass. I could
+        // not find any detailed explanation or theory behind this... but it does
+        // indeed work.
+        //
+        //     https://forums.nesdev.org/viewtopic.php?p=208409#p208409
+        if showBitsAfter != showBitsBefore {
+            if self.isPreRenderLine && self.isJustBeforeLastCycle && self.isOddFrame {
+                self.cycles = self.isRenderingEnabled ? 338 : 340
+            }
+        }
     }
 
     mutating public func updateOAMAddress(byte: UInt8) {
