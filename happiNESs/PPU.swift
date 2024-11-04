@@ -13,6 +13,7 @@ public struct PPU {
     public static let scanlinesPerFrame = 261
     public static let ppuCyclesPerScanline = 340
     public static let nmiInterruptScanline = 241
+    public static let preRenderScanline = Self.scanlinesPerFrame
 
     public static let ppuAddressSpaceStart: UInt16 = 0x2000
     public static let nametableSize: Int = 0x0400
@@ -42,7 +43,7 @@ public struct PPU {
     public var cycles: Int
     public var scanline: Int
     public var frameCycles: Int = 0
-    public var frameCount: Int = 0
+    public var frameNumber: Int = 0
 
     public var screenBuffer: [UInt8] = [UInt8](repeating: 0x00, count: Self.width * Self.height * 3)
 
@@ -84,7 +85,7 @@ public struct PPU {
         self.scanline = 0
         self.nmiDelayState = .none
         self.frameCycles = 0
-        self.frameCount = 0
+        self.frameNumber = 0
 
         self.nextSharedAddress = 0x0000
         self.currentSharedAddress = 0x0000
@@ -141,15 +142,68 @@ public struct PPU {
         self.statusRegister[.spriteZeroHit]
     }
 
+    mutating private func handleNmiState() {
+        self.nmiDelayState.decrement()
+
+        if self.nmiDelayState.shouldTriggerNmi() {
+            self.bus!.triggerNmi()
+        }
+    }
+
+    mutating private func handleRendering() {
+        if self.isRenderingEnabled && self.isVisibleLine && self.isVisibleCycle {
+            self.renderPixel()
+        }
+    }
+
+    mutating private func handleCaching() {
+        if self.isRenderingEnabled {
+            self.cacheBackgroundTiles()
+
+            // TODO: Revisit this because sprites should be cached for the _next_ line
+            if self.isVisibleLine && self.cycles == 0 {
+                self.cacheSprites()
+            }
+        }
+    }
+
+    mutating private func handleVerticalBlank() -> Bool {
+        var redrawScreen = false
+
+        if self.cycles == 1 {
+            switch self.scanline {
+            case Self.nmiInterruptScanline:
+                if self.suppressVerticalBlank {
+                    self.suppressVerticalBlank = false
+                } else {
+                    self.statusRegister[.verticalBlankStarted] = true
+                }
+
+                if self.controllerRegister[.generateNmi] {
+                    self.nmiDelayState.scheduleNmi()
+                }
+
+                redrawScreen = true
+            case Self.preRenderScanline:
+                self.statusRegister[.verticalBlankStarted] = false
+                self.statusRegister[.spriteZeroHit] = false
+            default:
+                break
+            }
+        }
+
+        return redrawScreen
+    }
+
     mutating func handleNewFrame() {
         self.frameCycles = 0
-        self.frameCount += 1
+        self.frameNumber += 1
         self.cycles = 0
         self.scanline = 0
         self.isOddFrame = !self.isOddFrame
     }
 
-    mutating func updateCycles() {
+    mutating func handleFrameCounts() {
         switch (self.isOddFrame, self.isPreRenderLine, self.cycles) {
         case (true, true, 339):
             // NOTA BENE: Per this section of the NESDev wiki, we need to skip
@@ -174,14 +228,6 @@ public struct PPU {
         }
     }
 
-    mutating private func checkNmiState() {
-        self.nmiDelayState.decrement()
-
-        if self.nmiDelayState.shouldTriggerNmi() {
-            self.bus!.triggerNmi()
-        }
-    }
-
     // The return value below ultimately reflects whether or not
     // we need to redraw the screen.
     //
@@ -190,43 +236,11 @@ public struct PPU {
         var redrawScreen = false
 
         for _ in 0 ..< cpuCycles * 3 {
-            self.checkNmiState()
-
-            if self.isRenderingEnabled {
-                if self.isVisibleLine && self.isVisibleCycle {
-                    self.renderPixel()
-                }
-
-                self.cacheBackgroundTiles()
-
-                // TODO: Revisit this because sprites should be cached for the _next_ line
-                if self.isVisibleLine && self.cycles == 0 {
-                    self.cacheSprites()
-                }
-            }
-
-            if self.cycles == 1 {
-                if self.isNmiScanline {
-                    if self.suppressVerticalBlank {
-                        self.suppressVerticalBlank = false
-                    } else {
-                        self.statusRegister[.verticalBlankStarted] = true
-                    }
-
-                    if self.controllerRegister[.generateNmi] {
-                        self.nmiDelayState.scheduleNmi()
-                    }
-
-                    redrawScreen = true
-                }
-
-                if self.isPreRenderLine {
-                    self.statusRegister[.verticalBlankStarted] = false
-                    self.statusRegister[.spriteZeroHit] = false
-                }
-            }
-
-            self.updateCycles()
+            self.handleNmiState()
+            self.handleRendering()
+            self.handleCaching()
+            redrawScreen = redrawScreen || self.handleVerticalBlank()
+            self.handleFrameCounts()
         }
 
         self.nmiDelayState.uncancel()
