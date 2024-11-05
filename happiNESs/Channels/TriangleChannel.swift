@@ -24,6 +24,18 @@ public struct TriangleChannel {
     public var timerPeriod: UInt16 = 0x0000
     public var timerValue: UInt16 = 0x0000
     public var dutyIndex: Int = 0
+
+    mutating public func reset() {
+        self.enabled = false
+        self.controlFlagEnabled = false
+        self.linearCounterReloadFLag = false
+        self.linearCounterReload = 0x00
+        self.linearCounterValue = 0x00
+        self.lengthCounterValue = 0x00
+        self.timerPeriod = 0x0000
+        self.timerValue = 0x0000
+        self.dutyIndex = 0
+    }
 }
 
 extension TriangleChannel {

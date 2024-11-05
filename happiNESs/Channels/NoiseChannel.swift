@@ -30,6 +30,23 @@ public struct NoiseChannel {
     private var timerValue: UInt16 = 0x0000
     public var lengthCounterValue: UInt8 = 0x00
     private var dutyIndex: Int = 0
+
+    mutating public func reset() {
+        self.enabled = false
+        self.controlFlag = .lengthCounterEnabled
+        self.constantVolumeFlag = false
+        self.constantVolume = 0x00
+        self.envelopeStart = false
+        self.envelopePeriod = 0x00
+        self.envelopeValue = 0x00
+        self.envelopeVolume = 0x00
+        self.mode = 1
+        self.shiftRegister = 0x0001
+        self.timerPeriod = 0x0000
+        self.timerValue = 0x0000
+        self.lengthCounterValue = 0x00
+        self.dutyIndex = 0
+    }
 }
 
 extension NoiseChannel {

@@ -11,6 +11,12 @@ public class AudioRingBuffer {
     private var buffer: [Float] = [Float](repeating: 0.0, count: 44100)
     private var takeIndex: Int = 0
     private var appendIndex: Int = 0
+
+    public func reset() {
+        self.buffer = [Float](repeating: 0.0, count: 44100)
+        self.takeIndex = 0
+        self.appendIndex = 0
+    }
 }
 
 extension AudioRingBuffer {
