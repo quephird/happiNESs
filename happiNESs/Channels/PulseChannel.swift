@@ -55,6 +55,32 @@ public struct PulseChannel {
     public init(channelNumber: ChannelNumber) {
         self.channelNumber = channelNumber
     }
+
+    mutating public func reset() {
+        self.enabled = false
+
+        self.dutyMode = 0
+        self.dutyIndex = 0
+        self.controlFlag = .lengthCounterEnabled
+        self.constantVolumeFlag = false
+        self.envelopeStart = false
+        self.envelopePeriod = 0x00
+        self.envelopeValue = 0x00
+        self.envelopeVolume = 0x00
+        self.constantVolume = 0x00
+
+        self.sweepReloaded = false
+        self.sweepEnabled = false
+        self.sweepPeriod = 0x00
+        self.sweepValue = 0x00
+        self.sweepNegated = false
+        self.sweepShift = 0x00
+
+        self.lengthCounterValue = 0x00
+        self.timerPeriod = 0x0000
+        self.timerValue = 0x0000
+        self.counterReload = 0x00
+    }
 }
 
 extension PulseChannel {

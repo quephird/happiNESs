@@ -39,6 +39,17 @@ public struct APU {
     public init(sampleRate: Double) {
         self.sampleRate = sampleRate
     }
+
+    mutating public func reset() {
+        self.status = 0x00
+
+        self.pulse1.reset()
+        self.pulse2.reset()
+        self.triangle.reset()
+        self.noise.reset()
+        self.dmc.reset()
+        self.buffer.reset()
+    }
 }
 
 extension APU {

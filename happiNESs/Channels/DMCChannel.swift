@@ -27,6 +27,25 @@ public struct DMCChannel {
     private var shiftRegister: UInt8 = 0x00
     private var bitCount: Int = 0
     private var sampleValue: UInt8 = 0x00
+
+    mutating public func reset() {
+        self.enabled = false
+
+        self.irqEnabled = false
+        self.loopEnabled = false
+        self.loopPeriod = 0x00
+        self.loopValue = 0x00
+
+        self.loadCounter = 0x00
+        self.sampleAddress = 0x0000
+        self.currentAddress = 0x0000
+        self.sampleLength = 0x0000
+        self.currentLength = 0x0000
+
+        self.shiftRegister = 0x00
+        self.bitCount = 0
+        self.sampleValue = 0x00
+    }
 }
 
 extension DMCChannel {

@@ -41,6 +41,7 @@ public class Bus {
 
     public func reset() {
         self.ppu.reset()
+        self.apu.reset()
     }
 }
 
