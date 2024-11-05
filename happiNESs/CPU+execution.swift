@@ -36,7 +36,7 @@ extension CPU {
     func executeInstruction() -> Bool {
         if self.stall > 0 {
             self.stall -= 1
-            return self.bus.tick(cycles: 1)
+            return self.tick(cycles: 1)
         }
 
         switch self.interrupt {
@@ -197,7 +197,7 @@ extension CPU {
             }
 
             let totalCycles = opcode.cycles + extraCycles
-            let result = self.bus.tick(cycles: totalCycles)
+            let result = self.tick(cycles: totalCycles)
 
             if !programCounterMutated {
                 self.programCounter += UInt16(opcode.instructionLength - 1)

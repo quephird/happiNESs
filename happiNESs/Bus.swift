@@ -16,7 +16,6 @@ public class Bus {
     public var apu: APU
     var cartridge: Cartridge?
     var vram: [UInt8]
-    var cycles: Int
     var joypad: Joypad
 
     public init() {
@@ -25,7 +24,6 @@ public class Bus {
         self.apu = APU(sampleRate: CPU.frequency / 44100.0)
 
         self.vram = [UInt8](repeating: 0x00, count: 2048)
-        self.cycles = 0
         self.joypad = Joypad()
 
         // NOTA BENE: We need to do this because there needs to be
@@ -126,7 +124,7 @@ extension Bus {
             self.ppu.writeOamBuffer(buffer: buffer)
 
             self.cpu!.stall += 513
-            if self.cycles%2 == 1 {
+            if self.cpu!.cycles%2 == 1 {
                 self.cpu!.stall += 1
             }
         case 0x4000 ... 0x4008, 0x400A ... 0x400C, 0x400E ... 0x4013, 0x4015, 0x4017:
@@ -142,13 +140,6 @@ extension Bus {
 }
 
 extension Bus {
-    func tick(cycles: Int) -> Bool {
-        self.cycles += cycles
-
-        self.apu.tick(cpuCycles: cycles)
-        return self.ppu.tick(cpuCycles: cycles)
-    }
-
     public func triggerNmi() {
         self.cpu!.interrupt = .nmi
     }

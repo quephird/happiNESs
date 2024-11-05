@@ -19,7 +19,6 @@ struct Speaker {
         let mainMixer = engine.mainMixerNode
         let output = engine.outputNode
         let outputFormat = output.inputFormat(forBus: 0)
-        let sampleRate = Float(outputFormat.sampleRate)
         let inputFormat = AVAudioFormat(commonFormat: outputFormat.commonFormat,
                                         sampleRate: outputFormat.sampleRate,
                                         channels: 1,
