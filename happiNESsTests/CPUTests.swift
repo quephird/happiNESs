@@ -11,7 +11,7 @@ import XCTest
 final class CPUTests: XCTestCase {
     func testAdcImmediate() {
         let program: [UInt8] = [0xA9, 0x50, 0x69, 0x50]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0xA0)
@@ -23,7 +23,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcZeroPage() {
         let program: [UInt8] = [0xA9, 0xB0, 0x65, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0xB0)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -36,7 +36,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcZeroPageX() {
         let program: [UInt8] = [0xA9, 0xB0, 0xA2, 0x20, 0x75, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0xB0)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -49,7 +49,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcAbsolute() {
         let program: [UInt8] = [0xA9, 0x81, 0x6D, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x7F)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -62,7 +62,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcAbsoluteX() {
         let program: [UInt8] = [0xA9, 0x81, 0xA2, 0x34, 0x7D, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x7F)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -75,7 +75,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcAbsoluteY() {
         let program: [UInt8] = [0xA9, 0x81, 0xA0, 0x34, 0x79, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x7F)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -88,7 +88,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcIndirectX() {
         let program: [UInt8] = [0xA9, 0xFF, 0xA2, 0x20, 0x61, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0xFF)
@@ -103,7 +103,7 @@ final class CPUTests: XCTestCase {
 
     func testAdcIndirectY() {
         let program: [UInt8] = [0xA9, 0xFF, 0xA0, 0x34, 0x71, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0xFF)
@@ -118,7 +118,7 @@ final class CPUTests: XCTestCase {
 
     func testAndImmediate() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x29, 0b0000_1111]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b0000_0000)
@@ -126,7 +126,7 @@ final class CPUTests: XCTestCase {
 
     func testAndZeroPage() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x25, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0010, byte: 0b0101_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -135,7 +135,7 @@ final class CPUTests: XCTestCase {
 
     func testAndZeroPageX() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0xA2, 0x20, 0x35, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0b0101_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -144,7 +144,7 @@ final class CPUTests: XCTestCase {
 
     func testAndAbsolute() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0x2D, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -153,7 +153,7 @@ final class CPUTests: XCTestCase {
 
     func testAndAbsoluteX() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x34, 0x3D, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -162,7 +162,7 @@ final class CPUTests: XCTestCase {
 
     func testAndAbsoluteY() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x39, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -171,7 +171,7 @@ final class CPUTests: XCTestCase {
 
     func testAndIndirectX() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x20, 0x21, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
@@ -182,7 +182,7 @@ final class CPUTests: XCTestCase {
 
     func testAndIndirectY() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x31, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
@@ -193,7 +193,7 @@ final class CPUTests: XCTestCase {
 
     func testAslAccumulator() {
         let program: [UInt8] = [0xA9, 0b1111_1111, 0x0A]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b1111_1110)
@@ -204,7 +204,7 @@ final class CPUTests: XCTestCase {
 
     func testAslZeroPage() {
         let program: [UInt8] = [0x06, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b1000_0000)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -216,7 +216,7 @@ final class CPUTests: XCTestCase {
 
     func testAslZeroPageX() {
         let program: [UInt8] = [0xA2, 0x21, 0x16, 0x21]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b0100_0000)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -228,7 +228,7 @@ final class CPUTests: XCTestCase {
 
     func testAslAbsolute() {
         let program: [UInt8] = [0x0E, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -240,7 +240,7 @@ final class CPUTests: XCTestCase {
 
     func testAslAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0x1E, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -261,7 +261,7 @@ final class CPUTests: XCTestCase {
             0x69, 0x20,
             0x69, 0x30,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x40)
@@ -275,7 +275,7 @@ final class CPUTests: XCTestCase {
             0x69, 0x20,
             0x69, 0x41,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -288,7 +288,7 @@ final class CPUTests: XCTestCase {
             0x69, 0x20,
             0x69, 0x42,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -296,7 +296,7 @@ final class CPUTests: XCTestCase {
 
     func testBitZeroPage() {
         let program: [UInt8] = [0xA9, 0b0001_1010, 0x24, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b1110_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -307,7 +307,7 @@ final class CPUTests: XCTestCase {
 
     func testBitAbsolute() {
         let program: [UInt8] = [0xA9, 0b1101_1010, 0x2C, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -323,7 +323,7 @@ final class CPUTests: XCTestCase {
             0xA9, 0x20,
             0xA9, 0x42,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -336,7 +336,7 @@ final class CPUTests: XCTestCase {
             0x69, 0xDE,
             0x69, 0x21,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -349,7 +349,7 @@ final class CPUTests: XCTestCase {
             0x69, 0xDE,
             0x69, 0x21,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -359,7 +359,7 @@ final class CPUTests: XCTestCase {
         // NOTA BENE: This program artificially sets flags in the status register
         // before the `BRK` instruction eventually pushes it onto the stack
         let program: [UInt8] = [0x38, 0xF8, 0x00]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.readByte(address: 0x01FD), 0x86)
@@ -376,7 +376,7 @@ final class CPUTests: XCTestCase {
             0xA9, 0xFF,
             0x69, 0x00,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -390,7 +390,7 @@ final class CPUTests: XCTestCase {
             0xA9, 0x00,
             0x69, 0x00,
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0b1000_0000)
@@ -398,7 +398,7 @@ final class CPUTests: XCTestCase {
 
     func testClc() {
         let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0x18]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(!cpu.statusRegister[.carry])
@@ -406,7 +406,7 @@ final class CPUTests: XCTestCase {
 
     func testCld() {
         let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0xD8]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(!cpu.statusRegister[.decimalMode])
@@ -414,7 +414,7 @@ final class CPUTests: XCTestCase {
 
     func testCli() {
         let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0x58]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(!cpu.statusRegister[.interruptsDisabled])
@@ -422,7 +422,7 @@ final class CPUTests: XCTestCase {
 
     func testClv() {
         let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28, 0xB8]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(!cpu.statusRegister[.overflow])
@@ -430,7 +430,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpImmediate() {
         let program: [UInt8] = [0xA9, 0x42, 0xC9, 0x43]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertTrue(!cpu.statusRegister[.carry])
@@ -440,7 +440,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpZeroPage() {
         let program: [UInt8] = [0xA9, 0x42, 0xC5, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -451,7 +451,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpZeroPageX() {
         let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0xD5, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -462,7 +462,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpAbsolute() {
         let program: [UInt8] = [0xA9, 0x42, 0xCD, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -473,7 +473,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpAbsoluteX() {
         let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x34, 0xDD, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -484,7 +484,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpAbsoluteY() {
         let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0xD9, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -495,7 +495,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpIndirectX() {
         let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0xC1, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0x43)
@@ -508,7 +508,7 @@ final class CPUTests: XCTestCase {
 
     func testCmpIndirectY() {
         let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0xD1, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0x43)
@@ -521,7 +521,7 @@ final class CPUTests: XCTestCase {
 
     func testCpxImmediate() {
         let program: [UInt8] = [0xA2, 0x42, 0xE0, 0x43]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertTrue(!cpu.statusRegister[.carry])
@@ -531,7 +531,7 @@ final class CPUTests: XCTestCase {
 
     func testCpxZeroPage() {
         let program: [UInt8] = [0xA2, 0x42, 0xE4, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -542,7 +542,7 @@ final class CPUTests: XCTestCase {
 
     func testCpxAbsolute() {
         let program: [UInt8] = [0xA2, 0x42, 0xEC, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -553,7 +553,7 @@ final class CPUTests: XCTestCase {
 
     func testCpyImmediate() {
         let program: [UInt8] = [0xA0, 0x42, 0xC0, 0x43]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertTrue(!cpu.statusRegister[.carry])
@@ -563,7 +563,7 @@ final class CPUTests: XCTestCase {
 
     func testCpyZeroPage() {
         let program: [UInt8] = [0xA0, 0x42, 0xC4, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -574,7 +574,7 @@ final class CPUTests: XCTestCase {
 
     func testCpyAbsolute() {
         let program: [UInt8] = [0xA0, 0x42, 0xCC, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -585,7 +585,7 @@ final class CPUTests: XCTestCase {
 
     func testDecZeroPage() {
         let program: [UInt8] = [0xC6, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x10, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -596,7 +596,7 @@ final class CPUTests: XCTestCase {
 
     func testDecZeroPageX() {
         let program: [UInt8] = [0xA2, 0x20, 0xD6, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x30, byte: 0x00)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -607,7 +607,7 @@ final class CPUTests: XCTestCase {
 
     func testDecAbsolute() {
         let program: [UInt8] = [0xCE, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -616,7 +616,7 @@ final class CPUTests: XCTestCase {
 
     func testDecAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0xDE, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -625,7 +625,7 @@ final class CPUTests: XCTestCase {
 
     func testDexOverflow() {
         let program: [UInt8] = [0xA9, 0x00, 0xAA, 0xCA]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.xRegister, 0xFF)
@@ -635,7 +635,7 @@ final class CPUTests: XCTestCase {
 
     func testDeyOverflow() {
         let program: [UInt8] = [0xA9, 0x00, 0xA8, 0x88]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.yRegister, 0xFF)
@@ -645,7 +645,7 @@ final class CPUTests: XCTestCase {
 
     func testEorImmediate() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x49, 0b0000_1111]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b1111_1111)
@@ -653,7 +653,7 @@ final class CPUTests: XCTestCase {
 
     func testEorZeroPage() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x45, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0010, byte: 0b0101_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -662,7 +662,7 @@ final class CPUTests: XCTestCase {
 
     func testEorZeroPageX() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0xA2, 0x20, 0x55, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0b0101_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -671,7 +671,7 @@ final class CPUTests: XCTestCase {
 
     func testEorAbsolute() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0x4D, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -680,7 +680,7 @@ final class CPUTests: XCTestCase {
 
     func testEorAbsoluteX() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x34, 0x5D, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -689,7 +689,7 @@ final class CPUTests: XCTestCase {
 
     func testEorAbsoluteY() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x59, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -698,7 +698,7 @@ final class CPUTests: XCTestCase {
 
     func testEorIndirectX() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x20, 0x41, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
@@ -709,7 +709,7 @@ final class CPUTests: XCTestCase {
 
     func testEorIndirectY() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x51, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
@@ -720,7 +720,7 @@ final class CPUTests: XCTestCase {
 
     func testIncZeroPage() {
         let program: [UInt8] = [0xE6, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x10, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -731,7 +731,7 @@ final class CPUTests: XCTestCase {
 
     func testIncZeroPageX() {
         let program: [UInt8] = [0xA2, 0x20, 0xF6, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x30, byte: 0xFF)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -742,7 +742,7 @@ final class CPUTests: XCTestCase {
 
     func testIncAbsolute() {
         let program: [UInt8] = [0xEE, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -751,7 +751,7 @@ final class CPUTests: XCTestCase {
 
     func testIncAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0xFE, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -760,7 +760,7 @@ final class CPUTests: XCTestCase {
 
     func testInxOverflow() {
         let program: [UInt8] = [0xA9, 0xFF, 0xAA, 0xE8]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.xRegister, 0x00)
@@ -770,7 +770,7 @@ final class CPUTests: XCTestCase {
 
     func testInyOverflow() {
         let program: [UInt8] = [0xA9, 0xFF, 0xA8, 0xC8]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.yRegister, 0x00)
@@ -787,7 +787,7 @@ final class CPUTests: XCTestCase {
             0xA9, 0xFF,
             0xA9, 0x42
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x42)
@@ -797,7 +797,7 @@ final class CPUTests: XCTestCase {
         // NOTA BENE: This program does the same as the above, albeit
         // via indirect addressing.
         let program: [UInt8] = [0x6C, 0x34, 0x12, 0xA9, 0xFF, 0xA9, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x05)
         cpu.writeByte(address: 0x1235, byte: 0x86)
         cpu.executeInstructions(stoppingAfter: 2)
@@ -817,7 +817,7 @@ final class CPUTests: XCTestCase {
             0x60,
             0xEA
         ]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 5)
 
         XCTAssertEqual(cpu.accumulator, 0xFF)
@@ -825,7 +825,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaImmediate() {
         let program: [UInt8] = [0xA9, 0x05]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.accumulator, 0x05)
@@ -835,7 +835,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaZeroPage() {
         let program: [UInt8] = [0xA5, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x10, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -844,7 +844,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaZeroPageX() {
         let program: [UInt8] = [0xA2, 0x20, 0xB5, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x30, byte: 0xFF)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -853,7 +853,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaAbsolute() {
         let program: [UInt8] = [0xAD, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -862,7 +862,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0xBD, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -871,7 +871,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaAbsoluteY() {
         let program: [UInt8] = [0xA0, 0x34, 0xB9, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -880,7 +880,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaIndirectX() {
         let program: [UInt8] = [0xA2, 0x0F, 0xA1, 0xF0]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x55)
         cpu.writeByte(address: 0x00FF, byte: 0x34)
         cpu.writeByte(address: 0x0000, byte: 0x12)
@@ -891,7 +891,7 @@ final class CPUTests: XCTestCase {
 
     func testLdaIndirectY() {
         let program: [UInt8] = [0xA0, 0x34, 0xB1, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0x55)
@@ -902,7 +902,7 @@ final class CPUTests: XCTestCase {
 
     func testLdxImmediate() {
         let program: [UInt8] = [0xA2, 0xF0]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.xRegister, 0xF0)
@@ -912,7 +912,7 @@ final class CPUTests: XCTestCase {
 
     func testLdxZeroPage() {
         let program: [UInt8] = [0xA6, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0010, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -921,7 +921,7 @@ final class CPUTests: XCTestCase {
 
     func testLdxZeroPageY() {
         let program: [UInt8] = [0xA0, 0xF0, 0xB6, 0x0F]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x00FF, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -930,7 +930,7 @@ final class CPUTests: XCTestCase {
 
     func testLdxAbsolute() {
         let program: [UInt8] = [0xAE, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -939,7 +939,7 @@ final class CPUTests: XCTestCase {
 
     func testLdxAbsoluteY() {
         let program: [UInt8] = [0xA0, 0x34, 0xBE, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -948,7 +948,7 @@ final class CPUTests: XCTestCase {
 
     func testLdyImmediate() {
         let program: [UInt8] = [0xA0, 0x00]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.yRegister, 0x00)
@@ -958,7 +958,7 @@ final class CPUTests: XCTestCase {
 
     func testLdyZeroPage() {
         let program: [UInt8] = [0xA4, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0010, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -967,7 +967,7 @@ final class CPUTests: XCTestCase {
 
     func testLdyZeroPageX() {
         let program: [UInt8] = [0xA2, 0xF0, 0xB4, 0x0F]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x00FF, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -976,7 +976,7 @@ final class CPUTests: XCTestCase {
 
     func testLdyAbsolute() {
         let program: [UInt8] = [0xAC, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -985,7 +985,7 @@ final class CPUTests: XCTestCase {
 
     func testLdyAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0xBC, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0xF0)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -994,7 +994,7 @@ final class CPUTests: XCTestCase {
 
     func testLsrAccumulator() {
         let program: [UInt8] = [0xA9, 0b1111_1111, 0x4A]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b0111_1111)
@@ -1005,7 +1005,7 @@ final class CPUTests: XCTestCase {
 
     func testLsrZeroPage() {
         let program: [UInt8] = [0x46, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b0000_0001)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -1017,7 +1017,7 @@ final class CPUTests: XCTestCase {
 
     func testLsrZeroPageX() {
         let program: [UInt8] = [0xA2, 0x21, 0x56, 0x21]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b0000_0010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1029,7 +1029,7 @@ final class CPUTests: XCTestCase {
 
     func testLsrAbsolute() {
         let program: [UInt8] = [0x4E, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -1041,7 +1041,7 @@ final class CPUTests: XCTestCase {
 
     func testLsrAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0x5E, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1053,7 +1053,7 @@ final class CPUTests: XCTestCase {
 
     func testOraImmediate() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x09, 0b0000_1111]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b1111_1111)
@@ -1061,7 +1061,7 @@ final class CPUTests: XCTestCase {
 
     func testOraZeroPage() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0x05, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0010, byte: 0b0101_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1070,7 +1070,7 @@ final class CPUTests: XCTestCase {
 
     func testOraZeroPageX() {
         let program: [UInt8] = [0xA9, 0b1111_0000, 0xA2, 0x20, 0x15, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0b0101_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -1079,7 +1079,7 @@ final class CPUTests: XCTestCase {
 
     func testOraAbsolute() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0x0D, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1088,7 +1088,7 @@ final class CPUTests: XCTestCase {
 
     func testOraAbsoluteX() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x34, 0x1D, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -1097,7 +1097,7 @@ final class CPUTests: XCTestCase {
 
     func testOraAbsoluteY() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x19, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -1106,7 +1106,7 @@ final class CPUTests: XCTestCase {
 
     func testOraIndirectX() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA2, 0x20, 0x01, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
@@ -1117,7 +1117,7 @@ final class CPUTests: XCTestCase {
 
     func testOraIndirectY() {
         let program: [UInt8] = [0xA9, 0b0101_0101, 0xA0, 0x34, 0x11, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
@@ -1128,7 +1128,7 @@ final class CPUTests: XCTestCase {
 
     func testPha() {
         let program: [UInt8] = [0xA9, 0x42, 0x48]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x01FD), 0x42)
@@ -1140,7 +1140,7 @@ final class CPUTests: XCTestCase {
         // so we do it imdirectly by loading the accumulator with a value
         // that affects it.
         let program: [UInt8] = [0xA9, 0xFF, 0x08]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(0b1011_0100, cpu.readByte(address: 0x01FD))
@@ -1157,7 +1157,7 @@ final class CPUTests: XCTestCase {
         // push the status register onto the stack, and then finally pop
         // the stack onto the accumulator with a _different_ value.
         let program: [UInt8] = [0xA9, 0xFF, 0x08, 0x68]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0b1011_0100)
@@ -1169,7 +1169,7 @@ final class CPUTests: XCTestCase {
 
     func testPlp() {
         let program: [UInt8] = [0xA9, 0xFF, 0x48, 0x28]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.stackPointer, 0xFD)
@@ -1183,7 +1183,7 @@ final class CPUTests: XCTestCase {
 
     func testRolAccumulator() {
         let program: [UInt8] = [0xA9, 0b1111_1111, 0x2A]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b1111_1110)
@@ -1194,7 +1194,7 @@ final class CPUTests: XCTestCase {
 
     func testRolZeroPage() {
         let program: [UInt8] = [0x26, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b0000_0001)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -1206,7 +1206,7 @@ final class CPUTests: XCTestCase {
 
     func testRolZeroPageX() {
         let program: [UInt8] = [0xA2, 0x21, 0x36, 0x21]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b0000_0010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1218,7 +1218,7 @@ final class CPUTests: XCTestCase {
 
     func testRolAbsolute() {
         let program: [UInt8] = [0x2E, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -1230,7 +1230,7 @@ final class CPUTests: XCTestCase {
 
     func testRolAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0x3E, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1242,7 +1242,7 @@ final class CPUTests: XCTestCase {
 
     func testRorAccumulator() {
         let program: [UInt8] = [0xA9, 0b1111_1111, 0x6A]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b0111_1111)
@@ -1253,7 +1253,7 @@ final class CPUTests: XCTestCase {
 
     func testRorZeroPage() {
         let program: [UInt8] = [0x66, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b1000_0001)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -1265,7 +1265,7 @@ final class CPUTests: XCTestCase {
 
     func testRorZeroPageX() {
         let program: [UInt8] = [0xA2, 0x21, 0x76, 0x21]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0b0000_0010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1277,7 +1277,7 @@ final class CPUTests: XCTestCase {
 
     func testRorAbsolute() {
         let program: [UInt8] = [0x6E, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 1)
 
@@ -1289,7 +1289,7 @@ final class CPUTests: XCTestCase {
 
     func testRorAbsoluteX() {
         let program: [UInt8] = [0xA2, 0x34, 0x7E, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0b1010_1010)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1300,7 +1300,7 @@ final class CPUTests: XCTestCase {
     }
 
 //    func testRti() {
-//        var cpu = makeCpu(programBytes: program)
+//        let cpu = makeCpu(programBytes: program)
 //        // NOTA BENE: Wow, is this a hacky test. First I push the high and low
 //        // bytes of the memory location just after the end of this program, 0x800A,
 //        // onto the stack, then I push a fakey status byte onto the stack, and
@@ -1327,7 +1327,7 @@ final class CPUTests: XCTestCase {
 //        // the high bits of that address (0x06) onto the stack through the accumulator,
 //        // then the low bits minus 1 (0x06) onto the stack. I wanted this test to be isolated
 //        // from the one for JSR.
-//        var cpu = makeCpu(programBytes: program)
+//        let cpu = makeCpu(programBytes: program)
 //        let program: [UInt8] = [
 //            0xA9, 0x06,
 //            0x48,
@@ -1343,7 +1343,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcImmediate() {
         let program: [UInt8] = [0xA9, 0x32, 0xE9, 0x50]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0xE1)
@@ -1355,7 +1355,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcZeroPage() {
         let program: [UInt8] = [0xA9, 0x30, 0xE5, 0x42]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0042, byte: 0x20)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1368,7 +1368,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcZeroPageX() {
         let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x20, 0xF5, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x20)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -1381,7 +1381,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcAbsolute() {
         let program: [UInt8] = [0xA9, 0x30, 0xED, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x20)
         cpu.executeInstructions(stoppingAfter: 2)
 
@@ -1394,7 +1394,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcAbsoluteX() {
         let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x34, 0xFD, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x20)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -1407,7 +1407,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcAbsoluteY() {
         let program: [UInt8] = [0xA9, 0x30, 0xA0, 0x34, 0xF9, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x1234, byte: 0x20)
         cpu.executeInstructions(stoppingAfter: 3)
 
@@ -1420,7 +1420,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcIndirectX() {
         let program: [UInt8] = [0xA9, 0x30, 0xA2, 0x20, 0xE1, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0x20)
@@ -1435,7 +1435,7 @@ final class CPUTests: XCTestCase {
 
     func testSbcIndirectY() {
         let program: [UInt8] = [0xA9, 0x30, 0xA0, 0x34, 0xF1, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.writeByte(address: 0x1234, byte: 0x20)
@@ -1450,7 +1450,7 @@ final class CPUTests: XCTestCase {
 
     func testSec() {
         let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0x38]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(cpu.statusRegister[.carry])
@@ -1458,7 +1458,7 @@ final class CPUTests: XCTestCase {
 
     func testSed() {
         let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0xF8]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(cpu.statusRegister[.decimalMode])
@@ -1466,7 +1466,7 @@ final class CPUTests: XCTestCase {
 
     func testSei() {
         let program: [UInt8] = [0xA9, 0x00, 0x48, 0x28, 0x78]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
         XCTAssertTrue(cpu.statusRegister[.interruptsDisabled])
@@ -1474,7 +1474,7 @@ final class CPUTests: XCTestCase {
 
     func testStaZeroPage() {
         let program: [UInt8] = [0xA9, 0x42, 0x85, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0010), 0x42)
@@ -1482,7 +1482,7 @@ final class CPUTests: XCTestCase {
 
     func testStaZeroPageX() {
         let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0x95, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.readByte(address: 0x0030), 0x42)
@@ -1490,7 +1490,7 @@ final class CPUTests: XCTestCase {
 
     func testStaAbsolute() {
         let program: [UInt8] = [0xA9, 0x42, 0x8D, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42)
@@ -1498,7 +1498,7 @@ final class CPUTests: XCTestCase {
 
     func testStaAbsoluteX() {
         let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x34, 0x9D, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42)
@@ -1506,7 +1506,7 @@ final class CPUTests: XCTestCase {
 
     func testStaAbsoluteY() {
         let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0x99, 0x00, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42)
@@ -1514,7 +1514,7 @@ final class CPUTests: XCTestCase {
 
     func testStaIndirectX() {
         let program: [UInt8] = [0xA9, 0x42, 0xA2, 0x20, 0x81, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x34)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.executeInstructions(stoppingAfter: 3)
@@ -1524,7 +1524,7 @@ final class CPUTests: XCTestCase {
 
     func testStaIndirectY() {
         let program: [UInt8] = [0xA9, 0x42, 0xA0, 0x34, 0x91, 0x30]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.writeByte(address: 0x0030, byte: 0x00)
         cpu.writeByte(address: 0x0031, byte: 0x12)
         cpu.executeInstructions(stoppingAfter: 3)
@@ -1534,7 +1534,7 @@ final class CPUTests: XCTestCase {
 
     func testStxZeroPage() {
         let program: [UInt8] = [0xA2, 0x42, 0x86, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0010), 0x42)
@@ -1542,7 +1542,7 @@ final class CPUTests: XCTestCase {
 
     func testStxZeroPageY() {
         let program: [UInt8] = [0xA2, 0x42, 0xA0, 0x20, 0x96, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.readByte(address: 0x0030), 0x42)
@@ -1550,7 +1550,7 @@ final class CPUTests: XCTestCase {
 
     func testStxAbsolute() {
         let program: [UInt8] = [0xA2, 0x42, 0x8E, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42)
@@ -1558,7 +1558,7 @@ final class CPUTests: XCTestCase {
 
     func testStyZeroPage() {
         let program: [UInt8] = [0xA0, 0x42, 0x84, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0010), 0x42)
@@ -1566,7 +1566,7 @@ final class CPUTests: XCTestCase {
 
     func testStyZeroPageX() {
         let program: [UInt8] = [0xA0, 0x42, 0xA2, 0x20, 0x94, 0x10]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.readByte(address: 0x0030), 0x42)
@@ -1574,7 +1574,7 @@ final class CPUTests: XCTestCase {
 
     func testStyAbsolute() {
         let program: [UInt8] = [0xA0, 0x42, 0x8C, 0x34, 0x12]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0x42)
@@ -1582,7 +1582,7 @@ final class CPUTests: XCTestCase {
 
     func testTax() {
         let program: [UInt8] = [0xA9, 0x0A, 0xAA]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.xRegister, 0x0A)
@@ -1592,7 +1592,7 @@ final class CPUTests: XCTestCase {
 
     func testTay() {
         let program: [UInt8] = [0xA9, 0xFF, 0xA8]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.yRegister, 0xFF)
@@ -1603,7 +1603,7 @@ final class CPUTests: XCTestCase {
     func testTsx() {
         // NOTA BENE: the stack pointer upon initialization is set to 0xFD
         let program: [UInt8] = [0xBA]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.xRegister, 0xFD)
@@ -1613,7 +1613,7 @@ final class CPUTests: XCTestCase {
 
     func testTxa() {
         let program: [UInt8] = [0xA2, 0xFF, 0x8A]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0xFF)
@@ -1624,7 +1624,7 @@ final class CPUTests: XCTestCase {
     func testTxs() {
         // NOTA BENE: the stack pointer upon initialization is set to 0xFF
         let program: [UInt8] = [0xA2, 0x00, 0x9A]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.stackPointer, 0x00)
@@ -1635,7 +1635,7 @@ final class CPUTests: XCTestCase {
     func testTya() {
         // NOTA BENE: the stack pointer upon initialization is set to 0xFF
         let program: [UInt8] = [0xA0, 0x00, 0x98]
-        var cpu = makeCpu(programBytes: program)
+        let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x00)
