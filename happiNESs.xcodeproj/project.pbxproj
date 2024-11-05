@@ -63,14 +63,14 @@
 		878D81472C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */; };
+		87C5B3272CD9C3C9008580A6 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3222CD9C3C9008580A6 /* Axrom.swift */; };
+		87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3232CD9C3C9008580A6 /* Cnrom.swift */; };
+		87C5B3292CD9C3C9008580A6 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3242CD9C3C9008580A6 /* Mmc1.swift */; };
+		87C5B32A2CD9C3C9008580A6 /* Uxrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3252CD9C3C9008580A6 /* Uxrom.swift */; };
+		87C5B32B2CD9C3C9008580A6 /* Nrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3262CD9C3C9008580A6 /* Nrom.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
 		87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* MapperNumber.swift */; };
 		87E981472CD076660090A200 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981462CD076660090A200 /* Mapper.swift */; };
-		87E981492CD0772A0090A200 /* Nrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981482CD0772A0090A200 /* Nrom.swift */; };
-		87E9814B2CD0916A0090A200 /* Cnrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814A2CD0916A0090A200 /* Cnrom.swift */; };
-		87E9814D2CD098680090A200 /* Uxrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814C2CD098680090A200 /* Uxrom.swift */; };
-		87E9814F2CD09BF70090A200 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E9814E2CD09BF70090A200 /* Axrom.swift */; };
-		87E981512CD0C45A0090A200 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981502CD0C45A0090A200 /* Mmc1.swift */; };
 		87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981522CD8B5990090A200 /* NMIDelayState.swift */; };
 		87E981562CD9A6950090A200 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981552CD9A6950090A200 /* nestest.nes */; };
 		87E981582CD9A6BF0090A200 /* ppu_vbl_nmi.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */; };
@@ -164,14 +164,14 @@
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
 		878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseChannel.swift; sourceTree = "<group>"; };
+		87C5B3222CD9C3C9008580A6 /* Axrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
+		87C5B3232CD9C3C9008580A6 /* Cnrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cnrom.swift; sourceTree = "<group>"; };
+		87C5B3242CD9C3C9008580A6 /* Mmc1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
+		87C5B3252CD9C3C9008580A6 /* Uxrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Uxrom.swift; sourceTree = "<group>"; };
+		87C5B3262CD9C3C9008580A6 /* Nrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nrom.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
 		87D265162C9DECAF00C143B1 /* MapperNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapperNumber.swift; sourceTree = "<group>"; };
 		87E981462CD076660090A200 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
-		87E981482CD0772A0090A200 /* Nrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nrom.swift; sourceTree = "<group>"; };
-		87E9814A2CD0916A0090A200 /* Cnrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cnrom.swift; sourceTree = "<group>"; };
-		87E9814C2CD098680090A200 /* Uxrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uxrom.swift; sourceTree = "<group>"; };
-		87E9814E2CD09BF70090A200 /* Axrom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
-		87E981502CD0C45A0090A200 /* Mmc1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
 		87E981522CD8B5990090A200 /* NMIDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NMIDelayState.swift; sourceTree = "<group>"; };
 		87E981552CD9A6950090A200 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
 		87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = ppu_vbl_nmi.nes; sourceTree = "<group>"; };
@@ -261,7 +261,6 @@
 		8744B1742C1CB9B3001B44B5 /* happiNESs */ = {
 			isa = PBXGroup;
 			children = (
-				8771BFA92CD03E6200306E13 /* Mappers */,
 				8744B1752C1CB9B3001B44B5 /* happiNESs.h */,
 				8744B1762C1CB9B3001B44B5 /* happiNESs.docc */,
 				878C69722CAA424400DA9BD4 /* Address.swift */,
@@ -271,23 +270,23 @@
 				8719320F2C372F6900A73C22 /* Bus.swift */,
 				874F51912CB9B51C00B12037 /* CachedSprite.swift */,
 				871932132C3798B400A73C22 /* Cartridge.swift */,
+				87C5B3212CD9C388008580A6 /* Channels */,
 				871F62352C65631F00132962 /* ControllerRegister.swift */,
 				8744B1902C1CC0C4001B44B5 /* CPU.swift */,
 				870AABE32CB382E000E9F3B6 /* CPU+execution.swift */,
 				870AABDF2CB37EA000E9F3B6 /* CPU+instructions.swift */,
 				870AABE12CB381C100E9F3B6 /* CPU+memory.swift */,
-				875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */,
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				87E981462CD076660090A200 /* Mapper.swift */,
 				87D265162C9DECAF00C143B1 /* MapperNumber.swift */,
+				87C5B32C2CD9C40A008580A6 /* Mappers */,
 				87184D092C7511F90003D090 /* MaskRegister.swift */,
 				871932112C37985700A73C22 /* Mirroring.swift */,
 				871932062C30E91D00A73C22 /* NESColor.swift */,
 				878D81462C815E760076ED30 /* NESError.swift */,
 				87E981522CD8B5990090A200 /* NMIDelayState.swift */,
-				878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */,
 				87184D0D2C756BEB0003D090 /* OAMRegister.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
@@ -296,13 +295,11 @@
 				870AABD92CB34E3000E9F3B6 /* PPU+tracing.swift */,
 				870AABDB2CB3533700E9F3B6 /* PPU+IO.swift */,
 				87184D042C7028F10003D090 /* PPUStatusRegister.swift */,
-				874F51B42CC1D05D00B12037 /* PulseChannel.swift */,
 				874F51AC2CBF05BC00B12037 /* Register.swift */,
 				874F51AA2CBF036600B12037 /* RegisterBit.swift */,
 				874F51B02CC03F1500B12037 /* RegisterBitMask.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
-				874F51AE2CBF10DA00B12037 /* TriangleChannel.swift */,
 				871F62332C6541D300132962 /* UInt16+bytes.swift */,
 				87D265142C9146F400C143B1 /* ViewPort.swift */,
 			);
@@ -320,14 +317,25 @@
 			path = happiNESsTests;
 			sourceTree = "<group>";
 		};
-		8771BFA92CD03E6200306E13 /* Mappers */ = {
+		87C5B3212CD9C388008580A6 /* Channels */ = {
 			isa = PBXGroup;
 			children = (
-				87E9814E2CD09BF70090A200 /* Axrom.swift */,
-				87E9814A2CD0916A0090A200 /* Cnrom.swift */,
-				87E981502CD0C45A0090A200 /* Mmc1.swift */,
-				87E981482CD0772A0090A200 /* Nrom.swift */,
-				87E9814C2CD098680090A200 /* Uxrom.swift */,
+				875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */,
+				878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */,
+				874F51AE2CBF10DA00B12037 /* TriangleChannel.swift */,
+				874F51B42CC1D05D00B12037 /* PulseChannel.swift */,
+			);
+			path = Channels;
+			sourceTree = "<group>";
+		};
+		87C5B32C2CD9C40A008580A6 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+				87C5B3222CD9C3C9008580A6 /* Axrom.swift */,
+				87C5B3232CD9C3C9008580A6 /* Cnrom.swift */,
+				87C5B3242CD9C3C9008580A6 /* Mmc1.swift */,
+				87C5B3262CD9C3C9008580A6 /* Nrom.swift */,
+				87C5B3252CD9C3C9008580A6 /* Uxrom.swift */,
 			);
 			path = Mappers;
 			sourceTree = "<group>";
@@ -501,7 +509,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */,
-				87E9814D2CD098680090A200 /* Uxrom.swift in Sources */,
 				870AABDC2CB3533700E9F3B6 /* PPU+IO.swift in Sources */,
 				870AABDE2CB36D4100E9F3B6 /* PPU+rendering.swift in Sources */,
 				870AABE22CB381C100E9F3B6 /* CPU+memory.swift in Sources */,
@@ -515,8 +522,10 @@
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
 				874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */,
+				87C5B3292CD9C3C9008580A6 /* Mmc1.swift in Sources */,
 				874F51AD2CBF05BC00B12037 /* Register.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
+				87C5B32B2CD9C3C9008580A6 /* Nrom.swift in Sources */,
 				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */,
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
@@ -533,20 +542,19 @@
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
 				874F51AF2CBF10DA00B12037 /* TriangleChannel.swift in Sources */,
 				871932142C3798B400A73C22 /* Cartridge.swift in Sources */,
-				87E981492CD0772A0090A200 /* Nrom.swift in Sources */,
-				87E981512CD0C45A0090A200 /* Mmc1.swift in Sources */,
 				87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */,
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,
 				870AABDA2CB34E3000E9F3B6 /* PPU+tracing.swift in Sources */,
 				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
+				87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
-				87E9814B2CD0916A0090A200 /* Cnrom.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 				874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */,
 				874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */,
 				874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */,
-				87E9814F2CD09BF70090A200 /* Axrom.swift in Sources */,
+				87C5B3272CD9C3C9008580A6 /* Axrom.swift in Sources */,
+				87C5B32A2CD9C3C9008580A6 /* Uxrom.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
