@@ -33,7 +33,7 @@ extension PPU {
         // current X value _and_ which has a non-transparent color. If we find none,
         // then we return a nil tuple.
         for sprite in self.currentSprites {
-            let spritePixelX = self.cycles - sprite.tileX
+            let spritePixelX = self.cycles - 1 - sprite.tileX
             // Check to see if the current X value is within the current sprite
             if spritePixelX < 0 || spritePixelX > 7 {
                 continue
@@ -60,9 +60,9 @@ extension PPU {
 
         switch (maybeSpriteColor, maybeBackgroundColor) {
         case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
-             if spriteIndex == 0 {
-                 self.statusRegister[.spriteZeroHit] = true
-             }
+            if spriteIndex == 0 {
+                self.statusRegister[.spriteZeroHit] = true
+            }
 
             switch backgroundPriority {
             case true:
@@ -81,7 +81,7 @@ extension PPU {
 
     mutating public func renderPixel() {
         let color = self.getCurrentPixelColor()
-        let currentPixelIndex = Self.width * self.scanline + self.cycles
+        let currentPixelIndex = Self.width * self.scanline + (self.cycles - 1)
         self.screenBuffer[currentPixelIndex * 3] = color.red
         self.screenBuffer[(currentPixelIndex * 3) + 1] = color.green
         self.screenBuffer[(currentPixelIndex * 3) + 2] = color.blue

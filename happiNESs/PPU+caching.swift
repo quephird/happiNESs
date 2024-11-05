@@ -367,7 +367,7 @@ extension PPU {
             // NOTA BENE: Since we're starting to render at cycle 0 for each line
             // we need to update caches every eighth line beginning at the _first_
             // cycle.
-            switch (self.cycles+1) % 8 {
+            switch (self.cycles) % 8 {
             case 1:
                 self.cacheNametableByte()
             case 3:

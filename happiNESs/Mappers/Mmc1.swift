@@ -6,7 +6,7 @@
 //
 
 struct Mmc1: Mapper {
-    public var cartridge: Cartridge
+    public unowned var cartridge: Cartridge
 
     private var prgRomBankMode: Int = 0
     private var chrRomBankMode: Int = 0

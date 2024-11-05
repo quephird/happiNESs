@@ -23,6 +23,7 @@ public class CPU {
     public var programCounter: UInt16
     public var bus: Bus
     public var interrupt: Interrupt = .none
+    public var stall: Int = 0
 
     public var tracingOn: Bool
 
@@ -51,6 +52,7 @@ public class CPU {
         self.stackPointer = Self.resetStackPointerValue
         self.programCounter = self.readWord(address: Self.resetVectorAddress)
         self.interrupt = .none
+        self.stall = 0
 
         self.bus.reset()
         // TODO: Look more deeply into whether or not this is the best strategy
@@ -72,8 +74,8 @@ public class CPU {
         self.pushStack(byte: copy.rawValue)
         self.statusRegister[.interruptsDisabled] = true
 
-        let _ = self.bus.tick(cycles: 2)
         self.programCounter = self.readWord(address: Self.nmiVectorAddress)
+        let _ = self.bus.tick(cycles: 7)
     }
 
     public func handleIrq() {
@@ -86,7 +88,7 @@ public class CPU {
         self.pushStack(byte: copy.rawValue)
         self.statusRegister[.interruptsDisabled] = true
 
-        let _ = self.bus.tick(cycles: 2)
         self.programCounter = self.readWord(address: Self.interruptVectorAddress)
+        let _ = self.bus.tick(cycles: 7)
     }
 }

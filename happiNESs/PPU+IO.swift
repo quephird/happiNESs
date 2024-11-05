@@ -16,6 +16,22 @@ extension PPU {
         self.statusRegister[.verticalBlankStarted] = false
         self.wRegister = false
 
+        // ACHTUNG! This implementation is taken from a thread on the NESDev forums
+        // on the topic of suppression of VBL under certain circumstances:
+        //
+        //     https://forums.nesdev.org/viewtopic.php?p=120121
+        if self.isNmiScanline && self.cycles == 1 {
+            self.suppressVerticalBlank = true
+        }
+
+        // NOTA BENE: This is Yet Another Hack, this time taken from another NES
+        // emulator, and which allows for blargg's 06-suppression test to pass:
+        //
+        //     https://github.com/donqustix/emunes/blob/master/src/nes/emulator/ppu.h#L204
+        if self.isNmiScanline && (self.cycles >= 1 && self.cycles <= 3) {
+            self.nmiDelayState = .canceled
+        }
+
         return result
     }
 
@@ -35,8 +51,34 @@ extension PPU {
         self.controllerRegister.update(byte: byte)
         let nmiAfter = self.controllerRegister[.generateNmi]
 
-        if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
-            self.bus!.triggerNmi()
+        switch (self.scanline, self.cycles) {
+        case (Self.nmiInterruptScanline, 1...3):
+            // NOTA BENE: This is a hack to get the last pesky test ROM to pass,
+            // namely 08-nmi_timing_off, to pass. Inspired by code that I saw from
+            // a Rust NES implementation:
+            //
+            //     https://github.com/razielgn/nes/blob/master/src/nes/ppu.rs#L697
+            if self.isNmiScanline && (self.cycles >= 1 && self.cycles <= 3) {
+                if nmiBefore && !nmiAfter {
+                    self.nmiDelayState = .canceled
+                }
+            }
+        case (Self.scanlinesPerFrame, 1):
+            // NOTA BENE: This is another thing that I gleaned from another NES emulator,
+            // to suppress queueing up an NMI if we're at the scanline & cycle at which
+            // VBL is cleared.
+            //
+            //     https://github.com/donqustix/emunes/blob/master/src/nes/emulator/ppu.h#L143
+            break
+        default:
+            // NOTA BENE: Per what is stated in this section on the NESDev wiki,
+            // if the NMI enabled flag is toggled when VBL is set, then we need to
+            // generate an NMI interrupt.
+            //
+            //     https://www.nesdev.org/wiki/NMI#Operation
+            if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
+                self.nmiDelayState.scheduleNmi()
+            }
         }
 
         let nametableBits = self.controllerRegister.rawValue & 0b0000_0011
@@ -44,7 +86,21 @@ extension PPU {
     }
 
     mutating public func updateMask(byte: UInt8) {
+        let showBitsBefore = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
         self.maskRegister.update(byte: byte)
+        let showBitsAfter = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
+
+        // ACHTUNG! This is yet another apparent hack discovered in the thread
+        // below which gets the tenth of blargg's PPU test ROMs to pass. I could
+        // not find any detailed explanation or theory behind this... but it does
+        // indeed work.
+        //
+        //     https://forums.nesdev.org/viewtopic.php?p=208409#p208409
+        if showBitsAfter != showBitsBefore {
+            if self.isPreRenderLine && self.isJustBeforeLastCycle && self.isOddFrame {
+                self.cycles = self.isRenderingEnabled ? 338 : 340
+            }
+        }
     }
 
     mutating public func updateOAMAddress(byte: UInt8) {
