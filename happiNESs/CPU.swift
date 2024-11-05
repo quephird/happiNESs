@@ -23,6 +23,7 @@ public class CPU {
     public var programCounter: UInt16
     public var bus: Bus
     public var interrupt: Interrupt = .none
+    public var cycles: Int = 0
     public var stall: Int = 0
 
     public var tracingOn: Bool
@@ -53,16 +54,25 @@ public class CPU {
         self.programCounter = self.readWord(address: Self.resetVectorAddress)
         self.interrupt = .none
         self.stall = 0
+        self.cycles = 0
 
         self.bus.reset()
         // TODO: Look more deeply into whether or not this is the best strategy
         // for simulating the initial number of CPU cycles when resetting the CPU
-        let _ = self.bus.tick(cycles: 7)
+        let _ = self.tick(cycles: 7)
     }
 
     public func handleButton(button: JoypadButton, status: Bool) {
         self.bus.joypad.updateButtonStatus(button: button, status: status)
     }
+
+    public func tick(cycles: Int) -> Bool {
+        self.cycles += cycles
+
+        self.bus.apu.tick(cpuCycles: cycles)
+        return self.bus.ppu.tick(cpuCycles: cycles)
+    }
+
 
     public func handleNmi() {
         self.pushStack(word: self.programCounter)
@@ -75,7 +85,7 @@ public class CPU {
         self.statusRegister[.interruptsDisabled] = true
 
         self.programCounter = self.readWord(address: Self.nmiVectorAddress)
-        let _ = self.bus.tick(cycles: 7)
+        let _ = self.tick(cycles: 7)
     }
 
     public func handleIrq() {
@@ -89,6 +99,6 @@ public class CPU {
         self.statusRegister[.interruptsDisabled] = true
 
         self.programCounter = self.readWord(address: Self.interruptVectorAddress)
-        let _ = self.bus.tick(cycles: 7)
+        let _ = self.tick(cycles: 7)
     }
 }

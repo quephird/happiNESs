@@ -117,7 +117,7 @@ func trace(cpu: CPU) -> String {
 
     trace += "PPU:" + String(format: "%3d,%3d ", cpu.bus.ppu.scanline, cpu.bus.ppu.cycles)
 
-    trace += "CYC:" + String(cpu.bus.cycles)
+    trace += "CYC:" + String(cpu.cycles)
 
     return trace
 }
