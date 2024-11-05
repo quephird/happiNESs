@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NESError: Error, LocalizedError {
+enum NESError: Equatable, Error, LocalizedError {
     case romFileCouldNotBeSelected
     case romFileCouldNotBeOpened
     case romNotInInesFormat

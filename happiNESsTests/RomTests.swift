@@ -19,8 +19,9 @@ final class RomTests: XCTestCase {
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
 
-        if let badRom = Cartridge(bytes: romBytes) {
-            XCTFail("ROM with bad tag should not have loaded!")
+        let expectedError = NESError.romNotInInesFormat
+        XCTAssertThrowsError(try Cartridge(bytes: romBytes)) { actualError in
+            XCTAssertEqual(actualError as! NESError, expectedError)
         }
     }
 
@@ -34,8 +35,9 @@ final class RomTests: XCTestCase {
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
 
-        if let badRom = Cartridge(bytes: romBytes) {
-            XCTFail("ROM with bad iNES version should not have loaded!")
+        let expectedError = NESError.versionTwoPointOhNotSupported
+        XCTAssertThrowsError(try Cartridge(bytes: romBytes)) { actualError in
+            XCTAssertEqual(actualError as! NESError, expectedError)
         }
     }
 
@@ -49,11 +51,8 @@ final class RomTests: XCTestCase {
         let chrBytes = [UInt8](repeating: 0x00, count: 8192)
 
         let allBytes = header + trainer + prgBytes + chrBytes
-        if let rom = Cartridge(bytes: allBytes) {
-            XCTAssertEqual(rom.prgMemory[0], 0xA9)
-            XCTAssertEqual(rom.prgMemory[1], 0x42)
-        } else {
-            XCTFail("ROM should have been successfully constructed")
-        }
+        let cartridge = try! Cartridge(bytes: allBytes)
+        XCTAssertEqual(cartridge.prgMemory[0], 0xA9)
+        XCTAssertEqual(cartridge.prgMemory[1], 0x42)
     }
 }
