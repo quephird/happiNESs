@@ -19,6 +19,10 @@ struct Nrom: Mapper {
             // Mirror if needed
             if self.cartridge.prgMemory.count == 0x4000 {
                 memoryIndex = memoryIndex % 0x4000
+            } else if self.cartridge.prgMemory.count == 0x2000 {
+                // ACHTUNG! This is a hack for games like Galaxian which are one
+                // of the very vew games that has an 8Kb PRG ROM
+                memoryIndex = memoryIndex % 0x2000
             }
 
             return self.cartridge.prgMemory[Int(memoryIndex)]

@@ -25,9 +25,10 @@ public class Cartridge {
         }
 
         let inesVersion = (bytes[7] >> 2) & 0b11;
-        if inesVersion != 0 {
-            throw NESError.versionTwoPointOhNotSupported
+        if inesVersion > 2 {
+            throw NESError.versionTwoPointOhOrEarlierSupported
         }
+        let isNesTwoPointOh = inesVersion == 2
 
         let fourScreenBit = bytes[6] & 0b1000 != 0;
         let horizontalVerticalbit = bytes[6] & 0b1 != 0;
@@ -37,18 +38,57 @@ public class Cartridge {
         case (false, false): .horizontal
         }
 
-        let mapperByte = (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
-        guard let mapperNumber = MapperNumber(rawValue: mapperByte) else {
-            throw NESError.mapperNotSupported(Int(mapperByte))
+        let mapperBits = if isNesTwoPointOh {
+            ((bytes[8] & 0b0000_1111) << 8) | (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
+        } else {
+            (bytes[7] & 0b1111_0000) | (bytes[6] >> 4)
+        }
+        guard let mapperNumber = MapperNumber(rawValue: UInt16(mapperBits)) else {
+            throw NESError.mapperNotSupported(Int(mapperBits))
         }
         self.mapperNumber = mapperNumber
 
-        let prgRomSize = Int(bytes[4]) * Self.prgMemoryPageSize
-        let chrRomSize = Int(bytes[5]) * Self.chrMemoryPageSize
+        let prgRomSize: Int
+        if isNesTwoPointOh {
+            let msbNibble = UInt16(bytes[9]) & 0b0000_1111
+            if msbNibble == 0x0F {
+                let exponent = Int((bytes[4] & 0b1111_1100) >> 2)
+                let multiplier = Int(bytes[4] & 0b0000_0011)
+                prgRomSize = (1 << exponent) * (multiplier * 2 + 1)
+            } else {
+                prgRomSize = Int(msbNibble << 8 | UInt16(bytes[4])) * Self.prgMemoryPageSize
+            }
+        } else {
+            prgRomSize = Int(bytes[4]) * Self.prgMemoryPageSize
+        }
+
         let skipTrainerBit = bytes[6] & 0b100 != 0
-        let prgMemoryStart = 16 + (skipTrainerBit ? 512 : 0)
-        let chrMemoryStart = prgMemoryStart + prgRomSize
+        let prgMemoryStart = if isNesTwoPointOh {
+            16
+        } else {
+            16 + (skipTrainerBit ? 512 : 0)
+        }
         let prgMemory = Array(bytes[prgMemoryStart ..< (prgMemoryStart + prgRomSize)])
+
+        let chrRomSize: Int
+        if isNesTwoPointOh {
+            let msbNibble = (UInt16(bytes[9]) & 0b1111_0000) >> 4
+            if msbNibble == 0x0F {
+                let exponent = Int((bytes[5] & 0b1111_1100) >> 2)
+                let multiplier = Int(bytes[5] & 0b0000_0011)
+                chrRomSize = (1 << exponent) * (multiplier * 2 + 1)
+            } else {
+                chrRomSize = Int(msbNibble << 8 | UInt16(bytes[5])) * Self.chrMemoryPageSize
+            }
+        } else {
+            chrRomSize = Int(bytes[5]) * Self.chrMemoryPageSize
+        }
+
+        let chrMemoryStart = if isNesTwoPointOh {
+            prgMemoryStart + prgRomSize + (skipTrainerBit ? 512 : 0)
+        } else {
+            prgMemoryStart + prgRomSize
+        }
         let chrMemory = if chrRomSize == 0 {
             [UInt8](repeating: 0x00, count: Self.chrMemoryPageSize)
         } else {
