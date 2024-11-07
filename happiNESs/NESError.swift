@@ -12,6 +12,7 @@ enum NESError: Equatable, Error, LocalizedError {
     case romFileCouldNotBeOpened
     case romNotInInesFormat
     case versionTwoPointOhOrEarlierSupported
+    case unsupportedTimingMode
     case mapperNotSupported(Int)
 
     var errorDescription: String? {
@@ -24,6 +25,8 @@ enum NESError: Equatable, Error, LocalizedError {
             "ROM file not in iNES format"
         case .versionTwoPointOhOrEarlierSupported:
             "NES 2.0 ROMs or earlier supported only"
+        case .unsupportedTimingMode:
+            "Only NTSC and PAL ROMs currently supported"
         case .mapperNotSupported(let mapperNumber):
             String(format: "Mapper number %03d not supported", mapperNumber)
         }

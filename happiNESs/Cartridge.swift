@@ -10,6 +10,7 @@ public class Cartridge {
     static let prgMemoryPageSize: Int = 16384
     static let chrMemoryPageSize: Int = 8192
 
+    public var timingMode: TimingMode
     public var mirroring: Mirroring
     public var mapperNumber: MapperNumber
     public var prgMemory: [UInt8]
@@ -29,6 +30,15 @@ public class Cartridge {
             throw NESError.versionTwoPointOhOrEarlierSupported
         }
         let isNesTwoPointOh = inesVersion == 2
+
+        let timingMode = if isNesTwoPointOh {
+            TimingMode(rawValue: bytes[9] & 0b0000_0001)
+        } else {
+            TimingMode(rawValue: bytes[12] & 0b0000_0011)
+        }
+        guard let timingMode, [.ntsc, .pal].contains(timingMode) else {
+            throw NESError.unsupportedTimingMode
+        }
 
         let fourScreenBit = bytes[6] & 0b1000 != 0;
         let horizontalVerticalbit = bytes[6] & 0b1 != 0;
@@ -95,6 +105,7 @@ public class Cartridge {
             Array(bytes[chrMemoryStart ..< (chrMemoryStart + chrRomSize)])
         }
 
+        self.timingMode = timingMode
         self.mirroring = mirroring
         self.prgMemory = prgMemory
         self.prgBankIndex = 0
