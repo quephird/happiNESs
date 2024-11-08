@@ -68,6 +68,7 @@
 		87C5B3292CD9C3C9008580A6 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3242CD9C3C9008580A6 /* Mmc1.swift */; };
 		87C5B32A2CD9C3C9008580A6 /* Uxrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3252CD9C3C9008580A6 /* Uxrom.swift */; };
 		87C5B32B2CD9C3C9008580A6 /* Nrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3262CD9C3C9008580A6 /* Nrom.swift */; };
+		87C5B32E2CDD71D9008580A6 /* TimingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B32D2CDD71D9008580A6 /* TimingMode.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
 		87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* MapperNumber.swift */; };
 		87E981472CD076660090A200 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981462CD076660090A200 /* Mapper.swift */; };
@@ -169,6 +170,7 @@
 		87C5B3242CD9C3C9008580A6 /* Mmc1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
 		87C5B3252CD9C3C9008580A6 /* Uxrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Uxrom.swift; sourceTree = "<group>"; };
 		87C5B3262CD9C3C9008580A6 /* Nrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nrom.swift; sourceTree = "<group>"; };
+		87C5B32D2CDD71D9008580A6 /* TimingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimingMode.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
 		87D265162C9DECAF00C143B1 /* MapperNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapperNumber.swift; sourceTree = "<group>"; };
 		87E981462CD076660090A200 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 				874F51AA2CBF036600B12037 /* RegisterBit.swift */,
 				874F51B02CC03F1500B12037 /* RegisterBitMask.swift */,
 				8744B1922C1D6D59001B44B5 /* StatusRegister.swift */,
+				87C5B32D2CDD71D9008580A6 /* TimingMode.swift */,
 				8763D06D2C3A340C006C1B4F /* Tracing.swift */,
 				871F62332C6541D300132962 /* UInt16+bytes.swift */,
 				87D265142C9146F400C143B1 /* ViewPort.swift */,
@@ -532,6 +535,7 @@
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				87E981472CD076660090A200 /* Mapper.swift in Sources */,
 				874F51AB2CBF036600B12037 /* RegisterBit.swift in Sources */,
+				87C5B32E2CDD71D9008580A6 /* TimingMode.swift in Sources */,
 				870AABE42CB382E000E9F3B6 /* CPU+execution.swift in Sources */,
 				87184D052C7028F10003D090 /* PPUStatusRegister.swift in Sources */,
 				870AABE02CB37EA000E9F3B6 /* CPU+instructions.swift in Sources */,

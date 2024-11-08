@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 9/20/24.
 //
 
-public enum MapperNumber: UInt8 {
+public enum MapperNumber: UInt16 {
     case nrom = 0
     case mmc1 = 1
     case uxrom = 2
