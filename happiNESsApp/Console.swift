@@ -83,6 +83,10 @@ import SwiftUI
         self.cpu.bus.ppu.dump()
     }
 
+    public func reset() {
+        self.cpu.reset()
+    }
+
     var tracingOn: Bool {
         get {
             access(keyPath: \.tracingOn)

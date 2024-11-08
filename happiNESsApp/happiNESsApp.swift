@@ -63,6 +63,11 @@ struct happiNESsApp: App {
                 }
                 Toggle("Toggle tracing", isOn: $console.tracingOn)
                 Divider()
+                Button("Reset game") {
+                    console.reset()
+                }
+                .keyboardShortcut("r", modifiers: .command)
+                .disabled(!console.cartridgeLoaded)
                 Picker(selection: $console.scale, label: Text("Scale")) {
                     Text("1x").tag(1.0)
                     Text("2x").tag(2.0)
