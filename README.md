@@ -8,7 +8,7 @@ Check out the project using git. Then open it up using Xcode and run the project
 
 <img src="./images/open_rom.png" />
 
-At this time, files in iNES 2.0 format are _not_ supported, and you will get an error if you attempt to load one. Also, if the ROM's mapper is not in the list below, you will also get an error. However, if you open a valid ROM file, the game should load and you should see the title screen for that game, and be able to immediately start playing it. You can load a new ROM file at any time even after selecting and playing one.
+ROM files must be in NES 2.0 format or earlier. If the ROM's mapper is not in the list below, you will get an error. However, if you open a valid ROM file, the game should load and you should see the title screen for that game, and be able to immediately start playing it. You can load a new ROM file at any time even after selecting and playing one.
 
 Keys are mapped to joypad buttons in the following manner:
 
@@ -30,6 +30,8 @@ Keys are mapped to joypad buttons in the following manner:
 You can also specify the scale of the screen between 1x, 2x, and 3x through the View menu of the app:
 
 <img src="./images/set_scale.png" />
+
+Hitting ⌘-R within happiNESs at any time while playing a game will reset it.
 
 # Supported games
 
