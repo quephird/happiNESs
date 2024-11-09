@@ -116,9 +116,15 @@ struct happiNESsApp: App {
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(!console.cartridgeLoaded)
                 Picker(selection: $console.scale, label: Text("Scale")) {
-                    Text("1x").tag(1.0)
-                    Text("2x").tag(2.0)
-                    Text("3x").tag(3.0)
+                    Text("1x")
+                        .tag(1.0)
+                        .keyboardShortcut("1", modifiers: .command)
+                    Text("2x")
+                        .tag(2.0)
+                        .keyboardShortcut("2", modifiers: .command)
+                    Text("3x")
+                        .tag(3.0)
+                        .keyboardShortcut("3", modifiers: .command)
                 }
                 .disabled(isFullscreen)
             }
