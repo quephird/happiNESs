@@ -38,11 +38,14 @@ struct happiNESsApp: App {
             if #available(macOS 15.0, *) {
                 HStack {
                     if isFullscreen {
-                        Spacer(minLength: 500)
+                        // NOTA BENE: We need to set the minimum lenght of the spacer
+                        // here to something large enough so that the centering of the
+                        // ContentView actually works.
+                        Spacer(minLength: NSScreen.main!.frame.width/2.0)
                     }
                     ContentView()
                     if isFullscreen {
-                        Spacer(minLength: 500)
+                        Spacer(minLength: NSScreen.main!.frame.width/2.0)
                     }
                 }
                     .background(Color.black)
