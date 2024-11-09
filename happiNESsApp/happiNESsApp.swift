@@ -34,6 +34,11 @@ struct happiNESsApp: App {
     }
 
     var body: some Scene {
+        let commonView = ContentView()
+            .environment(console)
+            .alert(errorMessage, isPresented: $showAlert, actions: {})
+            .dialogSeverity(.critical)
+
         Window("happiNESs", id: "main") {
             if #available(macOS 15.0, *) {
                 HStack {
@@ -43,7 +48,7 @@ struct happiNESsApp: App {
                         // ContentView actually works.
                         Spacer(minLength: NSScreen.main!.frame.width/2.0)
                     }
-                    ContentView()
+                    commonView
                     if isFullscreen {
                         Spacer(minLength: NSScreen.main!.frame.width/2.0)
                     }
@@ -51,9 +56,6 @@ struct happiNESsApp: App {
                     .background(Color.black)
                     .windowFullScreenBehavior(.enabled)
                     .windowResizeBehavior(.disabled)
-                    .environment(console)
-                    .alert(errorMessage, isPresented: $showAlert, actions: {})
-                    .dialogSeverity(.critical)
                     .onReceive(Self.fullscreenNotificationPublisher) { notification in
                         switch notification.name {
                         case NSWindow.didEnterFullScreenNotification:
@@ -71,10 +73,7 @@ struct happiNESsApp: App {
                         }
                     }
             } else {
-                ContentView()
-                    .environment(console)
-                    .alert(errorMessage, isPresented: $showAlert, actions: {})
-                    .dialogSeverity(.critical)
+                commonView
             }
         }
         .windowResizability(.contentSize)
