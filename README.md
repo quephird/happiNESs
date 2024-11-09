@@ -31,6 +31,8 @@ You can also specify the scale of the screen between 1x, 2x, and 3x through the 
 
 <img src="./images/set_scale.png" />
 
+... or through hitting ⌘-1, ⌘-2, or ⌘-3, respectively. Alternately, if you are on macOS 15.1 or later, you can run the game in fullscreen mode by selecting the "Enter Full Screen" choice from the View menu or via hitting the 🌐-F chord.
+
 Hitting ⌘-R within happiNESs at any time while playing a game will reset it.
 
 # Supported games
@@ -41,16 +43,27 @@ So far, the following mappers and associated games have been tested in this emul
   - 1941
   - Donkey Kong
   - Galaga
+  - Galaxian
   - Ms. Pacman
   - Pacman
   - Super Mario Bros.
   - Xevious
+- 001
+  - Castlevania II
+  - Double Dribble
+  - Pinball Quest
 - 002
   - 1943
+  - Blades of Steel
   - Castlevania
 - 003
   - Gradius
+  - Gyruss
   - Tiger Heli
+- 007
+  - Sky Shark (HUD is jumpy)
+  - Marble Madness (text box glitches a little at start of level)
+  - Wheel of Fortune
 
 Also, this emulator now supports sound! Games should play and sound _pretty_ close to the original, however certain things like timings and IRQ interrupt handling may not be quite right and will need some work to correct.
 
