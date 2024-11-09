@@ -5,17 +5,28 @@
 //  Created by Danielle Kefford on 6/29/24.
 //
 
+import happiNESs
 import SwiftUI
 import UniformTypeIdentifiers
 
 @main
 @MainActor
 struct happiNESsApp: App {
+    static let fullscreenNotificationPublisher = NotificationCenter.default.publisher(
+        for: NSWindow.didEnterFullScreenNotification
+    ).merge(
+        with: NotificationCenter.default.publisher(
+            for: NSWindow.didExitFullScreenNotification
+        )
+    )
+
     @State var console = try! Console()
 
     @State private var showFileImporter = false
     @State private var errorMessage = ""
     @State private var showAlert = false
+    @State private var isFullscreen = false
+    @State private var oldScale: Double = Console.defaultScale
 
     private func setErrorMessage(message: String) {
         self.errorMessage = message
@@ -24,10 +35,44 @@ struct happiNESsApp: App {
 
     var body: some Scene {
         Window("happiNESs", id: "main") {
-            ContentView()
-                .environment(console)
-                .alert(errorMessage, isPresented: $showAlert, actions: {})
-                .dialogSeverity(.critical)
+            if #available(macOS 15.0, *) {
+                HStack {
+                    if isFullscreen {
+                        Spacer(minLength: 500)
+                    }
+                    ContentView()
+                    if isFullscreen {
+                        Spacer(minLength: 500)
+                    }
+                }
+                    .background(Color.black)
+                    .windowFullScreenBehavior(.enabled)
+                    .windowResizeBehavior(.disabled)
+                    .environment(console)
+                    .alert(errorMessage, isPresented: $showAlert, actions: {})
+                    .dialogSeverity(.critical)
+                    .onReceive(Self.fullscreenNotificationPublisher) { notification in
+                        switch notification.name {
+                        case NSWindow.didEnterFullScreenNotification:
+                            if let window = notification.object as? NSWindow, let screen = window.screen {
+                                self.oldScale = console.scale
+                                let newScale = screen.frame.size.height / CGFloat(PPU.height)
+                                console.scale = newScale
+                            }
+                            self.isFullscreen = true
+                        case NSWindow.didExitFullScreenNotification:
+                            console.scale = oldScale
+                            self.isFullscreen = false
+                        default:
+                            break
+                        }
+                    }
+            } else {
+                ContentView()
+                    .environment(console)
+                    .alert(errorMessage, isPresented: $showAlert, actions: {})
+                    .dialogSeverity(.critical)
+            }
         }
         .windowResizability(.contentSize)
         .commands {
@@ -73,6 +118,7 @@ struct happiNESsApp: App {
                     Text("2x").tag(2.0)
                     Text("3x").tag(3.0)
                 }
+                .disabled(isFullscreen)
             }
         }
     }

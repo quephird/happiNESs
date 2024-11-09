@@ -28,7 +28,6 @@ struct ContentView: View {
             if self.console.cartridgeLoaded {
                 Screen(screenBuffer: console.screenBuffer,
                        scale: console.scale)
-                .padding()
                 .focusable()
                 .focusEffectDisabled()
                 .focused($focused)
@@ -42,10 +41,7 @@ struct ContentView: View {
                 Image("happiNESs")
             }
         }
-        .frame(
-            maxWidth: CGFloat(Screen.width) * console.scale,
-            maxHeight: CGFloat(Screen.height) * console.scale)
-        .fixedSize()
+        .scaledToFit()
     }
 }
 

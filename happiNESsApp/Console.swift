@@ -11,6 +11,7 @@ import SwiftUI
 
 @Observable @MainActor class Console {
     static let frameRate = 60
+    static let defaultScale = 2.0
 
     public static let keyMappings: [KeyEquivalent : JoypadButton] = [
         .upArrow : .up,
@@ -33,7 +34,7 @@ import SwiftUI
     // pixels has changed, namely any of the elements of  `screenBuffer`.
     @ObservationIgnored private var cpu: CPU
     var screenBuffer: [UInt8] = PPU.makeEmptyScreenBuffer()
-    var scale: Double = 2.0
+    var scale: Double = Console.defaultScale
 
     internal init() throws {
         let bus = Bus()
