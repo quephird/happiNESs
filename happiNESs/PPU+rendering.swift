@@ -47,7 +47,12 @@ extension PPU {
                 continue
             }
 
-            let color = NESColor.systemPalette[Int(self.paletteTable[paletteIndex])]
+            // NOTA BENE: We need to do this, and ought to have been doing it in the first place,
+            // because Joust, and perhaps other games, can have palette indices larger than 63.
+            // The system palette only has 64 entries, so we need to get only the last six bits
+            // of paletteIndex to prevent an "Index out of range" error.
+            let systemPaletteIndex = Int(self.paletteTable[paletteIndex]) & 0b0011_1111
+            let color = NESColor.systemPalette[systemPaletteIndex]
             return (color, sprite.index, sprite.backgroundPriority)
         }
 
@@ -75,7 +80,12 @@ extension PPU {
         case (nil, .some(let backgroundColor)):
             return backgroundColor
         case (nil, nil):
-            return NESColor.systemPalette[Int(self.paletteTable[0])]
+            // NOTA BENE: We need to do this, and ought to have been doing it in the first place,
+            // because Joust, and perhaps other games, can have palette indices larger than 63.
+            // The system palette only has 64 entries, so we need to get only the last six bits
+            // of paletteIndex to prevent an "Index out of range" error.
+            let systemPaletteIndex = Int(self.paletteTable[0]) & 0b0011_1111
+            return NESColor.systemPalette[systemPaletteIndex]
         }
     }
 
