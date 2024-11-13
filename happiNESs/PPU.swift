@@ -242,7 +242,7 @@ public struct PPU {
             self.handleNmiState()
             self.handleRendering()
             self.handleCaching()
-            redrawScreen = redrawScreen || self.handleVerticalBlank()
+            redrawScreen = self.handleVerticalBlank() || redrawScreen
             self.handleFrameCounts()
         }
 
