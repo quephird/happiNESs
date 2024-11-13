@@ -38,6 +38,7 @@ extension PPU {
     mutating public func updateAddress(byte: UInt8) {
         if !self.wRegister {
             self.nextSharedAddress[.highByte] = byte
+            self.nextSharedAddress[.bit14] = 0
         } else {
             self.nextSharedAddress[.lowByte] = byte
             self.currentSharedAddress = self.nextSharedAddress

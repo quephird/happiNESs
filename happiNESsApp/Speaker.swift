@@ -42,7 +42,7 @@ struct Speaker {
         engine.attach(sourceNode)
         engine.connect(sourceNode, to: mainMixer, format: inputFormat)
         engine.connect(mainMixer, to: output, format: outputFormat)
-        mainMixer.outputVolume = 0.5
+        mainMixer.outputVolume = 1.0
 
         try engine.start()
     }
