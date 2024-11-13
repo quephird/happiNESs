@@ -118,10 +118,10 @@ public struct PPU {
         self.cycles >= 1 && self.cycles <= Self.width
     }
     var isIncrementVerticalScrollCycle: Bool {
-        self.cycles == Self.width + 1
+        self.cycles == Self.width
     }
     var isCopyHorizontalScrollCycle: Bool {
-        self.cycles == Self.width + 2
+        self.cycles == Self.width + 1
     }
     var isCopyVerticalScrollCycle: Bool {
         self.cycles >= 280 && self.cycles <= 304
