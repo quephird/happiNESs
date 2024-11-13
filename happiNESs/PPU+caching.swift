@@ -195,7 +195,7 @@ extension PPU {
     }
 
     private func getSpriteData(for oamIndex: Int) -> UInt32 {
-        let tileY = Int(self.oamRegister.data[oamIndex]) + 1
+        let tileY = Int(self.oamRegister.data[oamIndex])
         let attributeByte = self.oamRegister.data[oamIndex + 2]
 
         let flipVertical = ((attributeByte >> 7) & 1) == 1
@@ -285,7 +285,7 @@ extension PPU {
             // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
             //
             //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
-            let tileY = Int(self.oamRegister.data[oamIndex]) + 1
+            let tileY = Int(self.oamRegister.data[oamIndex])
 
             let spritePixelY = self.scanline - tileY
             // The sprite height property takes into account whether or not all

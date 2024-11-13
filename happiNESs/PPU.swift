@@ -123,6 +123,9 @@ public struct PPU {
     var isCopyHorizontalScrollCycle: Bool {
         self.cycles == Self.width + 1
     }
+    var isCacheSpritesCycle: Bool {
+        self.cycles == Self.width + 1
+    }
     var isCopyVerticalScrollCycle: Bool {
         self.cycles >= 280 && self.cycles <= 304
     }
@@ -161,7 +164,7 @@ public struct PPU {
             self.cacheBackgroundTiles()
 
             // TODO: Revisit this because sprites should be cached for the _next_ line
-            if self.isVisibleLine && self.cycles == 0 {
+            if self.isVisibleLine && self.isCacheSpritesCycle {
                 self.cacheSprites()
             }
         }
