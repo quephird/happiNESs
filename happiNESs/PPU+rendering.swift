@@ -20,6 +20,10 @@ extension PPU {
     }
 
     private func getCurrentBackgroundTileColor() -> NESColor? {
+        if self.maskRegister[.showBackground] == false {
+            return nil
+        }
+
         let tileData = self.currentTileData
         let pixelData = tileData >> ((7 - self.currentFineX) * 4)
         let colorIndex = Int(pixelData & 0x0F)
@@ -27,6 +31,10 @@ extension PPU {
     }
 
     private func getCurrentSpriteColor() -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
+        if self.maskRegister[.showSprites] == false {
+            return nil
+        }
+
         // Note that `currentSprites` is ordered from left to right by the OAM index,
         // with the first (zeroth) element being the so-called sprite zero. Furthermore,
         // the strategy here is to find the first sprite whose pixels intersect with the
