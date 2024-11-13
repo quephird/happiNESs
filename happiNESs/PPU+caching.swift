@@ -328,7 +328,7 @@ extension PPU {
             // Reset coarse X
             self.currentSharedAddress[.coarseX] = 0b0_0000
             // Toggle horizontal nametable
-            self.currentSharedAddress[.nametable] ^= 0b01
+            self.currentSharedAddress[.nametableX] ^= 0b1
         } else {
             // Just increment coarse X
             self.currentSharedAddress[.coarseX] += 0b0_0001
@@ -344,7 +344,7 @@ extension PPU {
                 // Reset coarse Y
                 self.currentSharedAddress[.coarseY] = 0b0_0000
                 // Toggle vertical nametable
-                self.currentSharedAddress[.nametable] ^= 0b10
+                self.currentSharedAddress[.nametableY] ^= 0b1
             } else if self.currentSharedAddress[.coarseY] == 0b1_1111 {
                 // ACHTUNG! How would we ever get to this branch?
                 //
