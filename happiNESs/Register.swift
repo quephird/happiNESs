@@ -13,6 +13,7 @@ extension Register {
             (self & (1 << flag.bitIndex)) > 0
         }
         set {
+            self &= ~(1 << flag.bitIndex)
             self |= (newValue ? 1 : 0) << flag.bitIndex
         }
     }

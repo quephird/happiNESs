@@ -118,10 +118,13 @@ public struct PPU {
         self.cycles >= 1 && self.cycles <= Self.width
     }
     var isIncrementVerticalScrollCycle: Bool {
-        self.cycles == Self.width + 1
+        self.cycles == Self.width
     }
     var isCopyHorizontalScrollCycle: Bool {
-        self.cycles == Self.width + 2
+        self.cycles == Self.width + 1
+    }
+    var isCacheSpritesCycle: Bool {
+        self.cycles == Self.width + 1
     }
     var isCopyVerticalScrollCycle: Bool {
         self.cycles >= 280 && self.cycles <= 304
@@ -161,7 +164,7 @@ public struct PPU {
             self.cacheBackgroundTiles()
 
             // TODO: Revisit this because sprites should be cached for the _next_ line
-            if self.isVisibleLine && self.cycles == 0 {
+            if self.isVisibleLine && self.isCacheSpritesCycle {
                 self.cacheSprites()
             }
         }
@@ -239,7 +242,7 @@ public struct PPU {
             self.handleNmiState()
             self.handleRendering()
             self.handleCaching()
-            redrawScreen = redrawScreen || self.handleVerticalBlank()
+            redrawScreen = self.handleVerticalBlank() || redrawScreen
             self.handleFrameCounts()
         }
 

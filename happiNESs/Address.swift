@@ -29,6 +29,7 @@ enum AddressBitMask: Address {
     case coarseY    = 0b0000_0011_1110_0000
     case coarseX    = 0b0000_0000_0001_1111
 
+    case bit14      = 0b0100_0000_0000_0000
     case highByte   = 0b0011_1111_0000_0000
     case lowByte    = 0b0000_0000_1111_1111
 

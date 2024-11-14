@@ -37,7 +37,15 @@ extension PPU {
 
     mutating public func updateAddress(byte: UInt8) {
         if !self.wRegister {
+            // ACHTUNG! Per the following excerpt in the NESDev wiki for PPUADDR, we
+            // need to _explicitly_ reset bit 14 here:
+            //
+            //     "However, bit 14 of the internal t register that holds the data written
+            //     to PPUADDR is forced to 0 when writing the PPUADDR high byte"
+            //
+            //     https://www.nesdev.org/wiki/PPU_registers#PPUADDR_-_VRAM_address_($2006_write)
             self.nextSharedAddress[.highByte] = byte
+            self.nextSharedAddress[.bit14] = 0
         } else {
             self.nextSharedAddress[.lowByte] = byte
             self.currentSharedAddress = self.nextSharedAddress

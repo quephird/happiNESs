@@ -195,7 +195,7 @@ extension PPU {
     }
 
     private func getSpriteData(for oamIndex: Int) -> UInt32 {
-        let tileY = Int(self.oamRegister.data[oamIndex]) + 1
+        let tileY = Int(self.oamRegister.data[oamIndex])
         let attributeByte = self.oamRegister.data[oamIndex + 2]
 
         let flipVertical = ((attributeByte >> 7) & 1) == 1
@@ -285,7 +285,7 @@ extension PPU {
             // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
             //
             //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
-            let tileY = Int(self.oamRegister.data[oamIndex]) + 1
+            let tileY = Int(self.oamRegister.data[oamIndex])
 
             let spritePixelY = self.scanline - tileY
             // The sprite height property takes into account whether or not all
@@ -328,7 +328,7 @@ extension PPU {
             // Reset coarse X
             self.currentSharedAddress[.coarseX] = 0b0_0000
             // Toggle horizontal nametable
-            self.currentSharedAddress[.nametable] ^= 0b01
+            self.currentSharedAddress[.nametableX] ^= 0b1
         } else {
             // Just increment coarse X
             self.currentSharedAddress[.coarseX] += 0b0_0001
@@ -344,7 +344,7 @@ extension PPU {
                 // Reset coarse Y
                 self.currentSharedAddress[.coarseY] = 0b0_0000
                 // Toggle vertical nametable
-                self.currentSharedAddress[.nametable] ^= 0b10
+                self.currentSharedAddress[.nametableY] ^= 0b1
             } else if self.currentSharedAddress[.coarseY] == 0b1_1111 {
                 // ACHTUNG! How would we ever get to this branch?
                 //
