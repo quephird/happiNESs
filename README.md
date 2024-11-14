@@ -61,7 +61,7 @@ So far, the following mappers and associated games have been tested in this emul
   - Gyruss
   - Tiger Heli
 - 007
-  - Sky Shark (HUD is jumpy)
+  - Sky Shark
   - Marble Madness (text box glitches a little at start of level)
   - Wheel of Fortune
 
