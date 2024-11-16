@@ -27,7 +27,6 @@ public struct APU {
     private var frameIrqInhibited: Bool = false
     public var sampleRate: Double
 
-    // TODO: Add the other channels
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
     public var pulse2: PulseChannel = PulseChannel(channelNumber: .two)
     public var triangle: TriangleChannel = TriangleChannel()
@@ -249,7 +248,6 @@ extension APU {
     }
 
     mutating private func stepEnvelope() {
-        // TODO: call the methods on the other channels once they're implemented
         self.pulse1.stepEnvelope()
         self.pulse2.stepEnvelope()
         self.triangle.stepCounter()
@@ -257,13 +255,11 @@ extension APU {
     }
 
     mutating private func stepSweep() {
-        // TODO: call the methods on the other channels once they're implemented
         self.pulse1.stepSweep()
         self.pulse2.stepSweep()
     }
 
     mutating private func stepLength() {
-        // TODO: call the methods on the other channels once they're implemented
         self.pulse1.stepLength()
         self.pulse2.stepLength()
         self.triangle.stepLength()
