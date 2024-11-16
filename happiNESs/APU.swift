@@ -32,11 +32,17 @@ public struct APU {
     public var triangle: TriangleChannel = TriangleChannel()
     public var noise: NoiseChannel = NoiseChannel()
     public var dmc: DMCChannel = DMCChannel()
+    private var filterChain: FilterChain
+
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
 
     public init(sampleRate: Double) {
         self.sampleRate = sampleRate
+        self.filterChain = FilterChain(filters: [
+            HighPassFilter(sampleRate: 44100.0, cutoffFrequency: 90),
+            LowPassFilter(sampleRate: 44100.0, cutoffFrequency: 14000),
+        ])
     }
 
     mutating public func reset() {
@@ -267,19 +273,20 @@ extension APU {
     }
 
     mutating private func sendSample() {
-        // TODO: call the methods on the other channels once they're implemented
         let pulse1Sample = self.pulse1.getSample()
         let pulse2Sample = self.pulse2.getSample()
         let triangleSample = self.triangle.getSample()
         let noiseSample = self.noise.getSample()
         let dmcSample = self.dmc.getSample()
 
-        let signal = mix(pulse1: pulse1Sample,
-                         pulse2: pulse2Sample,
-                         triangle: triangleSample,
-                         noise: noiseSample,
-                         dmc: dmcSample)
-        self.buffer.append(value: signal)
+        let signalValue = mix(pulse1: pulse1Sample,
+                              pulse2: pulse2Sample,
+                              triangle: triangleSample,
+                              noise: noiseSample,
+                              dmc: dmcSample)
+
+        let filteredSignalValue = self.filterChain.filter(signalValue: signalValue)
+        self.buffer.append(value: filteredSignalValue)
     }
 
     // NOTA BENE: Coefficients for next two functions taken from:

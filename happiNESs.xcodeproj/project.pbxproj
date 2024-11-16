@@ -75,6 +75,10 @@
 		87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981522CD8B5990090A200 /* NMIDelayState.swift */; };
 		87E981562CD9A6950090A200 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981552CD9A6950090A200 /* nestest.nes */; };
 		87E981582CD9A6BF0090A200 /* ppu_vbl_nmi.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */; };
+		87F234532CE8567F00D2FDA6 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F234522CE8567700D2FDA6 /* Filter.swift */; };
+		87F234562CE856DB00D2FDA6 /* LowPassFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F234552CE856D100D2FDA6 /* LowPassFilter.swift */; };
+		87F234582CE8574400D2FDA6 /* FilterChain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F234572CE8573F00D2FDA6 /* FilterChain.swift */; };
+		87F2345A2CE85E0100D2FDA6 /* HighPassFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F234592CE85DFA00D2FDA6 /* HighPassFilter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,6 +181,10 @@
 		87E981522CD8B5990090A200 /* NMIDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NMIDelayState.swift; sourceTree = "<group>"; };
 		87E981552CD9A6950090A200 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
 		87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = ppu_vbl_nmi.nes; sourceTree = "<group>"; };
+		87F234522CE8567700D2FDA6 /* Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
+		87F234552CE856D100D2FDA6 /* LowPassFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LowPassFilter.swift; sourceTree = "<group>"; };
+		87F234572CE8573F00D2FDA6 /* FilterChain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterChain.swift; sourceTree = "<group>"; };
+		87F234592CE85DFA00D2FDA6 /* HighPassFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighPassFilter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +286,9 @@
 				870AABE32CB382E000E9F3B6 /* CPU+execution.swift */,
 				870AABDF2CB37EA000E9F3B6 /* CPU+instructions.swift */,
 				870AABE12CB381C100E9F3B6 /* CPU+memory.swift */,
+				87F234522CE8567700D2FDA6 /* Filter.swift */,
+				87F234572CE8573F00D2FDA6 /* FilterChain.swift */,
+				87F234542CE856C400D2FDA6 /* Filters */,
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
 				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
@@ -350,6 +361,15 @@
 				87E981552CD9A6950090A200 /* nestest.nes */,
 			);
 			path = roms;
+			sourceTree = "<group>";
+		};
+		87F234542CE856C400D2FDA6 /* Filters */ = {
+			isa = PBXGroup;
+			children = (
+				87F234552CE856D100D2FDA6 /* LowPassFilter.swift */,
+				87F234592CE85DFA00D2FDA6 /* HighPassFilter.swift */,
+			);
+			path = Filters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -513,6 +533,7 @@
 			files = (
 				8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */,
 				870AABDC2CB3533700E9F3B6 /* PPU+IO.swift in Sources */,
+				87F234582CE8574400D2FDA6 /* FilterChain.swift in Sources */,
 				870AABDE2CB36D4100E9F3B6 /* PPU+rendering.swift in Sources */,
 				870AABE22CB381C100E9F3B6 /* CPU+memory.swift in Sources */,
 				871F62302C62FE9E00132962 /* PPU.swift in Sources */,
@@ -534,6 +555,7 @@
 				8744B1932C1D6D59001B44B5 /* StatusRegister.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				87E981472CD076660090A200 /* Mapper.swift in Sources */,
+				87F234562CE856DB00D2FDA6 /* LowPassFilter.swift in Sources */,
 				874F51AB2CBF036600B12037 /* RegisterBit.swift in Sources */,
 				87C5B32E2CDD71D9008580A6 /* TimingMode.swift in Sources */,
 				870AABE42CB382E000E9F3B6 /* CPU+execution.swift in Sources */,
@@ -541,6 +563,7 @@
 				870AABE02CB37EA000E9F3B6 /* CPU+instructions.swift in Sources */,
 				8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */,
 				87184D0E2C756BEB0003D090 /* OAMRegister.swift in Sources */,
+				87F2345A2CE85E0100D2FDA6 /* HighPassFilter.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
 				87184D0A2C7511F90003D090 /* MaskRegister.swift in Sources */,
@@ -553,6 +576,7 @@
 				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
 				87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
+				87F234532CE8567F00D2FDA6 /* Filter.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 				874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */,
 				874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */,
