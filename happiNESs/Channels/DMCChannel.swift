@@ -91,8 +91,7 @@ extension DMCChannel {
 
     mutating private func stepReader() {
         if self.currentLength > 0 && self.bitCount == 0 {
-            // TODO: Figure out how best to do this
-            // self.cpu.stall += 4
+            self.bus!.cpu!.stall += 4
 
             self.shiftRegister = self.bus!.readByte(address: self.currentAddress)
             self.bitCount = 8
