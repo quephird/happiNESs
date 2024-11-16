@@ -9,17 +9,17 @@ public struct LowPassFilter: Filter {
     public var b0: Float
     public var b1: Float
     public var a1: Float
-    public var prevX: Float
-    public var prevY: Float
+    public var prevInputValue: Float
+    public var prevOutputValue: Float
 
-    init(sampleRate: Double, cutoffFrequency: Double) {
-        let c = Float(sampleRate) / Float.pi / Float(cutoffFrequency)
+    init(sampleRate: Float, cutoffFrequency: Float) {
+        let c = sampleRate / Float.pi / cutoffFrequency
         let a0i = 1 / (1 + c)
 
         self.b0 = a0i
         self.b1 = a0i
         self.a1 = (1 - c) * a0i
-        self.prevX = 0.0
-        self.prevY = 0.0
+        self.prevInputValue = 0.0
+        self.prevOutputValue = 0.0
     }
 }

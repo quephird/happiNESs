@@ -11,6 +11,7 @@ enum SequencerMode {
 }
 
 public struct APU {
+    static let audioSampleRate: Float = 44100.0
     static let frameCounterRate = CPU.frequency / 240.0
 
     // Values for this table taken from:
@@ -25,7 +26,7 @@ public struct APU {
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
     private var frameIrqInhibited: Bool = false
-    public var sampleRate: Double
+    public var sampleRate: Float
 
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
     public var pulse2: PulseChannel = PulseChannel(channelNumber: .two)
@@ -37,11 +38,11 @@ public struct APU {
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
 
-    public init(sampleRate: Double) {
+    public init(sampleRate: Float) {
         self.sampleRate = sampleRate
         self.filterChain = FilterChain(filters: [
-            HighPassFilter(sampleRate: 44100.0, cutoffFrequency: 90),
-            LowPassFilter(sampleRate: 44100.0, cutoffFrequency: 14000),
+            HighPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 90),
+            LowPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 14000),
         ])
     }
 
@@ -165,8 +166,8 @@ extension APU {
 
 extension APU {
     var shouldSendSample: Bool {
-        let oldSampleNumber = Int(Double(self.cycles - 1) / self.sampleRate)
-        let newSampleNumber = Int(Double(self.cycles) / self.sampleRate)
+        let oldSampleNumber = Int(Float(self.cycles - 1) / self.sampleRate)
+        let newSampleNumber = Int(Float(self.cycles) / self.sampleRate)
         return newSampleNumber != oldSampleNumber
     }
 
