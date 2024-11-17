@@ -169,6 +169,10 @@ extension APU {
 
 extension APU {
     var shouldSendSample: Bool {
+        // NOTA BENE: We can't just use simple modulo arithmetic here
+        // because we're dealing with Floats and Doubles and need to avoid
+        // truncation errors. For the time being, this is the most
+        // reliable way to detect if and when to send a sample.
         let oldSampleNumber = Int(Float(self.cycles - 1) / self.sampleRate)
         let newSampleNumber = Int(Float(self.cycles) / self.sampleRate)
         return newSampleNumber != oldSampleNumber
