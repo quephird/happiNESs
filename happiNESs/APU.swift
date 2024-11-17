@@ -25,6 +25,7 @@ public struct APU {
     public var bus: Bus? = nil
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
+    private var sequencerCount: Int = 0
     private var frameIrqInhibited: Bool = false
     public var sampleRate: Float
 
@@ -55,6 +56,8 @@ public struct APU {
         self.noise.reset()
         self.dmc.reset()
         self.buffer.reset()
+
+        self.sequencerCount = 0
     }
 }
 
@@ -202,52 +205,56 @@ extension APU {
     }
 
     mutating private func stepSequencer() {
+        self.sequencerCount += 1
+
         // NOTA BENE: Constants used below taken from:
         //
-        //     https://www.nesdev.org/wiki/APU_Frame_Counter
+        //     https://github.com/starrhorne/nes-rust/blob/master/src/apu/frame_counter.rs#L66-L109
         //
         // Note that the figures are doubled here because the sequencer clocks
         // at _half_ the rate of the CPU. Also, this is hardcoded to work with
         // NTSC timings.
         switch self.sequencerMode {
         case .four:
-            switch self.cycles % 29830 {
-            case 0:
-                self.generateIRQ()
-            case 7457: // Step 1
+            switch self.sequencerCount {
+            case 7459: // Step 1
                 self.stepEnvelope()
-            case 14913: // Step 2
+            case 14915: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 22371: // Step 3
+            case 22373: // Step 3
                 self.stepEnvelope()
-            case 29828:
+            case 29830:
                 self.generateIRQ()
-            case 29829: // Step 4
+            case 29831: // Step 4
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
                 self.generateIRQ()
+            case 29832:
+                self.generateIRQ()
+                self.sequencerCount = 2
             default:
                 break
             }
         case .five:
-            switch self.cycles % 37282 {
-            case 7457: // Step 1
+            switch self.sequencerCount {
+            case 7459: // Step 1
                 self.stepEnvelope()
-            case 14913: // Step 2
+            case 14915: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 22371: // Step 3
+            case 22373: // Step 3
                 self.stepEnvelope()
-            case 29829: // Step 4
+            case 29831: // Step 4
                 break
-            case 37281: // Step 5
+            case 37283: // Step 5
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
+                self.sequencerCount = 1
             default:
                 break
             }
