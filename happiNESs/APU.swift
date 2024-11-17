@@ -11,7 +11,7 @@ enum SequencerMode {
 }
 
 public struct APU {
-    static let audioSampleRate: Float = 44100.0
+    public static let audioSampleRate: Float = 44100.0
     static let frameCounterRate = CPU.frequency / 240.0
 
     // Values for this table taken from:
