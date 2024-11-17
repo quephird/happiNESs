@@ -126,7 +126,7 @@ extension APU {
     }
 
     mutating public func updateStatus(byte: UInt8) {
-        self.status = byte
+        self.status = byte[.apuStatus]
 
         self.pulse1.enabled = self.status[.pulse1Enabled]
         self.pulse2.enabled = self.status[.pulse2Enabled]
