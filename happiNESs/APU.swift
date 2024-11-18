@@ -41,6 +41,12 @@ public struct APU {
 
     public init(sampleRate: Float) {
         self.sampleRate = sampleRate
+        // NOTA BENE: Even though according to the following section in the NESDev
+        // wiki that there ought to be two high pass filters, I found that adding
+        // the one for 400 Hz made the resultant audio sound way too tinny, and so
+        // only one high pass and one low pass have been left in.
+        //
+        //     https://www.nesdev.org/wiki/APU_Mixer
         self.filterChain = FilterChain(filters: [
             HighPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 90),
             LowPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 14000),
