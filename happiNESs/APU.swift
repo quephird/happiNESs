@@ -11,6 +11,7 @@ enum SequencerMode {
 }
 
 public struct APU {
+    public static let audioSampleRate: Float = 44100.0
     static let frameCounterRate = CPU.frequency / 240.0
 
     // Values for this table taken from:
@@ -24,20 +25,32 @@ public struct APU {
     public var bus: Bus? = nil
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
+    private var sequencerCount: Int = 0
     private var frameIrqInhibited: Bool = false
-    public var sampleRate: Double
+    public var sampleRate: Float
 
-    // TODO: Add the other channels
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
     public var pulse2: PulseChannel = PulseChannel(channelNumber: .two)
     public var triangle: TriangleChannel = TriangleChannel()
     public var noise: NoiseChannel = NoiseChannel()
     public var dmc: DMCChannel = DMCChannel()
+    private var filterChain: FilterChain
+
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
 
-    public init(sampleRate: Double) {
+    public init(sampleRate: Float) {
         self.sampleRate = sampleRate
+        // NOTA BENE: Even though according to the following section in the NESDev
+        // wiki that there ought to be two high pass filters, I found that adding
+        // the one for 400 Hz made the resultant audio sound way too tinny, and so
+        // only one high pass and one low pass have been left in.
+        //
+        //     https://www.nesdev.org/wiki/APU_Mixer
+        self.filterChain = FilterChain(filters: [
+            HighPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 90),
+            LowPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 14000),
+        ])
     }
 
     mutating public func reset() {
@@ -49,6 +62,8 @@ public struct APU {
         self.noise.reset()
         self.dmc.reset()
         self.buffer.reset()
+
+        self.sequencerCount = 0
     }
 }
 
@@ -117,7 +132,7 @@ extension APU {
     }
 
     mutating public func updateStatus(byte: UInt8) {
-        self.status = byte
+        self.status = byte[.apuStatus]
 
         self.pulse1.enabled = self.status[.pulse1Enabled]
         self.pulse2.enabled = self.status[.pulse2Enabled]
@@ -160,8 +175,12 @@ extension APU {
 
 extension APU {
     var shouldSendSample: Bool {
-        let oldSampleNumber = Int(Double(self.cycles - 1) / self.sampleRate)
-        let newSampleNumber = Int(Double(self.cycles) / self.sampleRate)
+        // NOTA BENE: We can't just use simple modulo arithmetic here
+        // because we're dealing with Floats and Doubles and need to avoid
+        // truncation errors. For the time being, this is the most
+        // reliable way to detect if and when to send a sample.
+        let oldSampleNumber = Int(Float(self.cycles - 1) / self.sampleRate)
+        let newSampleNumber = Int(Float(self.cycles) / self.sampleRate)
         return newSampleNumber != oldSampleNumber
     }
 
@@ -196,52 +215,56 @@ extension APU {
     }
 
     mutating private func stepSequencer() {
+        self.sequencerCount += 1
+
         // NOTA BENE: Constants used below taken from:
         //
-        //     https://www.nesdev.org/wiki/APU_Frame_Counter
+        //     https://github.com/starrhorne/nes-rust/blob/master/src/apu/frame_counter.rs#L66-L109
         //
         // Note that the figures are doubled here because the sequencer clocks
         // at _half_ the rate of the CPU. Also, this is hardcoded to work with
         // NTSC timings.
         switch self.sequencerMode {
         case .four:
-            switch self.cycles % 29830 {
-            case 0:
-                self.generateIRQ()
-            case 7457: // Step 1
+            switch self.sequencerCount {
+            case 7459: // Step 1
                 self.stepEnvelope()
-            case 14913: // Step 2
+            case 14915: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 22371: // Step 3
+            case 22373: // Step 3
                 self.stepEnvelope()
-            case 29828:
+            case 29830:
                 self.generateIRQ()
-            case 29829: // Step 4
+            case 29831: // Step 4
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
                 self.generateIRQ()
+            case 29832:
+                self.generateIRQ()
+                self.sequencerCount = 2
             default:
                 break
             }
         case .five:
-            switch self.cycles % 37282 {
-            case 7457: // Step 1
+            switch self.sequencerCount {
+            case 7459: // Step 1
                 self.stepEnvelope()
-            case 14913: // Step 2
+            case 14915: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 22371: // Step 3
+            case 22373: // Step 3
                 self.stepEnvelope()
-            case 29829: // Step 4
+            case 29831: // Step 4
                 break
-            case 37281: // Step 5
+            case 37283: // Step 5
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
+                self.sequencerCount = 1
             default:
                 break
             }
@@ -249,7 +272,6 @@ extension APU {
     }
 
     mutating private func stepEnvelope() {
-        // TODO: call the methods on the other channels once they're implemented
         self.pulse1.stepEnvelope()
         self.pulse2.stepEnvelope()
         self.triangle.stepCounter()
@@ -257,13 +279,11 @@ extension APU {
     }
 
     mutating private func stepSweep() {
-        // TODO: call the methods on the other channels once they're implemented
         self.pulse1.stepSweep()
         self.pulse2.stepSweep()
     }
 
     mutating private func stepLength() {
-        // TODO: call the methods on the other channels once they're implemented
         self.pulse1.stepLength()
         self.pulse2.stepLength()
         self.triangle.stepLength()
@@ -271,19 +291,20 @@ extension APU {
     }
 
     mutating private func sendSample() {
-        // TODO: call the methods on the other channels once they're implemented
         let pulse1Sample = self.pulse1.getSample()
         let pulse2Sample = self.pulse2.getSample()
         let triangleSample = self.triangle.getSample()
         let noiseSample = self.noise.getSample()
         let dmcSample = self.dmc.getSample()
 
-        let signal = mix(pulse1: pulse1Sample,
-                         pulse2: pulse2Sample,
-                         triangle: triangleSample,
-                         noise: noiseSample,
-                         dmc: dmcSample)
-        self.buffer.append(value: signal)
+        let signalValue = mix(pulse1: pulse1Sample,
+                              pulse2: pulse2Sample,
+                              triangle: triangleSample,
+                              noise: noiseSample,
+                              dmc: dmcSample)
+
+        let filteredSignalValue = self.filterChain.filter(inputValue: signalValue)
+        self.buffer.append(value: filteredSignalValue)
     }
 
     // NOTA BENE: Coefficients for next two functions taken from:
