@@ -8,10 +8,10 @@
 public struct FilterChain {
     public var filters: [Filter]
 
-    mutating public func filter(signalValue: Float) -> Float {
-        var outputValue: Float = signalValue
+    mutating public func filter(inputValue: Float) -> Float {
+        var outputValue: Float = inputValue
         for i in filters.indices {
-            outputValue = filters[i].filter(signalValue: outputValue)
+            outputValue = filters[i].filter(inputValue: outputValue)
         }
 
         return outputValue

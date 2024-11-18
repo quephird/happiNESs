@@ -12,14 +12,14 @@ public protocol Filter {
     var prevInputValue: Float { get set }
     var prevOutputValue: Float { get set }
 
-    mutating func filter(signalValue: Float) -> Float
+    mutating func filter(inputValue: Float) -> Float
 }
 
 extension Filter {
-    mutating public func filter(signalValue: Float) -> Float {
-        let outputValue = self.b0*signalValue + self.b1*self.prevInputValue - self.a1*self.prevOutputValue
+    mutating public func filter(inputValue: Float) -> Float {
+        let outputValue = self.b0*inputValue + self.b1*self.prevInputValue - self.a1*self.prevOutputValue
         self.prevOutputValue = outputValue
-        self.prevInputValue = signalValue
+        self.prevInputValue = inputValue
         return outputValue
     }
 }

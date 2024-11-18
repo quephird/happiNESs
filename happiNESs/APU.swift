@@ -297,7 +297,7 @@ extension APU {
                               noise: noiseSample,
                               dmc: dmcSample)
 
-        let filteredSignalValue = self.filterChain.filter(signalValue: signalValue)
+        let filteredSignalValue = self.filterChain.filter(inputValue: signalValue)
         self.buffer.append(value: filteredSignalValue)
     }
 
