@@ -7,12 +7,12 @@
 
 extension PPU {
     // NOTA BENE: Called directly by the tracer, as well as by readStatus()
-    public func readStatusWithoutMutating() -> UInt8 {
+    public func readPpuStatusWithoutMutating() -> UInt8 {
         self.statusRegister.rawValue
     }
 
-    mutating public func readStatus() -> UInt8 {
-        let result = self.readStatusWithoutMutating()
+    mutating private func readPpuStatus() -> UInt8 {
+        let result = self.readPpuStatusWithoutMutating()
         self.statusRegister[.verticalBlankStarted] = false
         self.wRegister = false
 
@@ -35,7 +35,7 @@ extension PPU {
         return result
     }
 
-    mutating public func updateAddress(byte: UInt8) {
+    mutating private func writePpuAddress(byte: UInt8) {
         if !self.wRegister {
             // ACHTUNG! Per the following excerpt in the NESDev wiki for PPUADDR, we
             // need to _explicitly_ reset bit 14 here:
@@ -54,7 +54,7 @@ extension PPU {
         self.wRegister.toggle()
     }
 
-    mutating public func updateController(byte: UInt8) {
+    mutating private func writePpuControl(byte: UInt8) {
         let nmiBefore = self.controllerRegister[.generateNmi]
         self.controllerRegister.update(byte: byte)
         let nmiAfter = self.controllerRegister[.generateNmi]
@@ -93,7 +93,7 @@ extension PPU {
         self.nextSharedAddress[.nametable] = nametableBits
     }
 
-    mutating public func updateMask(byte: UInt8) {
+    mutating private func writePpuMask(byte: UInt8) {
         let showBitsBefore = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
         self.maskRegister.update(byte: byte)
         let showBitsAfter = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
@@ -111,25 +111,25 @@ extension PPU {
         }
     }
 
-    mutating public func updateOAMAddress(byte: UInt8) {
+    mutating private func writeOamAddress(byte: UInt8) {
         self.oamRegister.updateAddress(byte: byte)
     }
 
-    public func readOAMData() -> UInt8 {
+    private func readOamData() -> UInt8 {
         self.oamRegister.readByte()
     }
 
-    mutating public func writeOAMData(byte: UInt8) {
+    mutating private func writeOamData(byte: UInt8) {
         self.oamRegister.writeByte(byte: byte)
     }
 
-    mutating public func writeOamBuffer(buffer: [UInt8]) {
+    mutating public func writeOamDma(buffer: [UInt8]) {
         for byte in buffer {
             self.oamRegister.writeByte(byte: byte)
         }
     }
 
-    mutating public func writeScrollByte(byte: UInt8) {
+    mutating private func writePpuScroll(byte: UInt8) {
         let coarseBits = byte >> 3
         let fineBits = byte & 0b0000_0111
         if !self.wRegister {
@@ -267,8 +267,8 @@ extension PPU {
         }
     }
 
-    // NOTA BENE: Called directly by the tracer, as well as by readByte()
-    public func readPpuaddrWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
+    // NOTA BENE: Called directly by the tracer, as well as by readPpuData()
+    public func readPpuDataWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
         let address = self.currentSharedAddress
 
         let (result, shouldBuffer) = self.readByte(address: address)
@@ -279,8 +279,8 @@ extension PPU {
         return (result, nil)
     }
 
-    mutating public func readPpuaddr() -> UInt8 {
-        let (result, newInternalDataBuffer) = self.readPpuaddrWithoutMutating()
+    mutating private func readPpuData() -> UInt8 {
+        let (result, newInternalDataBuffer) = self.readPpuDataWithoutMutating()
 
         self.incrementVramAddress()
         if let newInternalDataBuffer {
@@ -290,7 +290,7 @@ extension PPU {
         return result
     }
 
-    mutating public func writePpuaddr(byte: UInt8) {
+    mutating private func writePpuData(byte: UInt8) {
         let address = self.currentSharedAddress % 0x4000
 
         switch address {
@@ -308,6 +308,7 @@ extension PPU {
         self.incrementVramAddress()
     }
 
+    // NOTA BENE: This method is called externally from the Bus
     mutating public func readByteWithoutMutating(address: Address) -> UInt8 {
         let mirroredAddress = address & 0b0010_0000_0000_0111
 
@@ -317,16 +318,17 @@ extension PPU {
             // but we return 0x00 nonetheless.
             return 0x00
         case 0x2002:
-            return self.readStatusWithoutMutating()
+            return self.readPpuStatusWithoutMutating()
         case 0x2004:
-            return self.readOAMData()
+            return self.readOamData()
         case 0x2007:
-            return self.readPpuaddrWithoutMutating().result
+            return self.readPpuDataWithoutMutating().result
         default:
             fatalError("We should not have gotten here in PPU.readByteWithoutMutating()")
         }
     }
 
+    // NOTA BENE: This method is called externally from the Bus
     mutating public func readByte(address: Address) -> UInt8 {
         let mirroredAddress = address & 0b0010_0000_0000_0111
 
@@ -336,11 +338,11 @@ extension PPU {
             // but we return 0x00 nonetheless.
             return 0x00
         case 0x2002:
-            return self.readStatus()
+            return self.readPpuStatus()
         case 0x2004:
-            return self.readOAMData()
+            return self.readOamData()
         case 0x2007:
-            return self.readPpuaddr()
+            return self.readPpuData()
         default:
             fatalError("We should not have gotten here in PPU.readByte()")
         }
@@ -352,19 +354,19 @@ extension PPU {
 
         switch mirrorDownAddr {
         case 0x2000:
-            self.updateController(byte: byte)
+            self.writePpuControl(byte: byte)
         case 0x2001:
-            self.updateMask(byte: byte)
+            self.writePpuMask(byte: byte)
         case 0x2003:
-            self.updateOAMAddress(byte: byte)
+            self.writeOamAddress(byte: byte)
         case 0x2004:
-            self.writeOAMData(byte: byte)
+            self.writeOamData(byte: byte)
         case 0x2005:
-            self.writeScrollByte(byte: byte)
+            self.writePpuScroll(byte: byte)
         case 0x2006:
-            self.updateAddress(byte: byte)
+            self.writePpuAddress(byte: byte)
         case 0x2007:
-            self.writePpuaddr(byte: byte)
+            self.writePpuData(byte: byte)
         default:
             break
         }

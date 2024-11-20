@@ -90,7 +90,7 @@ extension Bus {
             for index in 0 ..< 256 {
                 buffer[index] = self.readByte(address: baseAddress + UInt16(index))
             }
-            self.ppu.writeOamBuffer(buffer: buffer)
+            self.ppu.writeOamDma(buffer: buffer)
 
             self.cpu!.stall += 513
             if self.cpu!.cycles%2 == 1 {
