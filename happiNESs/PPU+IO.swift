@@ -268,7 +268,7 @@ extension PPU {
     }
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
-    public func readByteWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
+    public func readPpuaddrWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
         let address = self.currentSharedAddress
 
         let (result, shouldBuffer) = self.readByte(address: address)
@@ -279,8 +279,8 @@ extension PPU {
         return (result, nil)
     }
 
-    mutating public func readByte() -> UInt8 {
-        let (result, newInternalDataBuffer) = self.readByteWithoutMutating()
+    mutating public func readPpuaddr() -> UInt8 {
+        let (result, newInternalDataBuffer) = self.readPpuaddrWithoutMutating()
 
         self.incrementVramAddress()
         if let newInternalDataBuffer {
@@ -290,7 +290,7 @@ extension PPU {
         return result
     }
 
-    mutating public func writeByte(byte: UInt8) {
+    mutating public func writePpuaddr(byte: UInt8) {
         let address = self.currentSharedAddress % 0x4000
 
         switch address {
@@ -306,5 +306,67 @@ extension PPU {
         }
 
         self.incrementVramAddress()
+    }
+
+    mutating public func readByteWithoutMutating(address: Address) -> UInt8 {
+        let mirroredAddress = address & 0b0010_0000_0000_0111
+
+        switch mirroredAddress {
+        case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006:
+            // Reads from these addresses should not happen as they are write-only,
+            // but we return 0x00 nonetheless.
+            return 0x00
+        case 0x2002:
+            return self.readStatusWithoutMutating()
+        case 0x2004:
+            return self.readOAMData()
+        case 0x2007:
+            return self.readPpuaddrWithoutMutating().result
+        default:
+            fatalError("We should not have gotten here in PPU.readByteWithoutMutating()")
+        }
+    }
+
+    mutating public func readByte(address: Address) -> UInt8 {
+        let mirroredAddress = address & 0b0010_0000_0000_0111
+
+        switch mirroredAddress {
+        case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006:
+            // Reads from these addresses should not happen as they are write-only,
+            // but we return 0x00 nonetheless.
+            return 0x00
+        case 0x2002:
+            return self.readStatus()
+        case 0x2004:
+            return self.readOAMData()
+        case 0x2007:
+            return self.readPpuaddr()
+        default:
+            fatalError("We should not have gotten here in PPU.readByte()")
+        }
+    }
+
+    // NOTA BENE: This method is called externally from the Bus
+    mutating public func writeByte(address: Address, byte: UInt8) {
+        let mirrorDownAddr = address & 0b0010_0000_0000_0111
+
+        switch mirrorDownAddr {
+        case 0x2000:
+            self.updateController(byte: byte)
+        case 0x2001:
+            self.updateMask(byte: byte)
+        case 0x2003:
+            self.updateOAMAddress(byte: byte)
+        case 0x2004:
+            self.writeOAMData(byte: byte)
+        case 0x2005:
+            self.writeScrollByte(byte: byte)
+        case 0x2006:
+            self.updateAddress(byte: byte)
+        case 0x2007:
+            self.writePpuaddr(byte: byte)
+        default:
+            break
+        }
     }
 }
