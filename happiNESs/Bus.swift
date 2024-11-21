@@ -49,43 +49,26 @@ extension Bus {
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
     func readByteWithoutMutating(address: UInt16) -> UInt8 {
         switch address {
-        case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:
+        case 0x0000 ... 0x1FFF:
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
             return self.vram[vramAddress]
-        case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006, 0x4014:
-            // Reads from these addresses should not happen as they are write-only,
-            // but we return 0x00 nonetheless.
-            return 0x00
-        case 0x2002:
-            return self.ppu.readStatusWithoutMutating()
-        case 0x2007:
-            return self.ppu.readByteWithoutMutating().result
-        case 0x2008...Self.ppuRegistersMirrorsEnd:
-            let mirrorDownAddress = address & 0b0010_0000_0000_0111
-            return self.readByteWithoutMutating(address: mirrorDownAddress)
+        case 0x2000 ... 0x3FFF:
+            return self.ppu.readByteWithoutMutating(address: address)
+        case 0x4015:
+            return self.apu.readByte(address: address)
         case 0x4016:
             return self.joypad.readByteWithoutMutating()
         case 0x8000 ... 0xFFFF:
             return self.cartridge!.readByte(address: address)
         default:
-            // TODO: Implement memory reading from these addresses?
             return 0x00
         }
     }
 
     func readByte(address: UInt16) -> UInt8 {
         switch address {
-        case 0x2002:
-            return self.ppu.readStatus()
-        case 0x2004:
-            return self.ppu.readOAMData()
-        case 0x2007:
-            return self.ppu.readByte()
-        case 0x2008...Self.ppuRegistersMirrorsEnd:
-            let mirrorDownAddress = address & 0b0010_0000_0000_0111
-            return self.readByte(address: mirrorDownAddress)
-        case 0x4015:
-            return self.apu.readByte(address: address)
+        case 0x2000 ... 0x3FFF:
+            return self.ppu.readByte(address: address)
         case 0x4016:
             return self.joypad.readByte()
         default:
@@ -95,26 +78,11 @@ extension Bus {
 
     func writeByte(address: UInt16, byte: UInt8) {
         switch address {
-        case Self.ramMirrorsBegin ... Self.ramMirrorsEnd:
+        case 0x0000 ... 0x1FFF:
             let vramAddress = Int(address & 0b0000_0111_1111_1111)
             self.vram[vramAddress] = byte
-        case 0x2000:
-            self.ppu.updateController(byte: byte)
-        case 0x2001:
-            self.ppu.updateMask(byte: byte)
-        case 0x2003:
-            self.ppu.updateOAMAddress(byte: byte)
-        case 0x2004:
-            self.ppu.writeOAMData(byte: byte)
-        case 0x2005:
-            self.ppu.writeScrollByte(byte: byte)
-        case 0x2006:
-            self.ppu.updateAddress(byte: byte)
-        case 0x2007:
-            self.ppu.writeByte(byte: byte)
-        case 0x2008...Self.ppuRegistersMirrorsEnd:
-            let mirrorDownAddr = address & 0b0010_0000_0000_0111
-            self.writeByte(address: mirrorDownAddr, byte: byte)
+        case 0x2000 ... 0x3FFF:
+            self.ppu.writeByte(address: address, byte: byte)
         case 0x4014:
             var buffer: [UInt8] = [UInt8](repeating: 0, count: 256)
             let baseAddress: UInt16 = UInt16(byte) << 8
@@ -122,7 +90,7 @@ extension Bus {
             for index in 0 ..< 256 {
                 buffer[index] = self.readByte(address: baseAddress + UInt16(index))
             }
-            self.ppu.writeOamBuffer(buffer: buffer)
+            self.ppu.writeOamDma(buffer: buffer)
 
             self.cpu!.stall += 513
             if self.cpu!.cycles%2 == 1 {
