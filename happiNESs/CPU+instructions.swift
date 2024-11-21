@@ -93,7 +93,6 @@ extension CPU {
     }
 
     func brk() -> (Bool, Int) {
-        let currentStatus = self.statusRegister.rawValue
         // NOTA BENE: We've already advanced the program counter upon consuming the
         // `BRK` byte; now we need to advance it one more time since the byte after
         // the instruction is ignored, per the documentation. See
@@ -101,7 +100,10 @@ extension CPU {
         //     https://www.pagetable.com/c64ref/6502/?tab=2#BRK
         self.programCounter += 1
         self.pushStack(word: self.programCounter)
-        self.pushStack(byte: currentStatus)
+        // ACHTUNG! We need to set the B flag upon pushing to the stack!
+        //
+        //     https://www.nesdev.org/wiki/Status_flags#The_B_flag
+        self.pushStack(byte: self.statusRegister.rawValue | 0b0001_0000)
         self.programCounter = self.readWord(address: Self.interruptVectorAddress)
         self.statusRegister[.interruptsDisabled] = true
 
