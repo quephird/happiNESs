@@ -58,7 +58,7 @@ extension Bus {
             return self.apu.readByte(address: address)
         case 0x4016:
             return self.joypad.readByteWithoutMutating()
-        case 0x8000 ... 0xFFFF:
+        case 0x6000 ... 0xFFFF:
             return self.cartridge!.readByte(address: address)
         default:
             return 0x00
@@ -100,7 +100,7 @@ extension Bus {
             self.apu.writeByte(address: address, byte: byte)
         case 0x4016:
             self.joypad.writeByte(byte: byte)
-        case 0x8000 ... 0xFFFF:
+        case 0x6000 ... 0xFFFF:
             self.cartridge!.writeByte(address: address, byte: byte)
         default:
             break

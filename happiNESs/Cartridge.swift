@@ -17,6 +17,7 @@ public class Cartridge {
     public var prgBankIndex: Int
     public var chrMemory: [UInt8]
     public var chrBankIndex: Int
+    public var sram: [UInt8]
 
     public lazy var mapper: Mapper = mapperNumber.makeMapper(cartridge: self)
 
@@ -111,6 +112,7 @@ public class Cartridge {
         self.prgBankIndex = 0
         self.chrMemory = chrMemory
         self.chrBankIndex = 0
+        self.sram = [UInt8](repeating: 0x00, count: 0x2000)
     }
 
     public func readByte(address: UInt16) -> UInt8 {

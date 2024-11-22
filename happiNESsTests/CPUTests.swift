@@ -364,7 +364,7 @@ final class CPUTests: XCTestCase {
 
         XCTAssertEqual(cpu.readByte(address: 0x01FD), 0x86)
         XCTAssertEqual(cpu.readByte(address: 0x01FC), 0x04)
-        XCTAssertEqual(cpu.readByte(address: 0x01FB), 0b0010_1101)
+        XCTAssertEqual(cpu.readByte(address: 0x01FB), 0b0011_1101)
         XCTAssertEqual(cpu.programCounter, 0x0000)
     }
 

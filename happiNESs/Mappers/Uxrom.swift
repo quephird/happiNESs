@@ -13,6 +13,9 @@ struct Uxrom: Mapper {
         case 0x0000 ... 0x1FFF:
             let memoryIndex = Int(address)
             return self.cartridge.chrMemory[memoryIndex]
+        case 0x6000 ... 0x7FFF:
+            let index = Int(address - 0x6000)
+            return self.cartridge.sram[index]
         case 0x8000 ... 0xBFFF:
             let memoryIndex = self.cartridge.prgBankIndex * 0x4000 + Int(address - 0x8000)
             return self.cartridge.prgMemory[Int(memoryIndex)]
@@ -31,6 +34,9 @@ struct Uxrom: Mapper {
         case 0x0000 ... 0x1FFF:
             let memoryIndex = Int(address)
             self.cartridge.chrMemory[memoryIndex] = byte
+        case 0x6000 ... 0x7FFF:
+            let index = Int(address - 0x6000)
+            self.cartridge.sram[index] = byte
         case 0x8000 ... 0xFFFF:
             let bankIndex = byte & 0b0000_1111
             self.cartridge.prgBankIndex = Int(bankIndex)

@@ -28,14 +28,14 @@ final class RomTests: XCTestCase {
     func testRomWithBadVersion() throws {
         let header: [UInt8] = [
             0x4E, 0x45, 0x53, 0x1A,
-            0x02, 0x01, 0x31, 0b0000_1000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x02, 0x01, 0x31, 0b0000_1100, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ]
         let programBytes: [UInt8] = [0xA9, 0x42]
         let prgRomBytes = Array(repeating: 0x00, count: 0x0600) + programBytes + Array(repeating: 0x00, count: 0x9400 - programBytes.count)
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
 
-        let expectedError = NESError.versionTwoPointOhNotSupported
+        let expectedError = NESError.versionTwoPointOhOrEarlierSupported
         XCTAssertThrowsError(try Cartridge(bytes: romBytes)) { actualError in
             XCTAssertEqual(actualError as! NESError, expectedError)
         }
