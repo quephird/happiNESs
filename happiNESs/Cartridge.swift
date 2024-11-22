@@ -26,7 +26,7 @@ public class Cartridge {
             throw NESError.romNotInInesFormat
         }
 
-        let inesVersion = (bytes[7] >> 2) & 0b11;
+        let inesVersion = (bytes[7] >> 2) & 0b11
         if inesVersion > 2 {
             throw NESError.versionTwoPointOhOrEarlierSupported
         }
@@ -41,8 +41,8 @@ public class Cartridge {
             throw NESError.unsupportedTimingMode
         }
 
-        let fourScreenBit = bytes[6] & 0b1000 != 0;
-        let horizontalVerticalbit = bytes[6] & 0b1 != 0;
+        let fourScreenBit = bytes[6] & 0b1000 != 0
+        let horizontalVerticalbit = bytes[6] & 0b1 != 0
         let mirroring: Mirroring = switch (fourScreenBit, horizontalVerticalbit) {
         case (true, _): .fourScreen
         case (false, true): .vertical
