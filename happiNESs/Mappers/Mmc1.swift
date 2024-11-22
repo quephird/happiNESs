@@ -30,6 +30,9 @@ struct Mmc1: Mapper {
             let bankOffset = Int(address % 0x1000)
             let memoryIndex = Int(self.chrOffsets[bank]) + bankOffset
             return self.cartridge.chrMemory[memoryIndex]
+        case 0x6000 ... 0x7FFF:
+            let index = Int(address - 0x6000)
+            return self.cartridge.sram[index]
         case 0x8000 ... 0xFFFF:
             let addressOffset = address - 0x8000
             let bank = Int(addressOffset / 0x4000)
@@ -49,6 +52,9 @@ struct Mmc1: Mapper {
             let bankOffset = Int(address % 0x1000)
             let memoryIndex = Int(self.chrOffsets[bank]) + bankOffset
             self.cartridge.chrMemory[memoryIndex] = byte
+        case 0x6000 ... 0x7FFF:
+            let index = Int(address - 0x6000)
+            self.cartridge.sram[index] = byte
         case 0x8000 ... 0xFFFF:
             self.updateRegisters(address: address, byte: byte)
         default:

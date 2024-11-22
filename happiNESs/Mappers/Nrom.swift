@@ -13,6 +13,9 @@ struct Nrom: Mapper {
         case 0x0000 ... 0x1FFF:
             let memoryIndex = Int(address)
             return self.cartridge.chrMemory[memoryIndex]
+        case 0x6000 ... 0x7FFF:
+            let index = Int(address - 0x6000)
+            return self.cartridge.sram[index]
         case 0x8000 ... 0xFFFF:
             var memoryIndex = address - 0x8000
 
@@ -37,6 +40,9 @@ struct Nrom: Mapper {
         switch address {
         case 0x0000 ... 0x1FFF:
             break
+        case 0x6000 ... 0x7FFF:
+            let index = Int(address - 0x6000)
+            self.cartridge.sram[index] = byte
         case 0x8000 ... 0xFFFF:
             break
         default:
