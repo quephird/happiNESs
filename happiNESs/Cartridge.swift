@@ -10,6 +10,7 @@ public class Cartridge {
     static let prgMemoryPageSize: Int = 16384
     static let chrMemoryPageSize: Int = 8192
 
+    public var hasBattery: Bool
     public var timingMode: TimingMode
     public var mirroring: Mirroring
     public var mapperNumber: MapperNumber
@@ -41,6 +42,7 @@ public class Cartridge {
             throw NESError.unsupportedTimingMode
         }
 
+        let hasBattery = (bytes[6] & 0b0000_0010) != 0
         let fourScreenBit = bytes[6] & 0b1000 != 0
         let horizontalVerticalbit = bytes[6] & 0b1 != 0
         let mirroring: Mirroring = switch (fourScreenBit, horizontalVerticalbit) {
@@ -106,6 +108,7 @@ public class Cartridge {
             Array(bytes[chrMemoryStart ..< (chrMemoryStart + chrRomSize)])
         }
 
+        self.hasBattery = hasBattery
         self.timingMode = timingMode
         self.mirroring = mirroring
         self.prgMemory = prgMemory
