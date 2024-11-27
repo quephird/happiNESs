@@ -10,6 +10,8 @@ public class Cartridge {
     static let prgMemoryPageSize: Int = 16384
     static let chrMemoryPageSize: Int = 8192
 
+    public var cartridgeUrl: URL
+    public var saveDataFilePath: URL
     public var hasBattery: Bool
     public var timingMode: TimingMode
     public var mirroring: Mirroring
@@ -18,11 +20,19 @@ public class Cartridge {
     public var prgBankIndex: Int
     public var chrMemory: [UInt8]
     public var chrBankIndex: Int
-    public var sram: [UInt8]
+    public var isSramDirty: Bool = false
+    public var sram: [UInt8] {
+        didSet {
+            self.isSramDirty = true
+        }
+    }
 
     public lazy var mapper: Mapper = mapperNumber.makeMapper(cartridge: self)
 
-    public init(bytes: [UInt8]) throws {
+    public init(cartridgeUrl: URL, saveDataFileDirectory: URL) throws {
+        let data: Data = try Data(contentsOf: cartridgeUrl)
+        let bytes = [UInt8](data)
+
         if Array(bytes[0..<4]) != Self.nesTag {
             throw NESError.romNotInInesFormat
         }
@@ -108,14 +118,25 @@ public class Cartridge {
             Array(bytes[chrMemoryStart ..< (chrMemoryStart + chrRomSize)])
         }
 
+        self.cartridgeUrl = cartridgeUrl
+        let romFileName = self.cartridgeUrl.lastPathComponent
+        var saveDataFileName: String
+        if let index = romFileName.lastIndex(of: ".") {
+            let sramPrefix = String(romFileName.prefix(upTo: index))
+            saveDataFileName = sramPrefix + ".dat"
+        } else {
+            saveDataFileName = romFileName + ".dat"
+        }
+        self.saveDataFilePath = saveDataFileDirectory.appendingPathComponent(saveDataFileName)
+
         self.hasBattery = hasBattery
+        self.sram = [UInt8](repeating: 0x00, count: 0x2000)
         self.timingMode = timingMode
         self.mirroring = mirroring
         self.prgMemory = prgMemory
         self.prgBankIndex = 0
         self.chrMemory = chrMemory
         self.chrBankIndex = 0
-        self.sram = [UInt8](repeating: 0x00, count: 0x2000)
     }
 
     public func readByte(address: UInt16) -> UInt8 {
@@ -124,5 +145,31 @@ public class Cartridge {
 
     public func writeByte(address: UInt16, byte: UInt8) {
         self.mapper.writeByte(address: address, byte: byte)
+    }
+
+    public func loadSram() throws {
+        var sramData: Data
+        do {
+            sramData = try Data.init(contentsOf: self.saveDataFilePath)
+        } catch {
+            sramData = Data(repeating: 0x00, count: 0x2000)
+        }
+
+        if sramData.count != 0x2000 {
+            throw NESError.invalidSaveDatafile
+        }
+
+        self.sram = [UInt8](sramData)
+        self.isSramDirty = false
+    }
+
+    public func saveSram() throws {
+        do {
+            let sramData = Data(sram)
+            try sramData.write(to: self.saveDataFilePath)
+            self.isSramDirty = false
+        } catch let error {
+            throw NESError.unableToSaveDataFile(error.localizedDescription)
+        }
     }
 }

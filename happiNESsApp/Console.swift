@@ -27,6 +27,9 @@ import SwiftUI
     private var speaker: Speaker
     var cartridgeLoaded: Bool = false
     var displayTimer: Timer!
+    var saveDataFileDirectory: URL
+    public var lastSavedDate: Date = Date.now
+    public var currentError: NESError? = nil
 
     // NOTA BENE: We don't want the screen updated every single time something inside
     // this class changes, which is the one being observed by `ContentView`. We're only
@@ -42,12 +45,24 @@ import SwiftUI
         self.cpu = cpu
 
         self.speaker = try Speaker(inputBuffer: cpu.bus.apu.buffer)
+
+        do {
+            let fileManager = FileManager.default
+            self.saveDataFileDirectory = try fileManager.url(for: .applicationSupportDirectory,
+                                                             in: .userDomainMask,
+                                                             appropriateFor: nil,
+                                                             create: true).appending(path: "happiNESs")
+            try fileManager.createDirectory(at: saveDataFileDirectory, withIntermediateDirectories: true)
+        } catch {
+            throw NESError.cannotCreateSaveDataDirectory
+        }
     }
 
     public func runGame(fileUrl: URL) throws {
-        let data: Data = try Data(contentsOf: fileUrl)
-        let romBytes = [UInt8](data)
-        let cartridge = try Cartridge(bytes: romBytes)
+        let cartridge = try Cartridge(cartridgeUrl: fileUrl, saveDataFileDirectory: self.saveDataFileDirectory)
+        if cartridge.hasBattery {
+            try cartridge.loadSram()
+        }
 
         self.cpu.loadCartridge(cartridge: cartridge)
         self.cartridgeLoaded = true
@@ -69,6 +84,17 @@ import SwiftUI
     @objc func runForOneFrame() {
         cpu.executeInstructions(stoppingAfter: .nextFrame)
         cpu.bus.ppu.updateScreenBuffer(&self.screenBuffer)
+        if self.cpu.bus.cartridge!.isSramDirty {
+            if self.lastSavedDate.timeIntervalSinceNow < -5.0 {
+                do {
+                    try self.saveSram()
+                } catch let error as NESError {
+                    self.currentError = error
+                } catch {
+                    fatalError("We should not get here!")
+                }
+            }
+        }
     }
 
     func handleKey(_ keyPress: KeyPress) -> Bool {
@@ -86,6 +112,13 @@ import SwiftUI
 
     public func reset() {
         self.cpu.reset()
+    }
+
+    public func saveSram() throws {
+        if self.cpu.bus.cartridge!.hasBattery {
+            try self.cpu.bus.cartridge!.saveSram()
+            self.lastSavedDate = Date.now
+        }
     }
 
     var tracingOn: Bool {

@@ -14,7 +14,7 @@ public class Bus {
     public var cpu: CPU? = nil
     public var ppu: PPU
     public var apu: APU
-    var cartridge: Cartridge?
+    public var cartridge: Cartridge?
     var vram: [UInt8]
     var joypad: Joypad
 
