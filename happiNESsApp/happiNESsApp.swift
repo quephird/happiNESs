@@ -38,6 +38,13 @@ struct happiNESsApp: App {
             .environment(console)
             .alert(errorMessage, isPresented: $showAlert, actions: {})
             .dialogSeverity(.critical)
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+                do {
+                    try self.console.saveSram()
+                } catch {
+                    self.setErrorMessage(message: error.localizedDescription)
+                }
+            }
 
         Window("happiNESs", id: "main") {
             if #available(macOS 15.0, *) {
@@ -127,6 +134,11 @@ struct happiNESsApp: App {
                         .keyboardShortcut("3", modifiers: .command)
                 }
                 .disabled(isFullscreen)
+            }
+        }
+        .onChange(of: console.currentError) { oldValue, newValue in
+            if let consoleError = console.currentError {
+                self.setErrorMessage(message: consoleError.localizedDescription)
             }
         }
     }

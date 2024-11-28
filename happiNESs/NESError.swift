@@ -14,6 +14,9 @@ enum NESError: Equatable, Error, LocalizedError {
     case versionTwoPointOhOrEarlierSupported
     case unsupportedTimingMode
     case mapperNotSupported(Int)
+    case cannotCreateSaveDataDirectory
+    case invalidSaveDatafile
+    case unableToSaveDataFile(String)
 
     var errorDescription: String? {
         switch self {
@@ -29,6 +32,12 @@ enum NESError: Equatable, Error, LocalizedError {
             "Only NTSC and PAL ROMs currently supported"
         case .mapperNotSupported(let mapperNumber):
             String(format: "Mapper number %03d not supported", mapperNumber)
+        case .cannotCreateSaveDataDirectory:
+            "Could not create save directory for game data files"
+        case .invalidSaveDatafile:
+            "Save data file is somehow invalid and cannot be loaded"
+        case .unableToSaveDataFile(let message):
+            "Error saving SRAM: \(message)"
         }
     }
 }
