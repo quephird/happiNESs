@@ -10,9 +10,10 @@ public enum MapperNumber: UInt16 {
     case mmc1 = 1
     case uxrom = 2
     case cnrom = 3
+    case mmc3 = 4
     case axrom = 7
 
-    public func makeMapper(cartridge: Cartridge) -> Mapper {
+    public func makeMapper(cartridge: Cartridge, bus: Bus) -> Mapper {
         switch self {
         case .nrom:
             return Nrom(cartridge: cartridge)
@@ -22,6 +23,8 @@ public enum MapperNumber: UInt16 {
             return Uxrom(cartridge: cartridge)
         case .cnrom:
             return Cnrom(cartridge: cartridge)
+        case .mmc3:
+            return Mmc3(cartridge: cartridge, bus: bus)
         case .axrom:
             return Axrom(cartridge: cartridge)
         }

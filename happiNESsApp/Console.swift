@@ -59,7 +59,9 @@ import SwiftUI
     }
 
     public func runGame(fileUrl: URL) throws {
-        let cartridge = try Cartridge(cartridgeUrl: fileUrl, saveDataFileDirectory: self.saveDataFileDirectory)
+        let cartridge = try Cartridge(cartridgeUrl: fileUrl,
+                                      saveDataFileDirectory: self.saveDataFileDirectory,
+                                      bus: self.cpu.bus)
         if cartridge.hasBattery {
             try cartridge.loadSram()
         }

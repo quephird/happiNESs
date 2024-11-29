@@ -62,6 +62,10 @@ struct Mmc1: Mapper {
         }
     }
 
+    mutating func tick(cpuCycles: Int) {
+        // No-op for this mapper type
+    }
+
     mutating private func updateRegisters(address: UInt16, byte: UInt8) {
         if byte & 0x80 == 0x80 {
             self.shiftRegister = 0x10

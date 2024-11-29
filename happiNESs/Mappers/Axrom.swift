@@ -43,4 +43,8 @@ struct Axrom: Mapper {
             print("Attempted to write to NROM cartridge at address: \(address)")
         }
     }
+
+    mutating func tick(cpuCycles: Int) {
+        // No-op for this mapper type
+    }
 }

@@ -70,6 +70,7 @@ public class CPU {
         self.cycles += cycles
 
         self.bus.apu.tick(cpuCycles: cycles)
+        self.bus.cartridge!.mapper.tick(cpuCycles: cycles)
         return self.bus.ppu.tick(cpuCycles: cycles)
     }
 
