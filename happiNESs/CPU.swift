@@ -69,9 +69,14 @@ public class CPU {
     public func tick(cycles: Int) -> Bool {
         self.cycles += cycles
 
-        self.bus.apu.tick(cpuCycles: cycles)
-        self.bus.cartridge!.mapper.tick(cpuCycles: cycles)
-        return self.bus.ppu.tick(cpuCycles: cycles)
+        var shouldRedrawScreen: Bool = false
+        for _ in 0 ..< cycles {
+            shouldRedrawScreen = self.bus.ppu.tick() || shouldRedrawScreen
+            self.bus.cartridge!.mapper.tick()
+            self.bus.apu.tick()
+        }
+
+        return shouldRedrawScreen
     }
 
 

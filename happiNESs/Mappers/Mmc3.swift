@@ -51,10 +51,12 @@ struct Mmc3: Mapper {
         }
     }
 
-    mutating public func tick(cpuCycles: Int) {
+    // As with the PPU.tick() function, this one needs to execute the sequence
+    // of instructions three times for every tick of the CPU.
+    mutating public func tick() {
         let ppu = self.bus.ppu
 
-        for _ in 0 ..< cpuCycles * 3 {
+        for _ in 0 ..< 3 {
             if ppu.cycles != 280 {
                 return
             }

@@ -184,16 +184,16 @@ extension APU {
         return newSampleNumber != oldSampleNumber
     }
 
-    mutating public func tick(cpuCycles: Int) {
-        for _ in 0 ..< cpuCycles {
-            self.cycles += 1
+    // This function needs executes its body of instructions once for every tick
+    // of the CPU, unlike for the PPU and mapper tick() functions.
+    mutating public func tick() {
+        self.cycles += 1
 
-            self.stepTimer()
-            self.stepSequencer()
+        self.stepTimer()
+        self.stepSequencer()
 
-            if self.shouldSendSample {
-                self.sendSample()
-            }
+        if self.shouldSendSample {
+            self.sendSample()
         }
     }
 

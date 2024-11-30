@@ -45,7 +45,7 @@ struct Uxrom: Mapper {
         }
     }
 
-    mutating func tick(cpuCycles: Int) {
+    mutating func tick() {
         // No-op for this mapper type
     }
 }
