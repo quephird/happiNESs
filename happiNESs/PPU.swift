@@ -242,6 +242,7 @@ public struct PPU {
             self.handleNmiState()
             self.handleRendering()
             self.handleCaching()
+            self.cartridge!.mapper.tick(ppu: self)
             redrawScreen = self.handleVerticalBlank() || redrawScreen
             self.handleFrameCounts()
         }

@@ -50,7 +50,7 @@ struct Nrom: Mapper {
         }
     }
 
-    mutating func tick() {
+    mutating func tick(ppu: borrowing PPU) {
         // No-op for this mapper type
     }
 }

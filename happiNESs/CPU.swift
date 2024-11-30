@@ -72,7 +72,6 @@ public class CPU {
         var shouldRedrawScreen: Bool = false
         for _ in 0 ..< cycles {
             shouldRedrawScreen = self.bus.ppu.tick() || shouldRedrawScreen
-            self.bus.cartridge!.mapper.tick()
             self.bus.apu.tick()
         }
 

@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 11/28/24.
 //
 
-struct Mmc3: Mapper {
+class Mmc3: Mapper {
     public unowned var cartridge: Cartridge
 
     private var bus: Bus
@@ -51,29 +51,25 @@ struct Mmc3: Mapper {
         }
     }
 
-    // As with the PPU.tick() function, this one needs to execute the sequence
-    // of instructions three times for every tick of the CPU.
-    mutating public func tick() {
-        let ppu = self.bus.ppu
-
-        for _ in 0 ..< 3 {
-            if ppu.cycles != 280 {
-                return
-            }
-
-            if ppu.scanline > 239 && ppu.scanline < 261 {
-                return
-            }
-
-            if !ppu.maskRegister[.showBackground] && !ppu.maskRegister[.showSprites] {
-                return
-            }
-
-            self.handleScanLine()
+    // This tick function is called directly from the PPU tick function,
+    // borrowing the PPU so that it can access its state without copying.
+    public func tick(ppu: borrowing PPU) {
+        if ppu.cycles != 280 {
+            return
         }
+
+        if !ppu.isRenderLine {
+            return
+        }
+
+        if !ppu.isRenderingEnabled {
+            return
+        }
+
+        self.handleScanLine()
     }
 
-    mutating private func handleScanLine() {
+    private func handleScanLine() {
         if self.irqCounter == 0 {
             self.irqCounter = self.irqCounterReload
         } else {
@@ -85,7 +81,7 @@ struct Mmc3: Mapper {
         }
     }
 
-    mutating public func writeByte(address: UInt16, byte: UInt8) {
+    public func writeByte(address: UInt16, byte: UInt8) {
         switch address {
         case 0x0000 ... 0x1FFF:
             let bank = Int(address / 0x0400)
@@ -102,7 +98,7 @@ struct Mmc3: Mapper {
         }
     }
 
-    mutating private func writeRegister(address: UInt16, byte: UInt8) {
+    private func writeRegister(address: UInt16, byte: UInt8) {
         switch address {
         case 0x0000 ... 0x9FFF:
             switch address%2 == 0 {
@@ -136,23 +132,23 @@ struct Mmc3: Mapper {
     }
 
 
-    mutating private func writeBankData(byte: UInt8) {
+    private func writeBankData(byte: UInt8) {
         self.registers[self.registerIndex] = byte
         self.updateOffsets()
     }
 
-    mutating private func writeBankSelect(byte: UInt8) {
+    private func writeBankSelect(byte: UInt8) {
         self.prgRomBankMode = (byte >> 6) & 1
         self.chrRomBankMode = (byte >> 7) & 1
         self.registerIndex = Int(byte & 7)
         self.updateOffsets()
     }
 
-    mutating private func writeProtect(byte: UInt8) {
+    private func writeProtect(byte: UInt8) {
         // No-op
     }
 
-    mutating private func writeMirror(byte: UInt8) {
+    private func writeMirror(byte: UInt8) {
         switch byte & 1 {
         case 0:
             self.cartridge.mirroring = .vertical
@@ -161,20 +157,20 @@ struct Mmc3: Mapper {
         }
     }
 
-    mutating private func writeIrqReload(byte: UInt8) {
+    private func writeIrqReload(byte: UInt8) {
         self.irqCounter = 0
     }
 
-    mutating private func writeIrqLatch(byte: UInt8) {
+    private func writeIrqLatch(byte: UInt8) {
         self.irqCounterReload = byte
     }
 
-    mutating private func writeIrqEnable(byte: UInt8) {
+    private func writeIrqEnable(byte: UInt8) {
         // Note that the input is ignored
         self.irqEnabled = true
     }
 
-    mutating private func writeIrqDisable(byte: UInt8) {
+    private func writeIrqDisable(byte: UInt8) {
         // Note that the input is ignored
         self.irqEnabled = false
     }
@@ -211,7 +207,7 @@ struct Mmc3: Mapper {
         return offset
     }
 
-    mutating private func updateOffsets() {
+    private func updateOffsets() {
         switch self.prgRomBankMode {
         case 0:
             self.prgOffsets[0] = self.prgBankOffset(index: Int(self.registers[6]))
