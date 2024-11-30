@@ -5,8 +5,12 @@
 //  Created by Danielle Kefford on 10/28/24.
 //
 
-struct Cnrom: Mapper {
+class Cnrom: Mapper {
     public unowned var cartridge: Cartridge
+
+    init(cartridge: Cartridge) {
+        self.cartridge = cartridge
+    }
 
     public func readByte(address: UInt16) -> UInt8 {
         switch address {
@@ -46,7 +50,7 @@ struct Cnrom: Mapper {
         }
     }
 
-    mutating func tick(ppu: borrowing PPU) {
+    func tick(ppu: borrowing PPU) {
         // No-op for this mapper type
     }
 }
