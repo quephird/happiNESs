@@ -60,6 +60,10 @@ So far, the following mappers and associated games have been tested in this emul
   - Gradius
   - Gyruss
   - Tiger Heli
+- 004
+  - Astyanax
+  - Kirby's Adventure
+  - Rampart
 - 007
   - Sky Shark
   - Marble Madness (text box glitches a little at start of level)
