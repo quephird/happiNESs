@@ -231,17 +231,18 @@ public struct PPU {
         }
     }
 
-    // The return value below ultimately reflects whether or not
-    // we need to redraw the screen.
-    //
-    // TODO: Need to rename this function and the one in APU as well
-    mutating func tick(cpuCycles: Int) -> Bool {
+    // This function needs to execute the sequence of instructions three
+    // times for every tick of the CPU since the PPU runs at three times
+    // its clock rate. The return value below ultimately reflects whether
+    // or not we need to redraw the screen.
+    mutating func tick() -> Bool {
         var redrawScreen = false
 
-        for _ in 0 ..< cpuCycles * 3 {
+        for _ in 0 ..< 3 {
             self.handleNmiState()
             self.handleRendering()
             self.handleCaching()
+            self.cartridge!.mapper.tick(ppu: self)
             redrawScreen = self.handleVerticalBlank() || redrawScreen
             self.handleFrameCounts()
         }

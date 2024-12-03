@@ -5,8 +5,12 @@
 //  Created by Danielle Kefford on 10/28/24.
 //
 
-struct Nrom: Mapper {
+class Nrom: Mapper {
     public unowned var cartridge: Cartridge
+
+    init(cartridge: Cartridge) {
+        self.cartridge = cartridge
+    }
 
     public func readByte(address: UInt16) -> UInt8 {
         switch address {
@@ -48,5 +52,9 @@ struct Nrom: Mapper {
         default:
             print("Attempted to write to NROM cartridge at address: \(address)")
         }
+    }
+
+    func tick(ppu: borrowing PPU) {
+        // No-op for this mapper type
     }
 }

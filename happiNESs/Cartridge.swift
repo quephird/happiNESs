@@ -12,6 +12,7 @@ public class Cartridge {
 
     public var cartridgeUrl: URL
     public var saveDataFilePath: URL
+    public var bus: Bus
     public var hasBattery: Bool
     public var timingMode: TimingMode
     public var mirroring: Mirroring
@@ -27,9 +28,11 @@ public class Cartridge {
         }
     }
 
-    public lazy var mapper: Mapper = mapperNumber.makeMapper(cartridge: self)
+    public lazy var mapper: Mapper = mapperNumber.makeMapper(cartridge: self, bus: self.bus)
 
-    public init(cartridgeUrl: URL, saveDataFileDirectory: URL) throws {
+    public init(cartridgeUrl: URL,
+                saveDataFileDirectory: URL,
+                bus: Bus) throws {
         let data: Data = try Data(contentsOf: cartridgeUrl)
         let bytes = [UInt8](data)
 
@@ -137,6 +140,7 @@ public class Cartridge {
         self.prgBankIndex = 0
         self.chrMemory = chrMemory
         self.chrBankIndex = 0
+        self.bus = bus
     }
 
     public func readByte(address: UInt16) -> UInt8 {

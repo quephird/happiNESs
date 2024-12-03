@@ -26,7 +26,7 @@ public struct APU {
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
     private var sequencerCount: Int = 0
-    private var frameIrqInhibited: Bool = false
+    private var frameIrqEnabled: Bool = false
     public var sampleRate: Float
 
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
@@ -163,7 +163,7 @@ extension APU {
 
     mutating public func updateSequencer(byte: UInt8) {
         self.sequencerMode = byte[.sequencerMode] ? .five : .four
-        self.frameIrqInhibited = byte[.frameIrqInhibited]
+        self.frameIrqEnabled = !byte[.frameIrqInhibited]
 
         if self.sequencerMode == .five {
             self.stepEnvelope()
@@ -184,16 +184,16 @@ extension APU {
         return newSampleNumber != oldSampleNumber
     }
 
-    mutating public func tick(cpuCycles: Int) {
-        for _ in 0 ..< cpuCycles {
-            self.cycles += 1
+    // This function needs executes its body of instructions once for every tick
+    // of the CPU, unlike for the PPU and mapper tick() functions.
+    mutating public func tick() {
+        self.cycles += 1
 
-            self.stepTimer()
-            self.stepSequencer()
+        self.stepTimer()
+        self.stepSequencer()
 
-            if self.shouldSendSample {
-                self.sendSample()
-            }
+        if self.shouldSendSample {
+            self.sendSample()
         }
     }
 
@@ -327,6 +327,8 @@ extension APU {
     }
 
     mutating private func generateIRQ() {
-        self.bus!.triggerIrq()
+        if self.frameIrqEnabled {
+            self.bus!.triggerIrq()
+        }
     }
 }

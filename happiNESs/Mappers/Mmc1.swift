@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 10/29/24.
 //
 
-struct Mmc1: Mapper {
+class Mmc1: Mapper {
     public unowned var cartridge: Cartridge
 
     private var prgRomBankMode: Int = 0
@@ -45,7 +45,7 @@ struct Mmc1: Mapper {
         }
     }
 
-    mutating public func writeByte(address: UInt16, byte: UInt8) {
+    public func writeByte(address: UInt16, byte: UInt8) {
         switch address {
         case 0x0000 ... 0x1FFF:
             let bank = Int(address / 0x1000)
@@ -62,7 +62,11 @@ struct Mmc1: Mapper {
         }
     }
 
-    mutating private func updateRegisters(address: UInt16, byte: UInt8) {
+    func tick(ppu: borrowing PPU) {
+        // No-op for this mapper type
+    }
+
+    private func updateRegisters(address: UInt16, byte: UInt8) {
         if byte & 0x80 == 0x80 {
             self.shiftRegister = 0x10
             self.updateControlRegister(byte: self.controlRegister | 0x0C)
@@ -80,7 +84,7 @@ struct Mmc1: Mapper {
         }
     }
 
-    mutating private func updateOtherThings(address: UInt16, byte: UInt8) {
+    private func updateOtherThings(address: UInt16, byte: UInt8) {
         switch address {
         case 0x0000 ... 0x9FFF:
             self.updateControlRegister(byte: byte)
@@ -93,7 +97,7 @@ struct Mmc1: Mapper {
         }
     }
 
-    mutating private func updateControlRegister(byte: UInt8) {
+    private func updateControlRegister(byte: UInt8) {
         self.controlRegister = byte
 
         let mirroringBits = self.controlRegister & 0b0000_0011
@@ -114,7 +118,7 @@ struct Mmc1: Mapper {
         self.chrRomBankMode = Int((self.controlRegister & 0b0001_0000) >> 4)
     }
 
-    mutating private func updateOffsets() {
+    private func updateOffsets() {
         switch self.prgRomBankMode {
         case 0, 1:
             self.prgOffsets[0] = self.prgBankOffset(index: Int(self.prgBank & 0xFE))

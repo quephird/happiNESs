@@ -32,6 +32,7 @@
 		871F62302C62FE9E00132962 /* PPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F622F2C62FE9E00132962 /* PPU.swift */; };
 		871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62332C6541D300132962 /* UInt16+bytes.swift */; };
 		871F62362C65631F00132962 /* ControllerRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871F62352C65631F00132962 /* ControllerRegister.swift */; };
+		87244E592CF925DB00EC26D3 /* Mmc3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87244E582CF925D700EC26D3 /* Mmc3.swift */; };
 		8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1762C1CB9B3001B44B5 /* happiNESs.docc */; };
 		8744B17D2C1CB9B3001B44B5 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
 		8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8744B1812C1CB9B3001B44B5 /* CPUTests.swift */; };
@@ -139,6 +140,7 @@
 		871F622F2C62FE9E00132962 /* PPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PPU.swift; sourceTree = "<group>"; };
 		871F62332C6541D300132962 /* UInt16+bytes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt16+bytes.swift"; sourceTree = "<group>"; };
 		871F62352C65631F00132962 /* ControllerRegister.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerRegister.swift; sourceTree = "<group>"; };
+		87244E582CF925D700EC26D3 /* Mmc3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mmc3.swift; sourceTree = "<group>"; };
 		8744B1722C1CB9B3001B44B5 /* happiNESs.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = happiNESs.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8744B1752C1CB9B3001B44B5 /* happiNESs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = happiNESs.h; sourceTree = "<group>"; };
 		8744B1762C1CB9B3001B44B5 /* happiNESs.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = happiNESs.docc; sourceTree = "<group>"; };
@@ -348,6 +350,7 @@
 				87C5B3222CD9C3C9008580A6 /* Axrom.swift */,
 				87C5B3232CD9C3C9008580A6 /* Cnrom.swift */,
 				87C5B3242CD9C3C9008580A6 /* Mmc1.swift */,
+				87244E582CF925D700EC26D3 /* Mmc3.swift */,
 				87C5B3262CD9C3C9008580A6 /* Nrom.swift */,
 				87C5B3252CD9C3C9008580A6 /* Uxrom.swift */,
 			);
@@ -582,6 +585,7 @@
 				874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */,
 				874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */,
 				87C5B3272CD9C3C9008580A6 /* Axrom.swift in Sources */,
+				87244E592CF925DB00EC26D3 /* Mmc3.swift in Sources */,
 				87C5B32A2CD9C3C9008580A6 /* Uxrom.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
