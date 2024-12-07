@@ -9,8 +9,8 @@ extension PPU {
     public func dump() {
         print("cycles: \(cycles), scanline: \(scanline)")
         dumpSprites()
-        dumpNametable(vram.prefix(2048), labeled: "A")
-        dumpNametable(vram.suffix(2048), labeled: "B")
+        dumpNametable(vram.prefix(0x0400), labeled: "A")
+        dumpNametable(vram.suffix(0x0400), labeled: "B")
     }
 
     func dumpSprites() {
@@ -40,7 +40,7 @@ extension PPU {
             print("- tiles: ", terminator: "")
             for column in 0..<32 {
                 let i = column + row * 32
-                let tileIndex = Int(nametable[i])
+                let tileIndex = Int(nametable[nametable.startIndex + i])
                 print(String(format: "%2x", tileIndex), terminator: " ")
             }
             print()
@@ -50,7 +50,7 @@ extension PPU {
             print("- attrs: ", terminator: "")
             for column in 0..<16 {
                 let i = column + row * 16
-                let attrs = Int(nametable[i])
+                let attrs = Int(nametable[nametable.startIndex + i])
                 let topLeft = attrs & 0b11
                 let topRight = attrs & 0b1100 >> 2
                 print(String(format: "%2x", topLeft), terminator: " ")
@@ -61,7 +61,7 @@ extension PPU {
             print("         ", terminator: "")
             for column in 0..<16 {
                 let i = column + row * 16
-                let attrs = Int(nametable[i])
+                let attrs = Int(nametable[nametable.startIndex + i])
                 let botLeft = attrs & 0b110000 >> 4
                 let botRight = attrs & 0b11000000 >> 6
                 print(String(format: "%2x", botLeft), terminator: " ")
