@@ -252,42 +252,55 @@ extension PPU {
     }
 
     // NOTA BENE: This method is _only_ used internally by the PPU
-    public func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
+    public func readByteInternal(address: UInt16) -> UInt8 {
         let mirroredAddress = address % 0x4000
         switch mirroredAddress {
         case 0x0000 ... 0x1FFF:
-            return (self.cartridge!.readByte(address: mirroredAddress), true)
+            return self.cartridge!.readByte(address: mirroredAddress)
         case 0x2000 ... 0x3EFF:
-            return (self.vram[self.vramIndex(from: mirroredAddress)], true)
+            return self.vram[self.vramIndex(from: mirroredAddress)]
         case 0x3F00 ... 0x3FFF:
-            return (self.paletteTable[self.paletteIndex(from: mirroredAddress)], false)
+            return self.paletteTable[self.paletteIndex(from: mirroredAddress)]
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
         }
     }
 
-    // NOTA BENE: Called directly by the tracer, as well as by readPpuData()
-    public func readPpuDataWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
+    // NOTA BENE: Called indirectly by the tracer
+    public func readPpuDataWithoutMutating() -> UInt8 {
         let address = self.currentSharedAddress
+        let mirroredAddress = address % 0x4000
 
-        let (result, shouldBuffer) = self.readByte(address: address)
-        if shouldBuffer {
-            return (self.internalDataBuffer, result)
+        switch mirroredAddress {
+        case 0x0000 ... 0x3EFF:
+            return self.internalDataBuffer
+        case 0x3F00 ... 0x3FFF:
+            return self.readByteInternal(address: mirroredAddress)
+        default:
+            fatalError("We should never get here")
         }
-
-        return (result, nil)
     }
 
     mutating private func readPpuData() -> UInt8 {
-        let (result, newInternalDataBuffer) = self.readPpuDataWithoutMutating()
+        let address = self.currentSharedAddress
+        let byte = self.readByteInternal(address: address)
 
         self.incrementVramAddress()
-        if let newInternalDataBuffer {
-            self.internalDataBuffer = newInternalDataBuffer
-        }
 
-        return result
+        let mirroredAddress = address % 0x4000
+        switch mirroredAddress {
+        case 0x0000 ... 0x3EFF:
+            let bufferedByte = self.internalDataBuffer
+            self.internalDataBuffer = byte
+            return bufferedByte
+        case 0x3F00 ... 0x3FFF:
+            let otherByte = self.readByteInternal(address: mirroredAddress - 0x1000)
+            self.internalDataBuffer = otherByte
+            return byte
+        default:
+            fatalError("We should never get here")
+        }
     }
 
     mutating private func writePpuData(byte: UInt8) {
@@ -322,7 +335,7 @@ extension PPU {
         case 0x2004:
             return self.readOamData()
         case 0x2007:
-            return self.readPpuDataWithoutMutating().result
+            return self.readPpuDataWithoutMutating()
         default:
             fatalError("We should not have gotten here in PPU.readByteWithoutMutating()")
         }
