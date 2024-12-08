@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 73;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -58,6 +58,7 @@
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
 		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
+		878A82C52D064042005E7011 /* Font+custom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878A82C42D064036005E7011 /* Font+custom.swift */; };
 		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
 		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
 		878D81452C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
@@ -109,6 +110,15 @@
 				871932002C30C3A500A73C22 /* happiNESs.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		878A82BF2D063E4D005E7011 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Fonts;
+			dstSubfolderSpec = 7;
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -167,6 +177,7 @@
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
 		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
+		878A82C42D064036005E7011 /* Font+custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+custom.swift"; sourceTree = "<group>"; };
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
@@ -188,6 +199,34 @@
 		87F234572CE8573F00D2FDA6 /* FilterChain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterChain.swift; sourceTree = "<group>"; };
 		87F234592CE85DFA00D2FDA6 /* HighPassFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighPassFilter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		878A82BE2D063E36005E7011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				license.txt,
+				readme.txt,
+				"zelda-ii-the-adventure-of-link.otf",
+			);
+			target = 871931EC2C30BB2900A73C22 /* happiNESsApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		878A82C32D063E79005E7011 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 878A82BF2D063E4D005E7011 /* CopyFiles */;
+			membershipExceptions = (
+				license.txt,
+				readme.txt,
+				"zelda-ii-the-adventure-of-link.otf",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		878A82B82D063AA3005E7011 /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (878A82BE2D063E36005E7011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 878A82C32D063E79005E7011 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		871931EA2C30BB2900A73C22 /* Frameworks */ = {
@@ -220,9 +259,11 @@
 			isa = PBXGroup;
 			children = (
 				8709FF122C7FB36700EDF82F /* Info.plist */,
+				878A82B82D063AA3005E7011 /* Fonts */,
 				871931EF2C30BB2900A73C22 /* happiNESsApp.swift */,
 				8719320A2C3366A900A73C22 /* Console.swift */,
 				871931F12C30BB2900A73C22 /* ContentView.swift */,
+				878A82C42D064036005E7011 /* Font+custom.swift */,
 				8763D06B2C39E528006C1B4F /* Screen.swift */,
 				874F51B22CC0638500B12037 /* Speaker.swift */,
 				871931F32C30BB2C00A73C22 /* Assets.xcassets */,
@@ -397,11 +438,15 @@
 				871931EA2C30BB2900A73C22 /* Frameworks */,
 				871931EB2C30BB2900A73C22 /* Resources */,
 				871932032C30C3A600A73C22 /* Embed Frameworks */,
+				878A82BF2D063E4D005E7011 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				871932022C30C3A500A73C22 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				878A82B82D063AA3005E7011 /* Fonts */,
 			);
 			name = happiNESsApp;
 			productName = happiNESsApp;
@@ -466,7 +511,6 @@
 				};
 			};
 			buildConfigurationList = 8744B16C2C1CB9B3001B44B5 /* Build configuration list for PBXProject "happiNESs" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -474,6 +518,7 @@
 				Base,
 			);
 			mainGroup = 8744B1682C1CB9B3001B44B5;
+			preferredProjectObjectVersion = 56;
 			productRefGroup = 8744B1732C1CB9B3001B44B5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -523,6 +568,7 @@
 			files = (
 				8763D06C2C39E528006C1B4F /* Screen.swift in Sources */,
 				8719320C2C3366B000A73C22 /* Console.swift in Sources */,
+				878A82C52D064042005E7011 /* Font+custom.swift in Sources */,
 				878D81482C815E760076ED30 /* NESError.swift in Sources */,
 				874F51B32CC0638500B12037 /* Speaker.swift in Sources */,
 				871931F22C30BB2900A73C22 /* ContentView.swift in Sources */,

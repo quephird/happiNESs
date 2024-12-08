@@ -26,16 +26,21 @@ struct ContentView: View {
     var body: some View {
         Group {
             if self.console.cartridgeLoaded {
-                Screen(screenBuffer: console.screenBuffer,
-                       scale: console.scale)
-                .focusable()
-                .focusEffectDisabled()
-                .focused($focused)
-                .onAppear {
-                    focused = true
-                }
-                .onKeyPress(phases: .all) { keyPress in
-                    return console.handleKey(keyPress) ? .handled : .ignored
+                ZStack {
+                    Screen(screenBuffer: console.screenBuffer,
+                           scale: console.scale)
+                    .focusable()
+                    .focusEffectDisabled()
+                    .focused($focused)
+                    .onAppear {
+                        focused = true
+                    }
+                    .onKeyPress(phases: .all) { keyPress in
+                        return console.handleKey(keyPress) ? .handled : .ignored
+                    }
+                    if self.console.isPaused {
+                        Text("PAUSED").font(.zelda)
+                    }
                 }
             } else {
                 Image("happiNESs")

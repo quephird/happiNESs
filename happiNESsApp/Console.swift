@@ -24,6 +24,7 @@ import SwiftUI
         KeyEquivalent("s") : .buttonB,
     ]
 
+    public var isPaused: Bool = false
     private var speaker: Speaker
     var cartridgeLoaded: Bool = false
     var displayTimer: Timer!
@@ -84,6 +85,10 @@ import SwiftUI
     }
 
     @objc func runForOneFrame() {
+        if self.isPaused {
+            return
+        }
+
         cpu.executeInstructions(stoppingAfter: .nextFrame)
         cpu.bus.ppu.updateScreenBuffer(&self.screenBuffer)
         if self.cpu.bus.cartridge!.isSramDirty {

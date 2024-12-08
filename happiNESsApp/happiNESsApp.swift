@@ -28,6 +28,10 @@ struct happiNESsApp: App {
     @State private var isFullscreen = false
     @State private var oldScale: Double = Console.defaultScale
 
+    private var buttonLabel: String {
+        self.console.isPaused ? "Unpause game" : "Pause game"
+    }
+
     private func setErrorMessage(message: String) {
         self.errorMessage = message
         self.showAlert = true
@@ -122,6 +126,10 @@ struct happiNESsApp: App {
                 }
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(!console.cartridgeLoaded)
+                Button(self.buttonLabel) {
+                    console.isPaused.toggle()
+                }
+                .keyboardShortcut("p", modifiers: .command)
                 Picker(selection: $console.scale, label: Text("Scale")) {
                     Text("1x")
                         .tag(1.0)
