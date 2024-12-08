@@ -66,7 +66,7 @@ So far, the following mappers and associated games have been tested in this emul
   - Rampart
 - 007
   - Sky Shark
-  - Marble Madness (text box glitches a little at start of level)
+  - Marble Madness
   - Wheel of Fortune
 
 Also, this emulator now supports sound! Games should play and sound _pretty_ close to the original, however certain things like timings and IRQ interrupt handling may not be quite right and will need some work to correct.
