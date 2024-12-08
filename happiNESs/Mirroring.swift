@@ -5,6 +5,13 @@
 //  Created by Danielle Kefford on 7/4/24.
 //
 
+public enum Nametable: Int {
+    case a = 0x0000
+    case b = 0x0400
+    case c = 0x0800
+    case d = 0x0B00
+}
+
 public enum Mirroring: Int {
     // The actual "physical" layout of the nametables in the PPU VRAM is
     // the following:
@@ -40,12 +47,12 @@ public enum Mirroring: Int {
     // The two-dimensional array below encapsulates these mappings, with the
     // raw value of the mirroring strategy as the first index, and the inbound
     // nametable index as the second index.
-    static let nametableIndexLookup: [[Int]] = [
-        [0, 0, 1, 1],
-        [0, 1, 0, 1],
-        [0, 0, 0, 0],
-        [1, 1, 1, 1],
-        [0, 1, 2, 3],
+    static let nametableLookup: [[Nametable]] = [
+        [.a, .a, .b, .b],
+        [.a, .b, .a, .b],
+        [.a, .a, .a, .a],
+        [.b, .b, .b, .b],
+        [.a, .b, .c, .d],
     ]
 
     case horizontal = 0
@@ -54,7 +61,7 @@ public enum Mirroring: Int {
     case singleScreen1 = 3
     case fourScreen = 4
 
-    public func actualNametableIndex(for nametableIndex: Int) -> Int {
-        Self.nametableIndexLookup[self.rawValue][nametableIndex]
+    public func actualNametable(for nametableIndex: Int) -> Nametable {
+        Self.nametableLookup[self.rawValue][nametableIndex]
     }
 }
