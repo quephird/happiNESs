@@ -8,5 +8,5 @@
 import SwiftUI
 
 extension Font {
-    static let zelda = Font.custom("Zelda II: The Adventure of Link Regular", size: 42.0)
+    static let zelda = Font.custom("Zelda II: The Adventure of Link Regular", size: 24.0)
 }

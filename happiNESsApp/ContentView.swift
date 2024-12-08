@@ -39,7 +39,9 @@ struct ContentView: View {
                         return console.handleKey(keyPress) ? .handled : .ignored
                     }
                     if self.console.isPaused {
-                        Text("PAUSED").font(.zelda)
+                        Text("PAUSED")
+                            .font(.zelda)
+                            .scaleEffect(console.scale)
                     }
                 }
             } else {
