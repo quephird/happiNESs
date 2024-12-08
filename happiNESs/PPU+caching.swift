@@ -74,7 +74,7 @@ extension PPU {
 
     mutating private func cacheNametableByte() {
         let address = 0x2000 | (self.currentSharedAddress & 0x0FFF)
-        self.currentNametableByte = self.readByte(address: address).result
+        self.currentNametableByte = self.readByteInternal(address: address)
     }
 
     mutating private func cachePaletteIndex() {
@@ -142,7 +142,7 @@ extension PPU {
         let paletteIndexShift = (metatileBlockIndexY << 1 | metatileBlockIndexX) * 2
 
         // ... now actually grab the palette byte using the current attribute address...
-        let paletteByte = self.readByte(address: self.currentAttributeAddress).result
+        let paletteByte = self.readByteInternal(address: self.currentAttributeAddress)
 
         // ... finally, pluck out and cache the two bits representing the palette index
         self.currentPaletteIndex = (paletteByte >> paletteIndexShift) & 0b0000_0011
@@ -154,7 +154,7 @@ extension PPU {
                                               bitPlaneIndex: false,
                                               fineY: self.currentSharedAddress[.fineY])
 
-        self.currentLowTileByte = self.readByte(address: address).result
+        self.currentLowTileByte = self.readByteInternal(address: address)
     }
 
     mutating private func cacheHighTileByte() {
@@ -163,7 +163,7 @@ extension PPU {
                                               bitPlaneIndex: true,
                                               fineY: self.currentSharedAddress[.fineY])
 
-        self.currentHighTileByte = self.readByte(address: address).result
+        self.currentHighTileByte = self.readByteInternal(address: address)
     }
 
     mutating private func cacheTileData() {
@@ -247,8 +247,8 @@ extension PPU {
                                                       tileIndex: tileIndex,
                                                       bitPlaneIndex: true,
                                                       fineY: UInt8(spritePixelY))
-        var lowTileByte = self.readByte(address: lowTileAddress).result
-        var highTileByte = self.readByte(address: highTileAddress).result
+        var lowTileByte = self.readByteInternal(address: lowTileAddress)
+        var highTileByte = self.readByteInternal(address: highTileAddress)
         let paletteBits = (attributeByte & 0b11) << 2
 
         // Here we're caching the palette information for the current sprite.

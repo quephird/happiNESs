@@ -150,57 +150,11 @@ extension PPU {
 
     private func vramIndex(from address: UInt16) -> Int {
         // Mirror down 0x3000-0x3EFF to 0x2000-0x2EFF
-        let mirroredVramAddress = address & 0b0010_1111_1111_1111
-
-        let addressOffset = Int(mirroredVramAddress - Self.ppuAddressSpaceStart)
-        let nameTableIndex = addressOffset / Self.nametableSize
-        let nameTableOffset = addressOffset % Self.nametableSize
-
-        // The actual "physical" layout of the nametables in the PPU VRAM is
-        // the following:
-        //
-        //     [ A ] [ B ]
-        //
-        // where A is the primary nametable and B is the secondary nametable,
-        // each with 32 x 30 = 960 bytes. (The next 64 bytes for each is reserved
-        // for the pattern tables.)
-        //
-        // However, the way PPU memory addresses map to the nametables depends on
-        // the mirroring strategy hardcoded into the ROM, and thus set in the PPU.
-        // In PPU address space, there are virtually _four_ nametables, two of which
-        // are mirrors of the other two:
-        //
-        //     [ 0 ] [ 1 ]
-        //     [ 2 ] [ 3 ]
-        //
-        // And so, we need to map the requested memory address to the correct index
-        // of the PPU VRAM array. For vertical mirroring, virtual nametable indices 0 and 2
-        // need to map to actual nametable A, whereas indices 1 and 3 need to map to
-        // B:
-        //
-        //     [ A ] [ B ]
-        //     [ A ] [ B ]
-        //
-        // For horizontal mirroring, virtual nametable indices 0 and 1 need to map to
-        // actual nametable A, whereas indices 2 and 3 need to map to B:
-        //
-        //     [ A ] [ A ]
-        //     [ B ] [ B ]
-        //
-        // And so, the `let` statement below maps the tuple of mirroring strategy
-        // and virtual nametable index to the beginning "physical" nametable address.
-        // From there, we can add the nametable offset to get the actual address.
-        // (For now, this emulator only handles vertical and horizontal mirroring.)
-        let actualNametableIndexStart = switch (self.cartridge!.mirroring, nameTableIndex) {
-        case (_, 0), (.horizontal, 1), (.vertical, 2), (.singleScreen0, _):
-            0x0000
-        case (.horizontal, 2), (.vertical, 1), (_, 3), (.singleScreen1, _):
-            0x0400
-        default:
-            fatalError("Invalid nametable index")
-        }
-
-        return actualNametableIndexStart + nameTableOffset
+        let addressOffset = Int(address - Self.ppuAddressSpaceStart) % 0x1000
+        let inboundNametableIndex = addressOffset / Self.nametableSize
+        let nametableOffset = addressOffset % Self.nametableSize
+        let actualNametableIndex = self.cartridge!.mirroring.actualNametableIndex(for: inboundNametableIndex)
+        return actualNametableIndex * 0x400 + nametableOffset
     }
 
     private func paletteIndex(from address: Address) -> Int {
@@ -252,42 +206,55 @@ extension PPU {
     }
 
     // NOTA BENE: This method is _only_ used internally by the PPU
-    public func readByte(address: UInt16) -> (result: UInt8, shouldBuffer: Bool) {
+    public func readByteInternal(address: UInt16) -> UInt8 {
         let mirroredAddress = address % 0x4000
         switch mirroredAddress {
         case 0x0000 ... 0x1FFF:
-            return (self.cartridge!.readByte(address: mirroredAddress), true)
+            return self.cartridge!.readByte(address: mirroredAddress)
         case 0x2000 ... 0x3EFF:
-            return (self.vram[self.vramIndex(from: mirroredAddress)], true)
+            return self.vram[self.vramIndex(from: mirroredAddress)]
         case 0x3F00 ... 0x3FFF:
-            return (self.paletteTable[self.paletteIndex(from: mirroredAddress)], false)
+            return self.paletteTable[self.paletteIndex(from: mirroredAddress)]
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
         }
     }
 
-    // NOTA BENE: Called directly by the tracer, as well as by readPpuData()
-    public func readPpuDataWithoutMutating() -> (result: UInt8, newInternalDataBuffer: UInt8?) {
+    // NOTA BENE: Called indirectly by the tracer
+    public func readPpuDataWithoutMutating() -> UInt8 {
         let address = self.currentSharedAddress
+        let mirroredAddress = address % 0x4000
 
-        let (result, shouldBuffer) = self.readByte(address: address)
-        if shouldBuffer {
-            return (self.internalDataBuffer, result)
+        switch mirroredAddress {
+        case 0x0000 ... 0x3EFF:
+            return self.internalDataBuffer
+        case 0x3F00 ... 0x3FFF:
+            return self.readByteInternal(address: mirroredAddress)
+        default:
+            fatalError("We should never get here")
         }
-
-        return (result, nil)
     }
 
     mutating private func readPpuData() -> UInt8 {
-        let (result, newInternalDataBuffer) = self.readPpuDataWithoutMutating()
+        let address = self.currentSharedAddress
+        let byte = self.readByteInternal(address: address)
 
         self.incrementVramAddress()
-        if let newInternalDataBuffer {
-            self.internalDataBuffer = newInternalDataBuffer
-        }
 
-        return result
+        let mirroredAddress = address % 0x4000
+        switch mirroredAddress {
+        case 0x0000 ... 0x3EFF:
+            let bufferedByte = self.internalDataBuffer
+            self.internalDataBuffer = byte
+            return bufferedByte
+        case 0x3F00 ... 0x3FFF:
+            let otherByte = self.readByteInternal(address: mirroredAddress - 0x1000)
+            self.internalDataBuffer = otherByte
+            return byte
+        default:
+            fatalError("We should never get here")
+        }
     }
 
     mutating private func writePpuData(byte: UInt8) {
@@ -322,7 +289,7 @@ extension PPU {
         case 0x2004:
             return self.readOamData()
         case 0x2007:
-            return self.readPpuDataWithoutMutating().result
+            return self.readPpuDataWithoutMutating()
         default:
             fatalError("We should not have gotten here in PPU.readByteWithoutMutating()")
         }

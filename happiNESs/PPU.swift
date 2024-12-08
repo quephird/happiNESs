@@ -163,7 +163,6 @@ public struct PPU {
         if self.isRenderingEnabled {
             self.cacheBackgroundTiles()
 
-            // TODO: Revisit this because sprites should be cached for the _next_ line
             if self.isVisibleLine && self.isCacheSpritesCycle {
                 self.cacheSprites()
             }
