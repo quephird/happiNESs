@@ -153,8 +153,8 @@ extension PPU {
         let addressOffset = Int(address - Self.ppuAddressSpaceStart) % 0x1000
         let inboundNametableIndex = addressOffset / Self.nametableSize
         let nametableOffset = addressOffset % Self.nametableSize
-        let actualNametableIndex = self.cartridge!.mirroring.actualNametableIndex(for: inboundNametableIndex)
-        return actualNametableIndex * 0x400 + nametableOffset
+        let actualNametable = self.cartridge!.mirroring.actualNametable(for: inboundNametableIndex)
+        return actualNametable.rawValue + nametableOffset
     }
 
     private func paletteIndex(from address: Address) -> Int {
