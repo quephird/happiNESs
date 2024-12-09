@@ -33,7 +33,7 @@ You can also specify the scale of the screen between 1x, 2x, and 3x through the 
 
 ... or through hitting ⌘-1, ⌘-2, or ⌘-3, respectively. Alternately, if you are on macOS 15.1 or later, you can run the game in fullscreen mode by selecting the "Enter Full Screen" choice from the View menu or via hitting the 🌐-F chord.
 
-Hitting ⌘-R within happiNESs at any time while playing a game will reset it.
+Hitting ⌘-R within happiNESs at any time while playing a game will reset it. You can also pause any game at any time by hitting ⌘-P; hitting that chord again will unpause it.
 
 # Supported games
 
