@@ -121,6 +121,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		878A82C92D06636D005E7011 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Sounds;
+			dstSubfolderSpec = 7;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -210,6 +219,13 @@
 			);
 			target = 871931EC2C30BB2900A73C22 /* happiNESsApp */;
 		};
+		878A82CC2D066384005E7011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				pause.mp3,
+			);
+			target = 871931EC2C30BB2900A73C22 /* happiNESsApp */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
@@ -222,10 +238,18 @@
 				"zelda-ii-the-adventure-of-link.otf",
 			);
 		};
+		878A82CB2D066381005E7011 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 878A82C92D06636D005E7011 /* CopyFiles */;
+			membershipExceptions = (
+				pause.mp3,
+			);
+		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		878A82B82D063AA3005E7011 /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (878A82BE2D063E36005E7011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 878A82C32D063E79005E7011 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
+		878A82C62D0662A7005E7011 /* Sounds */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (878A82CC2D066384005E7011 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 878A82CB2D066381005E7011 /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Sounds; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -260,6 +284,7 @@
 			children = (
 				8709FF122C7FB36700EDF82F /* Info.plist */,
 				878A82B82D063AA3005E7011 /* Fonts */,
+				878A82C62D0662A7005E7011 /* Sounds */,
 				871931EF2C30BB2900A73C22 /* happiNESsApp.swift */,
 				8719320A2C3366A900A73C22 /* Console.swift */,
 				871931F12C30BB2900A73C22 /* ContentView.swift */,
@@ -439,6 +464,7 @@
 				871931EB2C30BB2900A73C22 /* Resources */,
 				871932032C30C3A600A73C22 /* Embed Frameworks */,
 				878A82BF2D063E4D005E7011 /* CopyFiles */,
+				878A82C92D06636D005E7011 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -447,6 +473,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				878A82B82D063AA3005E7011 /* Fonts */,
+				878A82C62D0662A7005E7011 /* Sounds */,
 			);
 			name = happiNESsApp;
 			productName = happiNESsApp;

@@ -128,6 +128,13 @@ import SwiftUI
         }
     }
 
+    public func togglePause() {
+        self.isPaused.toggle()
+        if self.isPaused {
+            self.speaker.playPauseSound()
+        }
+    }
+
     var tracingOn: Bool {
         get {
             access(keyPath: \.tracingOn)

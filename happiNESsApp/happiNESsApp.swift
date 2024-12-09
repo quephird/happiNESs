@@ -127,7 +127,7 @@ struct happiNESsApp: App {
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(!console.cartridgeLoaded)
                 Button(self.buttonLabel) {
-                    console.isPaused.toggle()
+                    console.togglePause()
                 }
                 .keyboardShortcut("p", modifiers: .command)
                 Picker(selection: $console.scale, label: Text("Scale")) {
