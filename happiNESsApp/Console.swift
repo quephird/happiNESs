@@ -24,6 +24,7 @@ import SwiftUI
         KeyEquivalent("s") : .buttonB,
     ]
 
+    public var isPaused: Bool = false
     private var speaker: Speaker
     var cartridgeLoaded: Bool = false
     var displayTimer: Timer!
@@ -84,6 +85,10 @@ import SwiftUI
     }
 
     @objc func runForOneFrame() {
+        if self.isPaused {
+            return
+        }
+
         cpu.executeInstructions(stoppingAfter: .nextFrame)
         cpu.bus.ppu.updateScreenBuffer(&self.screenBuffer)
         if self.cpu.bus.cartridge!.isSramDirty {
@@ -120,6 +125,13 @@ import SwiftUI
         if self.cpu.bus.cartridge!.hasBattery {
             try self.cpu.bus.cartridge!.saveSram()
             self.lastSavedDate = Date.now
+        }
+    }
+
+    public func togglePause() {
+        self.isPaused.toggle()
+        if self.isPaused {
+            self.speaker.playPauseSound()
         }
     }
 

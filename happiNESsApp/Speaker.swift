@@ -12,6 +12,11 @@ import happiNESs
 struct Speaker {
     public var inputBuffer: AudioRingBuffer
     private let engine = AVAudioEngine()
+    private let wavNode = AVAudioPlayerNode()
+    private let pauseWavFile = try! AVAudioFile(forReading: Bundle.main.url(forResource: "pause",
+                                                                            withExtension: "mp3",
+                                                                            subdirectory: "Sounds",
+                                                                            localization: nil)!)
 
     init(inputBuffer: AudioRingBuffer) throws {
         self.inputBuffer = inputBuffer
@@ -49,9 +54,16 @@ struct Speaker {
 
         engine.attach(sourceNode)
         engine.connect(sourceNode, to: mainMixer, format: inputFormat)
+        engine.attach(self.wavNode)
+        engine.connect(wavNode, to: mainMixer, format: inputFormat)
         engine.connect(mainMixer, to: output, format: outputFormat)
         mainMixer.outputVolume = 1.0
 
         try engine.start()
+    }
+
+    public func playPauseSound() {
+        self.wavNode.scheduleFile(self.pauseWavFile, at: nil)
+        self.wavNode.play()
     }
 }

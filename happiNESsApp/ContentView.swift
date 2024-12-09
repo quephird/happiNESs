@@ -23,19 +23,36 @@ struct ContentView: View {
     //     https://www.hackingwithswift.com/quick-start/swiftui/how-to-detect-and-respond-to-key-press-events
     @FocusState private var focused: Bool
 
+    @State private var isPausedShowing = false
+
     var body: some View {
         Group {
             if self.console.cartridgeLoaded {
-                Screen(screenBuffer: console.screenBuffer,
-                       scale: console.scale)
-                .focusable()
-                .focusEffectDisabled()
-                .focused($focused)
-                .onAppear {
-                    focused = true
-                }
-                .onKeyPress(phases: .all) { keyPress in
-                    return console.handleKey(keyPress) ? .handled : .ignored
+                ZStack {
+                    Screen(screenBuffer: console.screenBuffer,
+                           scale: console.scale)
+                    .focusable()
+                    .focusEffectDisabled()
+                    .focused($focused)
+                    .onAppear {
+                        focused = true
+                    }
+                    .onKeyPress(phases: .all) { keyPress in
+                        return console.handleKey(keyPress) ? .handled : .ignored
+                    }
+                    if self.console.isPaused {
+                        Text("PAUSED")
+                            .font(.zelda)
+                            .scaleEffect(console.scale)
+                            .opacity(self.isPausedShowing ? 0.0 : 1.0)
+                            .onAppear {
+                                self.isPausedShowing = true
+                            }
+                            .animation(.easeOut(duration: 2.0), value: self.isPausedShowing)
+                            .onDisappear {
+                                self.isPausedShowing = false
+                            }
+                    }
                 }
             } else {
                 Image("happiNESs")
