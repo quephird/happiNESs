@@ -55,9 +55,9 @@ extension PPU {
     }
 
     mutating private func writePpuControl(byte: UInt8) {
-        let nmiBefore = self.controllerRegister[.generateNmi]
-        self.controllerRegister.update(byte: byte)
-        let nmiAfter = self.controllerRegister[.generateNmi]
+        let nmiBefore = self.control[.generateNmi]
+        self.control = byte
+        let nmiAfter = self.control[.generateNmi]
 
         switch (self.scanline, self.cycles) {
         case (Self.nmiInterruptScanline, 1...3):
@@ -89,7 +89,7 @@ extension PPU {
             }
         }
 
-        let nametableBits = self.controllerRegister.rawValue & 0b0000_0011
+        let nametableBits = self.control & 0b0000_0011
         self.nextSharedAddress[.nametable] = nametableBits
     }
 
@@ -144,7 +144,7 @@ extension PPU {
     }
 
     mutating private func incrementVramAddress() {
-        let increment = self.controllerRegister.vramAddressIncrement()
+        let increment = self.control[.vramAddressIncrement] ? 32 : 1
         self.currentSharedAddress = (self.currentSharedAddress &+ UInt16(increment)) & 0x3FFF
     }
 

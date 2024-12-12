@@ -16,7 +16,7 @@ extension PPU {
         tileWidth
     }
     var spriteHeight: Int {
-        self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight
+        self.control[.spritesAre8x16] ? tileHeight * 2 : tileHeight
     }
 
     private func getCurrentBackgroundTileColor() -> NESColor? {

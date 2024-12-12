@@ -26,7 +26,7 @@ public struct PPU {
     public var internalDataBuffer: UInt8
 
     // TODO: Think about replacing these with simple UInt8's
-    public var controllerRegister: ControllerRegister
+    public var control: Register
     public var maskRegister: MaskRegister
     public var oamRegister: OAMRegister
     public var status: Register
@@ -61,7 +61,7 @@ public struct PPU {
         self.internalDataBuffer = 0x00
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
-        self.controllerRegister = ControllerRegister()
+        self.control = 0x00
         self.maskRegister = MaskRegister()
         self.oamRegister = OAMRegister()
         self.status = 0x00
@@ -75,7 +75,7 @@ public struct PPU {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
 
-        self.controllerRegister.reset()
+        self.control = 0x00
         self.maskRegister.reset()
         self.oamRegister.reset()
         self.status = 0x00
@@ -181,7 +181,7 @@ public struct PPU {
                     self.status[.verticalBlankStarted] = true
                 }
 
-                if self.controllerRegister[.generateNmi] {
+                if self.control[.generateNmi] {
                     self.nmiDelayState.scheduleNmi()
                 }
 
