@@ -25,10 +25,10 @@ public struct PPU {
     public var vram: [UInt8]
     public var internalDataBuffer: UInt8
 
-    // TODO: Think about replacing these with simple UInt8's
     public var control: Register
     public var mask: Register
-    public var oamRegister: OAMRegister
+    public var oamAddress: Register
+    public var oamData: [UInt8]
     public var status: Register
     public var suppressVerticalBlank: Bool = false
 
@@ -63,7 +63,8 @@ public struct PPU {
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
         self.control = 0x00
         self.mask = 0x00
-        self.oamRegister = OAMRegister()
+        self.oamAddress = 0x00
+        self.oamData = [UInt8](repeating: 0x00, count: 256)
         self.status = 0x00
 
         self.cycles = 0
@@ -77,7 +78,8 @@ public struct PPU {
 
         self.control = 0x00
         self.mask = 0x00
-        self.oamRegister.reset()
+        self.oamAddress = 0x00
+        self.oamData = [UInt8](repeating: 0x00, count: 256)
         self.status = 0x00
         self.suppressVerticalBlank = false
 

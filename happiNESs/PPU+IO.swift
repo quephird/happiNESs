@@ -112,20 +112,21 @@ extension PPU {
     }
 
     mutating private func writeOamAddress(byte: UInt8) {
-        self.oamRegister.updateAddress(byte: byte)
+        self.oamAddress = byte
     }
 
     private func readOamData() -> UInt8 {
-        self.oamRegister.readByte()
+        self.oamData[Int(self.oamAddress)]
     }
 
     mutating private func writeOamData(byte: UInt8) {
-        self.oamRegister.writeByte(byte: byte)
+        self.oamData[Int(self.oamAddress)] = byte
+        self.oamAddress =  self.oamAddress &+ 1
     }
 
     mutating public func writeOamDma(buffer: [UInt8]) {
         for byte in buffer {
-            self.oamRegister.writeByte(byte: byte)
+            self.writeOamData(byte: byte)
         }
     }
 

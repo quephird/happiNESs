@@ -195,14 +195,14 @@ extension PPU {
     }
 
     private func getSpriteData(for oamIndex: Int) -> UInt32 {
-        let tileY = Int(self.oamRegister.data[oamIndex])
-        let attributeByte = self.oamRegister.data[oamIndex + 2]
+        let tileY = Int(self.oamData[oamIndex])
+        let attributeByte = self.oamData[oamIndex + 2]
 
         let flipVertical = ((attributeByte >> 7) & 1) == 1
         let flipHorizontal = ((attributeByte >> 6) & 1) == 1
 
         var bankIndex = self.control[.spritePatternBankIndex]
-        var tileIndex = self.oamRegister.data[oamIndex + 1]
+        var tileIndex = self.oamData[oamIndex + 1]
         var spritePixelY: Int = self.scanline - tileY
         if self.control[.spritesAre8x16] {
             if flipVertical {
@@ -281,11 +281,11 @@ extension PPU {
         var newCachedSprites: [CachedSprite] = []
 
         // Note that each sprite takes _four consecutive bytes_ in the OAM
-        for oamIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4) {
+        for oamIndex in stride(from: 0, to: self.oamData.count, by: 4) {
             // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
             //
             //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
-            let tileY = Int(self.oamRegister.data[oamIndex])
+            let tileY = Int(self.oamData[oamIndex])
 
             let spritePixelY = self.scanline - tileY
             // The sprite height property takes into account whether or not all
@@ -296,8 +296,8 @@ extension PPU {
             }
 
             let data = self.getSpriteData(for: oamIndex)
-            let tileX = Int(self.oamRegister.data[oamIndex + 3])
-            let backgroundPriority = ((self.oamRegister.data[oamIndex + 2] >> 5) & 0b0000_0001) == 1
+            let tileX = Int(self.oamData[oamIndex + 3])
+            let backgroundPriority = ((self.oamData[oamIndex + 2] >> 5) & 0b0000_0001) == 1
             let newSprite = CachedSprite(data: data,
                                          tileX: tileX,
                                          backgroundPriority: backgroundPriority,
