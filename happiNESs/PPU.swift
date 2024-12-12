@@ -27,7 +27,7 @@ public struct PPU {
 
     // TODO: Think about replacing these with simple UInt8's
     public var control: Register
-    public var maskRegister: MaskRegister
+    public var mask: Register
     public var oamRegister: OAMRegister
     public var status: Register
     public var suppressVerticalBlank: Bool = false
@@ -62,7 +62,7 @@ public struct PPU {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
         self.control = 0x00
-        self.maskRegister = MaskRegister()
+        self.mask = 0x00
         self.oamRegister = OAMRegister()
         self.status = 0x00
 
@@ -76,7 +76,7 @@ public struct PPU {
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
 
         self.control = 0x00
-        self.maskRegister.reset()
+        self.mask = 0x00
         self.oamRegister.reset()
         self.status = 0x00
         self.suppressVerticalBlank = false
@@ -94,10 +94,10 @@ public struct PPU {
 
     // Various computed properties used across multiple concerns
     var isRenderingEnabled: Bool {
-        self.maskRegister[.showBackground] || self.maskRegister[.showSprites]
+        self.mask[.showBackground] || self.mask[.showSprites]
     }
     var isBackgroundEnabled: Bool {
-        self.maskRegister[.showBackground]
+        self.mask[.showBackground]
     }
     var isVisibleLine: Bool {
         self.scanline < Self.height

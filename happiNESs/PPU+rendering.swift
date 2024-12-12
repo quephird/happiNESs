@@ -20,7 +20,7 @@ extension PPU {
     }
 
     private func getCurrentBackgroundTileColor() -> NESColor? {
-        if self.maskRegister[.showBackground] == false {
+        if self.mask[.showBackground] == false {
             return nil
         }
 
@@ -31,7 +31,7 @@ extension PPU {
     }
 
     private func getCurrentSpriteColor() -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
-        if self.maskRegister[.showSprites] == false {
+        if self.mask[.showSprites] == false {
             return nil
         }
 

@@ -94,9 +94,9 @@ extension PPU {
     }
 
     mutating private func writePpuMask(byte: UInt8) {
-        let showBitsBefore = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
-        self.maskRegister.update(byte: byte)
-        let showBitsAfter = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
+        let showBitsBefore = (self.mask[.showBackground], self.mask[.showSprites])
+        self.mask = byte
+        let showBitsAfter = (self.mask[.showBackground], self.mask[.showSprites])
 
         // ACHTUNG! This is yet another apparent hack discovered in the thread
         // below which gets the tenth of blargg's PPU test ROMs to pass. I could
