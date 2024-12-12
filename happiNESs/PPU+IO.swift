@@ -8,12 +8,12 @@
 extension PPU {
     // NOTA BENE: Called directly by the tracer, as well as by readStatus()
     public func readPpuStatusWithoutMutating() -> UInt8 {
-        self.statusRegister.rawValue
+        self.status
     }
 
     mutating private func readPpuStatus() -> UInt8 {
         let result = self.readPpuStatusWithoutMutating()
-        self.statusRegister[.verticalBlankStarted] = false
+        self.status[.verticalBlankStarted] = false
         self.wRegister = false
 
         // ACHTUNG! This implementation is taken from a thread on the NESDev forums
@@ -84,7 +84,7 @@ extension PPU {
             // generate an NMI interrupt.
             //
             //     https://www.nesdev.org/wiki/NMI#Operation
-            if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
+            if !nmiBefore && nmiAfter && self.status[.verticalBlankStarted] {
                 self.nmiDelayState.scheduleNmi()
             }
         }

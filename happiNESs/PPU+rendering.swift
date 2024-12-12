@@ -74,7 +74,7 @@ extension PPU {
         switch (maybeSpriteColor, maybeBackgroundColor) {
         case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
             if spriteIndex == 0 {
-                self.statusRegister[.spriteZeroHit] = true
+                self.status[.spriteZeroHit] = true
             }
 
             switch backgroundPriority {

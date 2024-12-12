@@ -29,7 +29,7 @@ public struct PPU {
     public var controllerRegister: ControllerRegister
     public var maskRegister: MaskRegister
     public var oamRegister: OAMRegister
-    public var statusRegister: PPUStatusRegister
+    public var status: Register
     public var suppressVerticalBlank: Bool = false
 
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
@@ -64,7 +64,7 @@ public struct PPU {
         self.controllerRegister = ControllerRegister()
         self.maskRegister = MaskRegister()
         self.oamRegister = OAMRegister()
-        self.statusRegister = PPUStatusRegister()
+        self.status = 0x00
 
         self.cycles = 0
         self.scanline = 0
@@ -78,7 +78,7 @@ public struct PPU {
         self.controllerRegister.reset()
         self.maskRegister.reset()
         self.oamRegister.reset()
-        self.statusRegister.reset()
+        self.status = 0x00
         self.suppressVerticalBlank = false
 
         self.cycles = 0
@@ -142,7 +142,7 @@ public struct PPU {
         self.cycles > Self.ppuCyclesPerScanline
     }
     var isSpriteZeroHit: Bool {
-        self.statusRegister[.spriteZeroHit]
+        self.status[.spriteZeroHit]
     }
 
     mutating private func handleNmiState() {
@@ -178,7 +178,7 @@ public struct PPU {
                 if self.suppressVerticalBlank {
                     self.suppressVerticalBlank = false
                 } else {
-                    self.statusRegister[.verticalBlankStarted] = true
+                    self.status[.verticalBlankStarted] = true
                 }
 
                 if self.controllerRegister[.generateNmi] {
@@ -187,8 +187,8 @@ public struct PPU {
 
                 redrawScreen = true
             case Self.preRenderScanline:
-                self.statusRegister[.verticalBlankStarted] = false
-                self.statusRegister[.spriteZeroHit] = false
+                self.status[.verticalBlankStarted] = false
+                self.status[.spriteZeroHit] = false
             default:
                 break
             }
