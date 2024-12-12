@@ -16,7 +16,7 @@ public class CPU {
     static let stackBottomMemoryAddress: UInt16 = 0x0100
 
     public var accumulator: UInt8
-    public var statusRegister: StatusRegister
+    public var status: Register
     public var xRegister: UInt8
     public var yRegister: UInt8
     public var stackPointer: UInt8
@@ -31,7 +31,7 @@ public class CPU {
     public init(bus: Bus, tracingOn: Bool = false) {
         self.bus = bus
         self.accumulator = 0x00
-        self.statusRegister = StatusRegister(rawValue: 0x00)
+        self.status = 0x24
         self.xRegister = 0x00
         self.yRegister = 0x00
         self.stackPointer = Self.resetStackPointerValue
@@ -46,10 +46,10 @@ public class CPU {
     }
 
     public func reset() {
-        self.accumulator = 0x00;
-        self.statusRegister.reset();
-        self.xRegister = 0x00;
-        self.yRegister = 0x00;
+        self.accumulator = 0x00
+        self.status = 0x24
+        self.xRegister = 0x00
+        self.yRegister = 0x00
         self.stackPointer = Self.resetStackPointerValue
         self.programCounter = self.readWord(address: Self.resetVectorAddress)
         self.interrupt = .none
@@ -82,12 +82,12 @@ public class CPU {
     public func handleNmi() {
         self.pushStack(word: self.programCounter)
 
-        var copy = self.statusRegister
+        var copy = self.status
         copy[.break] = false
-        copy[.unused] = true
+        copy[.cpuStatusUnused] = true
 
-        self.pushStack(byte: copy.rawValue)
-        self.statusRegister[.interruptsDisabled] = true
+        self.pushStack(byte: copy)
+        self.status[.interruptsDisabled] = true
 
         self.programCounter = self.readWord(address: Self.nmiVectorAddress)
         let _ = self.tick(cycles: 7)
@@ -96,12 +96,12 @@ public class CPU {
     public func handleIrq() {
         self.pushStack(word: self.programCounter)
 
-        var copy = self.statusRegister
+        var copy = self.status
         copy[.break] = false
-        copy[.unused] = true
+        copy[.cpuStatusUnused] = true
 
-        self.pushStack(byte: copy.rawValue)
-        self.statusRegister[.interruptsDisabled] = true
+        self.pushStack(byte: copy)
+        self.status[.interruptsDisabled] = true
 
         self.programCounter = self.readWord(address: Self.interruptVectorAddress)
         let _ = self.tick(cycles: 7)

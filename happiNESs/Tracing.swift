@@ -112,7 +112,7 @@ func trace(cpu: CPU) -> String {
     trace += "A:" + String(format: "%02X ", cpu.accumulator)
     trace += "X:" + String(format: "%02X ", cpu.xRegister)
     trace += "Y:" + String(format: "%02X ", cpu.yRegister)
-    trace += "P:" + String(format: "%02X ", cpu.statusRegister.rawValue)
+    trace += "P:" + String(format: "%02X ", cpu.status)
     trace += "SP:" + String(format: "%02X ", cpu.stackPointer)
 
     trace += "PPU:" + String(format: "%3d,%3d ", cpu.bus.ppu.scanline, cpu.bus.ppu.cycles)

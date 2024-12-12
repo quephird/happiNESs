@@ -9,7 +9,7 @@ enum RegisterBit {
     // CPU status register flags
     case carry
     case zero
-    case interrupt
+    case interruptsDisabled
     case decimalMode
     case `break`
     case cpuStatusUnused
@@ -37,11 +37,11 @@ enum RegisterBit {
     case generateNmi  //0: off; 1: on
 
     // PPUMASK register flags
-    case greyscale
-    case showBackgroundLeftmostPixels
-    case showSpritesLeftmostPixels
-    case showBackground
-    case showSprites
+    case greyscale // 0: normal color, 1: produce a greyscale display
+    case showBackgroundLeftmostPixels // 0: hide, 1: show
+    case showSpritesLeftmostPixels // 0: hide, 1: show
+    case showBackground // 0: hide, 1: show
+    case showSprites // 0: hide, 1: show
     case emphasizeRed
     case emphasizeGreen
     case emphasizeBlue
@@ -75,7 +75,7 @@ enum RegisterBit {
             .showBackgroundLeftmostPixels, .pulse2Enabled,
             .apuFrameCounterUnused2:
             1
-        case .interrupt, .ppuStatusUnused3, .vramAddressIncrement,
+        case .interruptsDisabled, .ppuStatusUnused3, .vramAddressIncrement,
             .showSpritesLeftmostPixels, .triangleEnabled,
             .apuFrameCounterUnused3:
             2

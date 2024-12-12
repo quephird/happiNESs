@@ -15,10 +15,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0xA0)
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testAdcZeroPage() {
@@ -28,10 +28,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x60)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testAdcZeroPageX() {
@@ -41,10 +41,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x60)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testAdcAbsolute() {
@@ -54,10 +54,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testAdcAbsoluteX() {
@@ -67,10 +67,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testAdcAbsoluteY() {
@@ -80,10 +80,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testAdcIndirectX() {
@@ -95,10 +95,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0xFE)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testAdcIndirectY() {
@@ -110,10 +110,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0xFE)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testAndImmediate() {
@@ -197,9 +197,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b1111_1110)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testAslZeroPage() {
@@ -209,9 +209,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0000)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testAslZeroPageX() {
@@ -221,9 +221,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b1000_0000)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testAslAbsolute() {
@@ -233,9 +233,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0100)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testAslAbsoluteX() {
@@ -245,9 +245,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0100)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testBcc() {
@@ -300,9 +300,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x0042, byte: 0b1110_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.overflow])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.overflow])
     }
 
     func testBitAbsolute() {
@@ -311,9 +311,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0b1010_0101)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.overflow])
     }
 
     func testBmi() {
@@ -401,7 +401,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testCld() {
@@ -409,7 +409,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(!cpu.statusRegister[.decimalMode])
+        XCTAssertTrue(!cpu.status[.decimalMode])
     }
 
     func testCli() {
@@ -417,7 +417,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(!cpu.statusRegister[.interruptsDisabled])
+        XCTAssertTrue(!cpu.status[.interruptsDisabled])
     }
 
     func testClv() {
@@ -425,7 +425,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
+        XCTAssertTrue(!cpu.status[.overflow])
     }
 
     func testCmpImmediate() {
@@ -433,9 +433,9 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpZeroPage() {
@@ -444,9 +444,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpZeroPageX() {
@@ -455,9 +455,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpAbsolute() {
@@ -466,9 +466,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpAbsoluteX() {
@@ -477,9 +477,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpAbsoluteY() {
@@ -488,9 +488,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpIndirectX() {
@@ -501,9 +501,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCmpIndirectY() {
@@ -514,9 +514,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 3)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCpxImmediate() {
@@ -524,9 +524,9 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCpxZeroPage() {
@@ -535,9 +535,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCpxAbsolute() {
@@ -546,9 +546,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCpyImmediate() {
@@ -556,9 +556,9 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCpyZeroPage() {
@@ -567,9 +567,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x0030, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testCpyAbsolute() {
@@ -578,9 +578,9 @@ final class CPUTests: XCTestCase {
         cpu.writeByte(address: 0x1234, byte: 0x43)
         cpu.executeInstructions(stoppingAfter: 2)
 
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testDecZeroPage() {
@@ -590,8 +590,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x10), 0x54)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testDecZeroPageX() {
@@ -601,8 +601,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x30), 0xFF)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testDecAbsolute() {
@@ -629,8 +629,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.xRegister, 0xFF)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testDeyOverflow() {
@@ -639,8 +639,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.yRegister, 0xFF)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testEorImmediate() {
@@ -725,8 +725,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x10), 0x56)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testIncZeroPageX() {
@@ -736,8 +736,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x30), 0x00)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testIncAbsolute() {
@@ -764,8 +764,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.xRegister, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testInyOverflow() {
@@ -774,8 +774,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.yRegister, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testJmpAbsolute() {
@@ -829,8 +829,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.accumulator, 0x05)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testLdaZeroPage() {
@@ -906,8 +906,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.xRegister, 0xF0)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testLdxZeroPage() {
@@ -952,8 +952,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.yRegister, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testLdyZeroPage() {
@@ -998,9 +998,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b0111_1111)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testLsrZeroPage() {
@@ -1010,9 +1010,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0000)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testLsrZeroPageX() {
@@ -1022,9 +1022,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0001)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testLsrAbsolute() {
@@ -1034,9 +1034,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testLsrAbsoluteX() {
@@ -1046,9 +1046,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testOraImmediate() {
@@ -1162,9 +1162,9 @@ final class CPUTests: XCTestCase {
 
         XCTAssertEqual(cpu.accumulator, 0b1011_0100)
         XCTAssertEqual(cpu.stackPointer, 0xFD)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testPlp() {
@@ -1173,12 +1173,12 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.stackPointer, 0xFD)
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.break])
-        XCTAssertTrue(cpu.statusRegister[.interruptsDisabled])
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.break])
+        XCTAssertTrue(cpu.status[.interruptsDisabled])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testRolAccumulator() {
@@ -1187,9 +1187,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b1111_1110)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testRolZeroPage() {
@@ -1199,9 +1199,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0010)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testRolZeroPageX() {
@@ -1211,9 +1211,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0100)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testRolAbsolute() {
@@ -1223,9 +1223,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0100)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testRolAbsoluteX() {
@@ -1235,9 +1235,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0100)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testRorAccumulator() {
@@ -1246,9 +1246,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0b0111_1111)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testRorZeroPage() {
@@ -1258,9 +1258,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0100_0000)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testRorZeroPageX() {
@@ -1270,9 +1270,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x0042), 0b0000_0001)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testRorAbsolute() {
@@ -1282,9 +1282,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
     func testRorAbsoluteX() {
@@ -1294,9 +1294,9 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.readByte(address: 0x1234), 0b0101_0101)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
-        XCTAssertTrue(!cpu.statusRegister[.carry])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
     }
 
 //    func testRti() {
@@ -1347,10 +1347,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0xE1)
-        XCTAssertTrue(!cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testSbcZeroPage() {
@@ -1360,10 +1360,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertFalse(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertFalse(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSbcZeroPageX() {
@@ -1373,10 +1373,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertFalse(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertFalse(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSbcAbsolute() {
@@ -1386,10 +1386,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertFalse(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertFalse(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSbcAbsoluteX() {
@@ -1399,10 +1399,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertFalse(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertFalse(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSbcAbsoluteY() {
@@ -1412,10 +1412,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertFalse(cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertFalse(cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSbcIndirectX() {
@@ -1427,10 +1427,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSbcIndirectY() {
@@ -1442,10 +1442,10 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 3)
 
         XCTAssertEqual(cpu.accumulator, 0x0F)
-        XCTAssertTrue(cpu.statusRegister[.carry])
-        XCTAssertTrue(!cpu.statusRegister[.overflow])
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+        XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testSec() {
@@ -1453,7 +1453,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(cpu.statusRegister[.carry])
+        XCTAssertTrue(cpu.status[.carry])
     }
 
     func testSed() {
@@ -1461,7 +1461,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(cpu.statusRegister[.decimalMode])
+        XCTAssertTrue(cpu.status[.decimalMode])
     }
 
     func testSei() {
@@ -1469,7 +1469,7 @@ final class CPUTests: XCTestCase {
         let cpu = makeCpu(programBytes: program)
         cpu.executeInstructions(stoppingAfter: 4)
 
-        XCTAssertTrue(cpu.statusRegister[.interruptsDisabled])
+        XCTAssertTrue(cpu.status[.interruptsDisabled])
     }
 
     func testStaZeroPage() {
@@ -1586,8 +1586,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.xRegister, 0x0A)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testTay() {
@@ -1596,8 +1596,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.yRegister, 0xFF)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testTsx() {
@@ -1607,8 +1607,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 1)
 
         XCTAssertEqual(cpu.xRegister, 0xFD)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testTxa() {
@@ -1617,8 +1617,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0xFF)
-        XCTAssertTrue(!cpu.statusRegister[.zero])
-        XCTAssertTrue(cpu.statusRegister[.negative])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(cpu.status[.negative])
     }
 
     func testTxs() {
@@ -1628,8 +1628,8 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.stackPointer, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 
     func testTya() {
@@ -1639,7 +1639,7 @@ final class CPUTests: XCTestCase {
         cpu.executeInstructions(stoppingAfter: 2)
 
         XCTAssertEqual(cpu.accumulator, 0x00)
-        XCTAssertTrue(cpu.statusRegister[.zero])
-        XCTAssertTrue(!cpu.statusRegister[.negative])
+        XCTAssertTrue(cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
     }
 }
