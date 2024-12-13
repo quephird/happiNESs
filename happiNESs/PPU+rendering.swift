@@ -16,11 +16,11 @@ extension PPU {
         tileWidth
     }
     var spriteHeight: Int {
-        self.controllerRegister[.spritesAre8x16] ? tileHeight * 2 : tileHeight
+        self.control[.spritesAre8x16] ? tileHeight * 2 : tileHeight
     }
 
     private func getCurrentBackgroundTileColor() -> NESColor? {
-        if self.maskRegister[.showBackground] == false {
+        if self.mask[.showBackground] == false {
             return nil
         }
 
@@ -31,7 +31,7 @@ extension PPU {
     }
 
     private func getCurrentSpriteColor() -> (color: NESColor, index: Int, backgroundPriority: Bool)? {
-        if self.maskRegister[.showSprites] == false {
+        if self.mask[.showSprites] == false {
             return nil
         }
 
@@ -74,7 +74,7 @@ extension PPU {
         switch (maybeSpriteColor, maybeBackgroundColor) {
         case (.some((let spriteColor, let spriteIndex, let backgroundPriority)), .some(let backgroundColor)):
             if spriteIndex == 0 {
-                self.statusRegister[.spriteZeroHit] = true
+                self.status[.spriteZeroHit] = true
             }
 
             switch backgroundPriority {

@@ -25,11 +25,11 @@ public struct PPU {
     public var vram: [UInt8]
     public var internalDataBuffer: UInt8
 
-    // TODO: Think about replacing these with simple UInt8's
-    public var controllerRegister: ControllerRegister
-    public var maskRegister: MaskRegister
-    public var oamRegister: OAMRegister
-    public var statusRegister: PPUStatusRegister
+    public var control: Register
+    public var mask: Register
+    public var oamAddress: Register
+    public var oamData: [UInt8]
+    public var status: Register
     public var suppressVerticalBlank: Bool = false
 
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
@@ -61,10 +61,11 @@ public struct PPU {
         self.internalDataBuffer = 0x00
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
-        self.controllerRegister = ControllerRegister()
-        self.maskRegister = MaskRegister()
-        self.oamRegister = OAMRegister()
-        self.statusRegister = PPUStatusRegister()
+        self.control = 0x00
+        self.mask = 0x00
+        self.oamAddress = 0x00
+        self.oamData = [UInt8](repeating: 0x00, count: 256)
+        self.status = 0x00
 
         self.cycles = 0
         self.scanline = 0
@@ -75,10 +76,11 @@ public struct PPU {
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.paletteTable = [UInt8](repeating: 0x00, count: 32)
 
-        self.controllerRegister.reset()
-        self.maskRegister.reset()
-        self.oamRegister.reset()
-        self.statusRegister.reset()
+        self.control = 0x00
+        self.mask = 0x00
+        self.oamAddress = 0x00
+        self.oamData = [UInt8](repeating: 0x00, count: 256)
+        self.status = 0x00
         self.suppressVerticalBlank = false
 
         self.cycles = 0
@@ -94,10 +96,10 @@ public struct PPU {
 
     // Various computed properties used across multiple concerns
     var isRenderingEnabled: Bool {
-        self.maskRegister[.showBackground] || self.maskRegister[.showSprites]
+        self.mask[.showBackground] || self.mask[.showSprites]
     }
     var isBackgroundEnabled: Bool {
-        self.maskRegister[.showBackground]
+        self.mask[.showBackground]
     }
     var isVisibleLine: Bool {
         self.scanline < Self.height
@@ -142,7 +144,7 @@ public struct PPU {
         self.cycles > Self.ppuCyclesPerScanline
     }
     var isSpriteZeroHit: Bool {
-        self.statusRegister[.spriteZeroHit]
+        self.status[.spriteZeroHit]
     }
 
     mutating private func handleNmiState() {
@@ -178,17 +180,17 @@ public struct PPU {
                 if self.suppressVerticalBlank {
                     self.suppressVerticalBlank = false
                 } else {
-                    self.statusRegister[.verticalBlankStarted] = true
+                    self.status[.verticalBlankStarted] = true
                 }
 
-                if self.controllerRegister[.generateNmi] {
+                if self.control[.generateNmi] {
                     self.nmiDelayState.scheduleNmi()
                 }
 
                 redrawScreen = true
             case Self.preRenderScanline:
-                self.statusRegister[.verticalBlankStarted] = false
-                self.statusRegister[.spriteZeroHit] = false
+                self.status[.verticalBlankStarted] = false
+                self.status[.spriteZeroHit] = false
             default:
                 break
             }

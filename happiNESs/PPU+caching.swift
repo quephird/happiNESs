@@ -10,7 +10,7 @@ extension PPU {
         0x2000 | (0x0FFF & self.currentSharedAddress)
     }
     var backgroundPatternBaseAddress: UInt16 {
-        self.controllerRegister[.backgroundPatternBankIndex] ? 0x1000 : 0x0000
+        self.control[.backgroundPatternBankIndex] ? 0x1000 : 0x0000
     }
     var currentAttributeAddress: UInt16 {
         // The attribute table byte associated with any one tile is actually
@@ -149,7 +149,7 @@ extension PPU {
     }
 
     mutating private func cacheLowTileByte() {
-        let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
+        let address = Self.makeChrTileAddress(bankIndex: self.control[.backgroundPatternBankIndex],
                                               tileIndex: self.currentNametableByte,
                                               bitPlaneIndex: false,
                                               fineY: self.currentSharedAddress[.fineY])
@@ -158,7 +158,7 @@ extension PPU {
     }
 
     mutating private func cacheHighTileByte() {
-        let address = Self.makeChrTileAddress(bankIndex: self.controllerRegister[.backgroundPatternBankIndex],
+        let address = Self.makeChrTileAddress(bankIndex: self.control[.backgroundPatternBankIndex],
                                               tileIndex: self.currentNametableByte,
                                               bitPlaneIndex: true,
                                               fineY: self.currentSharedAddress[.fineY])
@@ -195,16 +195,16 @@ extension PPU {
     }
 
     private func getSpriteData(for oamIndex: Int) -> UInt32 {
-        let tileY = Int(self.oamRegister.data[oamIndex])
-        let attributeByte = self.oamRegister.data[oamIndex + 2]
+        let tileY = Int(self.oamData[oamIndex])
+        let attributeByte = self.oamData[oamIndex + 2]
 
         let flipVertical = ((attributeByte >> 7) & 1) == 1
         let flipHorizontal = ((attributeByte >> 6) & 1) == 1
 
-        var bankIndex = self.controllerRegister[.spritePatternBankIndex]
-        var tileIndex = self.oamRegister.data[oamIndex + 1]
+        var bankIndex = self.control[.spritePatternBankIndex]
+        var tileIndex = self.oamData[oamIndex + 1]
         var spritePixelY: Int = self.scanline - tileY
-        if self.controllerRegister[.spritesAre8x16] {
+        if self.control[.spritesAre8x16] {
             if flipVertical {
                 spritePixelY = 15 - spritePixelY
             }
@@ -281,11 +281,11 @@ extension PPU {
         var newCachedSprites: [CachedSprite] = []
 
         // Note that each sprite takes _four consecutive bytes_ in the OAM
-        for oamIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4) {
+        for oamIndex in stride(from: 0, to: self.oamData.count, by: 4) {
             // ACHTUNG! Note that the value in OAM is one less than the actual Y value!
             //
             //    https://www.nesdev.org/wiki/PPU_OAM#Byte_0
-            let tileY = Int(self.oamRegister.data[oamIndex])
+            let tileY = Int(self.oamData[oamIndex])
 
             let spritePixelY = self.scanline - tileY
             // The sprite height property takes into account whether or not all
@@ -296,8 +296,8 @@ extension PPU {
             }
 
             let data = self.getSpriteData(for: oamIndex)
-            let tileX = Int(self.oamRegister.data[oamIndex + 3])
-            let backgroundPriority = ((self.oamRegister.data[oamIndex + 2] >> 5) & 0b0000_0001) == 1
+            let tileX = Int(self.oamData[oamIndex + 3])
+            let backgroundPriority = ((self.oamData[oamIndex + 2] >> 5) & 0b0000_0001) == 1
             let newSprite = CachedSprite(data: data,
                                          tileX: tileX,
                                          backgroundPriority: backgroundPriority,

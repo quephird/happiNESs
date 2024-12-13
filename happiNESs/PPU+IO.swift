@@ -8,12 +8,12 @@
 extension PPU {
     // NOTA BENE: Called directly by the tracer, as well as by readStatus()
     public func readPpuStatusWithoutMutating() -> UInt8 {
-        self.statusRegister.rawValue
+        self.status
     }
 
     mutating private func readPpuStatus() -> UInt8 {
         let result = self.readPpuStatusWithoutMutating()
-        self.statusRegister[.verticalBlankStarted] = false
+        self.status[.verticalBlankStarted] = false
         self.wRegister = false
 
         // ACHTUNG! This implementation is taken from a thread on the NESDev forums
@@ -55,9 +55,9 @@ extension PPU {
     }
 
     mutating private func writePpuControl(byte: UInt8) {
-        let nmiBefore = self.controllerRegister[.generateNmi]
-        self.controllerRegister.update(byte: byte)
-        let nmiAfter = self.controllerRegister[.generateNmi]
+        let nmiBefore = self.control[.generateNmi]
+        self.control = byte
+        let nmiAfter = self.control[.generateNmi]
 
         switch (self.scanline, self.cycles) {
         case (Self.nmiInterruptScanline, 1...3):
@@ -84,19 +84,19 @@ extension PPU {
             // generate an NMI interrupt.
             //
             //     https://www.nesdev.org/wiki/NMI#Operation
-            if !nmiBefore && nmiAfter && self.statusRegister[.verticalBlankStarted] {
+            if !nmiBefore && nmiAfter && self.status[.verticalBlankStarted] {
                 self.nmiDelayState.scheduleNmi()
             }
         }
 
-        let nametableBits = self.controllerRegister.rawValue & 0b0000_0011
+        let nametableBits = self.control & 0b0000_0011
         self.nextSharedAddress[.nametable] = nametableBits
     }
 
     mutating private func writePpuMask(byte: UInt8) {
-        let showBitsBefore = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
-        self.maskRegister.update(byte: byte)
-        let showBitsAfter = (self.maskRegister[.showBackground], self.maskRegister[.showSprites])
+        let showBitsBefore = (self.mask[.showBackground], self.mask[.showSprites])
+        self.mask = byte
+        let showBitsAfter = (self.mask[.showBackground], self.mask[.showSprites])
 
         // ACHTUNG! This is yet another apparent hack discovered in the thread
         // below which gets the tenth of blargg's PPU test ROMs to pass. I could
@@ -112,20 +112,21 @@ extension PPU {
     }
 
     mutating private func writeOamAddress(byte: UInt8) {
-        self.oamRegister.updateAddress(byte: byte)
+        self.oamAddress = byte
     }
 
     private func readOamData() -> UInt8 {
-        self.oamRegister.readByte()
+        self.oamData[Int(self.oamAddress)]
     }
 
     mutating private func writeOamData(byte: UInt8) {
-        self.oamRegister.writeByte(byte: byte)
+        self.oamData[Int(self.oamAddress)] = byte
+        self.oamAddress =  self.oamAddress &+ 1
     }
 
     mutating public func writeOamDma(buffer: [UInt8]) {
         for byte in buffer {
-            self.oamRegister.writeByte(byte: byte)
+            self.writeOamData(byte: byte)
         }
     }
 
@@ -144,7 +145,7 @@ extension PPU {
     }
 
     mutating private func incrementVramAddress() {
-        let increment = self.controllerRegister.vramAddressIncrement()
+        let increment = self.control[.vramAddressIncrement] ? 32 : 1
         self.currentSharedAddress = (self.currentSharedAddress &+ UInt16(increment)) & 0x3FFF
     }
 

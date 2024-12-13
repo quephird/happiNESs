@@ -114,7 +114,7 @@ extension Bus {
     }
 
     public func triggerIrq() {
-        if !self.cpu!.statusRegister[.interruptsDisabled] {
+        if !self.cpu!.status[.interruptsDisabled] {
             self.cpu!.interrupt = .irq
         }
     }

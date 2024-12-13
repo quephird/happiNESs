@@ -15,11 +15,11 @@ extension PPU {
 
     func dumpSprites() {
         print("sprites: ")
-        for oamDataIndex in stride(from: 0, to: self.oamRegister.data.count, by: 4).reversed() {
-            let tileY = Int(self.oamRegister.data[oamDataIndex])
-            let tileIndex = Int(self.oamRegister.data[oamDataIndex + 1])
-            let tileAttributes = self.oamRegister.data[oamDataIndex + 2]
-            let tileX = Int(self.oamRegister.data[oamDataIndex + 3])
+        for oamDataIndex in stride(from: 0, to: self.oamData.count, by: 4).reversed() {
+            let tileY = Int(self.oamData[oamDataIndex])
+            let tileIndex = Int(self.oamData[oamDataIndex + 1])
+            let tileAttributes = self.oamData[oamDataIndex + 2]
+            let tileX = Int(self.oamData[oamDataIndex + 3])
 
             let flipVertical = tileAttributes >> 7 & 1 == 1
             let flipHorizontal = tileAttributes >> 6 & 1 == 1
