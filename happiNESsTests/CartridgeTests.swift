@@ -8,6 +8,16 @@
 import XCTest
 @testable import happiNESs
 
+struct MockBus: Interruptible {
+    func triggerNmi() {
+        // Do nothing
+    }
+
+    func triggerIrq() {
+        // Do nothing
+    }
+}
+
 final class CartridgeTests: XCTestCase {
     func testRomWithBadTag() throws {
         let header: [UInt8] = [
