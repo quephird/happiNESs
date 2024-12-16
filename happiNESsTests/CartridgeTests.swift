@@ -8,16 +8,6 @@
 import XCTest
 @testable import happiNESs
 
-struct MockBus: Interruptible {
-    func triggerNmi() {
-        // Do nothing
-    }
-
-    func triggerIrq() {
-        // Do nothing
-    }
-}
-
 final class CartridgeTests: XCTestCase {
     func testRomWithBadTag() throws {
         let header: [UInt8] = [
@@ -28,9 +18,10 @@ final class CartridgeTests: XCTestCase {
         let prgRomBytes = Array(repeating: 0x00, count: 0x0600) + programBytes + Array(repeating: 0x00, count: 0x9400 - programBytes.count)
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
+        let romData = Data(romBytes)
 
         let expectedError = NESError.romNotInInesFormat
-        XCTAssertThrowsError(try Cartridge(bytes: romBytes)) { actualError in
+        XCTAssertThrowsError(try Cartridge(romData: romData, interruptible: MockBus())) { actualError in
             XCTAssertEqual(actualError as! NESError, expectedError)
         }
     }
@@ -44,9 +35,10 @@ final class CartridgeTests: XCTestCase {
         let prgRomBytes = Array(repeating: 0x00, count: 0x0600) + programBytes + Array(repeating: 0x00, count: 0x9400 - programBytes.count)
         let chrRomBytes = [UInt8](repeating: 0x00, count: 8192)
         let romBytes = header + prgRomBytes + chrRomBytes
+        let romData = Data(romBytes)
 
         let expectedError = NESError.versionTwoPointOhOrEarlierSupported
-        XCTAssertThrowsError(try Cartridge(bytes: romBytes)) { actualError in
+        XCTAssertThrowsError(try Cartridge(romData: romData, interruptible: MockBus())) { actualError in
             XCTAssertEqual(actualError as! NESError, expectedError)
         }
     }
@@ -60,8 +52,9 @@ final class CartridgeTests: XCTestCase {
         let prgBytes: [UInt8] = [0xA9, 0x42] + [UInt8](repeating: 0x00, count: 32766)
         let chrBytes = [UInt8](repeating: 0x00, count: 8192)
 
-        let allBytes = header + trainer + prgBytes + chrBytes
-        let cartridge = try! Cartridge(bytes: allBytes)
+        let romBytes = header + trainer + prgBytes + chrBytes
+        let romData = Data(romBytes)
+        let cartridge = try! Cartridge(romData: romData, interruptible: MockBus())
         XCTAssertEqual(cartridge.prgMemory[0], 0xA9)
         XCTAssertEqual(cartridge.prgMemory[1], 0x42)
     }
