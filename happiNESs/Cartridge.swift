@@ -20,7 +20,7 @@ public class Cartridge {
     public var chrMemory: [UInt8]
     public var chrBankIndex: Int
     public var isSramDirty: Bool = false
-    public var sram: [UInt8] {
+    public var sram: Data {
         didSet {
             self.isSramDirty = true
         }
@@ -116,7 +116,7 @@ public class Cartridge {
         }
 
         self.hasBattery = hasBattery
-        self.sram = [UInt8](repeating: 0x00, count: 0x2000)
+        self.sram = Data(repeating: 0x00, count: 0x2000)
         self.timingMode = timingMode
         self.mirroring = mirroring
         self.prgMemory = prgMemory
@@ -139,13 +139,11 @@ public class Cartridge {
             return
         }
 
-        let sramData = try loadClosure()
-
-        self.sram = [UInt8](sramData)
+        self.sram = try loadClosure()
         self.isSramDirty = false
     }
 
-    public func saveSramIfNeeded(saveClosure: ([UInt8]) throws -> Void) throws {
+    public func saveSramIfNeeded(saveClosure: (Data) throws -> Void) throws {
         if !self.hasBattery {
             return
         }

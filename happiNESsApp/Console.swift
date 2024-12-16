@@ -153,8 +153,7 @@ import SwiftUI
     public func saveSram() throws {
         do {
             try self.cartridge!.saveSramIfNeeded { sram in
-                let sramData = Data(sram)
-                try sramData.write(to: self.saveSramPath!)
+                try sram.write(to: self.saveSramPath!)
                 self.lastSavedDate = Date.now
             }
         } catch let error {
