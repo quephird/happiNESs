@@ -10,8 +10,6 @@ public class Cartridge {
     static let prgMemoryPageSize: Int = 16384
     static let chrMemoryPageSize: Int = 8192
 
-    public var cartridgeUrl: URL
-    public var saveDataFilePath: URL
     public var interruptible: Interruptible
     public var hasBattery: Bool
     public var timingMode: TimingMode
@@ -117,17 +115,6 @@ public class Cartridge {
             Array(romData[chrMemoryStart ..< (chrMemoryStart + chrRomSize)])
         }
 
-        self.cartridgeUrl = cartridgeUrl
-        let romFileName = self.cartridgeUrl.lastPathComponent
-        var saveDataFileName: String
-        if let index = romFileName.lastIndex(of: ".") {
-            let sramPrefix = String(romFileName.prefix(upTo: index))
-            saveDataFileName = sramPrefix + ".dat"
-        } else {
-            saveDataFileName = romFileName + ".dat"
-        }
-        self.saveDataFilePath = saveDataFileDirectory.appendingPathComponent(saveDataFileName)
-
         self.hasBattery = hasBattery
         self.sram = [UInt8](repeating: 0x00, count: 0x2000)
         self.timingMode = timingMode
@@ -147,29 +134,28 @@ public class Cartridge {
         self.mapper.writeByte(address: address, byte: byte)
     }
 
-    public func loadSram() throws {
-        var sramData: Data
-        do {
-            sramData = try Data.init(contentsOf: self.saveDataFilePath)
-        } catch {
-            sramData = Data(repeating: 0x00, count: 0x2000)
+    public func loadSramIfNeeded(loadClosure: () throws -> Data) throws {
+        if !self.hasBattery {
+            return
         }
 
-        if sramData.count != 0x2000 {
-            throw NESError.invalidSaveDatafile
-        }
+        let sramData = try loadClosure()
 
         self.sram = [UInt8](sramData)
         self.isSramDirty = false
     }
 
-    public func saveSram() throws {
-        do {
-            let sramData = Data(sram)
-            try sramData.write(to: self.saveDataFilePath)
-            self.isSramDirty = false
-        } catch let error {
-            throw NESError.unableToSaveDataFile(error.localizedDescription)
+    public func saveSramIfNeeded(saveClosure: ([UInt8]) throws -> Void) throws {
+        if !self.hasBattery {
+            return
         }
+
+        if !self.isSramDirty {
+            return
+        }
+
+        try saveClosure(self.sram)
+
+        self.isSramDirty = false
     }
 }
