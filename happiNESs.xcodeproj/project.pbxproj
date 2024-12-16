@@ -48,7 +48,7 @@
 		875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */; };
 		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
-		8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* RomTests.swift */; };
+		8763D06A2C39B719006C1B4F /* CartridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* CartridgeTests.swift */; };
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
@@ -171,7 +171,7 @@
 		875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMCChannel.swift; sourceTree = "<group>"; };
 		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
-		8763D0692C39B719006C1B4F /* RomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RomTests.swift; sourceTree = "<group>"; };
+		8763D0692C39B719006C1B4F /* CartridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartridgeTests.swift; sourceTree = "<group>"; };
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
@@ -379,7 +379,7 @@
 				87E981542CD9A6170090A200 /* roms */,
 				8744B1812C1CB9B3001B44B5 /* CPUTests.swift */,
 				8763D0672C39B61F006C1B4F /* Helpers.swift */,
-				8763D0692C39B719006C1B4F /* RomTests.swift */,
+				8763D0692C39B719006C1B4F /* CartridgeTests.swift */,
 			);
 			path = happiNESsTests;
 			sourceTree = "<group>";
@@ -647,7 +647,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8763D06A2C39B719006C1B4F /* RomTests.swift in Sources */,
+				8763D06A2C39B719006C1B4F /* CartridgeTests.swift in Sources */,
 				8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */,
 				8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */,
 			);

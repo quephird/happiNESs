@@ -8,7 +8,7 @@
 import XCTest
 @testable import happiNESs
 
-final class RomTests: XCTestCase {
+final class CartridgeTests: XCTestCase {
     func testRomWithBadTag() throws {
         let header: [UInt8] = [
             0x0B, 0xAD, 0x0B, 0xAD,
