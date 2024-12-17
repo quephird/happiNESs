@@ -27,8 +27,10 @@ import SwiftUI
     public var isPaused: Bool = false
     private var speaker: Speaker
     var cartridgeLoaded: Bool = false
+    private var cartridge: Cartridge?
     var displayTimer: Timer!
-    var saveDataFileDirectory: URL
+    var saveSramDirectory: URL
+    private var saveSramPath: URL?
     public var lastSavedDate: Date = Date.now
     public var currentError: NESError? = nil
 
@@ -49,23 +51,33 @@ import SwiftUI
 
         do {
             let fileManager = FileManager.default
-            self.saveDataFileDirectory = try fileManager.url(for: .applicationSupportDirectory,
+            self.saveSramDirectory = try fileManager.url(for: .applicationSupportDirectory,
                                                              in: .userDomainMask,
                                                              appropriateFor: nil,
                                                              create: true).appending(path: "happiNESs")
-            try fileManager.createDirectory(at: saveDataFileDirectory, withIntermediateDirectories: true)
+            try fileManager.createDirectory(at: saveSramDirectory, withIntermediateDirectories: true)
         } catch {
             throw NESError.cannotCreateSaveDataDirectory
         }
     }
 
     public func runGame(fileUrl: URL) throws {
-        let cartridge = try Cartridge(cartridgeUrl: fileUrl,
-                                      saveDataFileDirectory: self.saveDataFileDirectory,
-                                      bus: self.cpu.bus)
-        if cartridge.hasBattery {
-            try cartridge.loadSram()
+        let romData: Data = try Data(contentsOf: fileUrl)
+        let cartridge = try Cartridge(romData: romData,
+                                      interruptible: self.cpu.bus)
+
+        let romFileName = fileUrl.lastPathComponent
+        var saveSramFilename: String
+        if let index = romFileName.lastIndex(of: ".") {
+            let sramPrefix = String(romFileName.prefix(upTo: index))
+            saveSramFilename = sramPrefix + ".dat"
+        } else {
+            saveSramFilename = romFileName + ".dat"
         }
+        self.saveSramPath = saveSramDirectory.appendingPathComponent(saveSramFilename)
+
+        self.cartridge = cartridge
+        try self.loadSram()
 
         self.cpu.loadCartridge(cartridge: cartridge)
         self.cartridgeLoaded = true
@@ -121,10 +133,31 @@ import SwiftUI
         self.cpu.reset()
     }
 
+    public func loadSram() throws {
+        try self.cartridge!.loadSramIfNeeded {
+            var sramData: Data
+            do {
+                sramData = try Data.init(contentsOf: self.saveSramPath!)
+            } catch {
+                sramData = Data(repeating: 0x00, count: 0x2000)
+            }
+
+            if sramData.count != 0x2000 {
+                throw NESError.invalidSaveDatafile
+            }
+
+            return sramData
+        }
+    }
+
     public func saveSram() throws {
-        if self.cpu.bus.cartridge!.hasBattery {
-            try self.cpu.bus.cartridge!.saveSram()
-            self.lastSavedDate = Date.now
+        do {
+            try self.cartridge!.saveSramIfNeeded { sram in
+                try sram.write(to: self.saveSramPath!)
+                self.lastSavedDate = Date.now
+            }
+        } catch let error {
+            throw NESError.unableToSaveDataFile(error.localizedDescription)
         }
     }
 

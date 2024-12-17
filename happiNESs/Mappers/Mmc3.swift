@@ -8,7 +8,7 @@
 class Mmc3: Mapper {
     public unowned var cartridge: Cartridge
 
-    private var bus: Bus
+    private var interruptible: Interruptible
     private var prgRomBankMode: UInt8 = 0
     private var chrRomBankMode: UInt8 = 0
     private var registerIndex: Int = 0
@@ -19,9 +19,9 @@ class Mmc3: Mapper {
     private var irqCounterReload: UInt8 = 0
     private var irqEnabled: Bool = false
 
-    init(cartridge: Cartridge, bus: Bus) {
+    init(cartridge: Cartridge, interruptible: Interruptible) {
         self.cartridge = cartridge
-        self.bus = bus
+        self.interruptible = interruptible
 
         self.prgOffsets[0] = self.prgBankOffset(index: 0)
         self.prgOffsets[1] = self.prgBankOffset(index: 1)
@@ -76,7 +76,7 @@ class Mmc3: Mapper {
             self.irqCounter -= 1
 
             if self.irqCounter == 0 && self.irqEnabled {
-                self.bus.triggerIrq()
+                self.interruptible.triggerIrq()
             }
         }
     }

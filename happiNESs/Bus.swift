@@ -108,7 +108,7 @@ extension Bus {
     }
 }
 
-extension Bus {
+extension Bus: Interruptible {
     public func triggerNmi() {
         self.cpu!.interrupt = .nmi
     }
