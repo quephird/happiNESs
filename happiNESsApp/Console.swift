@@ -134,7 +134,11 @@ import SwiftUI
     }
 
     public func loadSram() throws {
-        try self.cartridge!.loadSramIfNeeded {
+        guard let cartridge = self.cartridge else {
+            return
+        }
+
+        try cartridge.loadSramIfNeeded {
             var sramData: Data
             do {
                 sramData = try Data.init(contentsOf: self.saveSramPath!)
@@ -152,7 +156,11 @@ import SwiftUI
 
     public func saveSram() throws {
         do {
-            try self.cartridge!.saveSramIfNeeded { sram in
+            guard let cartridge = self.cartridge else {
+                return
+            }
+
+            try cartridge.saveSramIfNeeded { sram in
                 try sram.write(to: self.saveSramPath!)
                 self.lastSavedDate = Date.now
             }
