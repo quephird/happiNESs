@@ -137,7 +137,7 @@
 		870AABDF2CB37EA000E9F3B6 /* CPU+instructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CPU+instructions.swift"; sourceTree = "<group>"; };
 		870AABE12CB381C100E9F3B6 /* CPU+memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CPU+memory.swift"; sourceTree = "<group>"; };
 		870AABE32CB382E000E9F3B6 /* CPU+execution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CPU+execution.swift"; sourceTree = "<group>"; };
-		871931ED2C30BB2900A73C22 /* happiNESsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = happiNESsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		871931ED2C30BB2900A73C22 /* happiNESs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = happiNESs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		871931EF2C30BB2900A73C22 /* happiNESsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = happiNESsApp.swift; sourceTree = "<group>"; };
 		871931F12C30BB2900A73C22 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		871931F32C30BB2C00A73C22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -323,7 +323,7 @@
 			children = (
 				8744B1722C1CB9B3001B44B5 /* happiNESs.framework */,
 				8744B17C2C1CB9B3001B44B5 /* happiNESsTests.xctest */,
-				871931ED2C30BB2900A73C22 /* happiNESsApp.app */,
+				871931ED2C30BB2900A73C22 /* happiNESs.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -465,7 +465,7 @@
 			);
 			name = happiNESsApp;
 			productName = happiNESsApp;
-			productReference = 871931ED2C30BB2900A73C22 /* happiNESsApp.app */;
+			productReference = 871931ED2C30BB2900A73C22 /* happiNESs.app */;
 			productType = "com.apple.product-type.application";
 		};
 		8744B1712C1CB9B3001B44B5 /* happiNESs */ = {
@@ -695,7 +695,8 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = happiNESs;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -723,7 +724,8 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PRODUCT_NAME = happiNESs;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
