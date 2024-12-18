@@ -30,9 +30,25 @@ extension CPU {
             let baseAddress = self.readWord(address: address)
             let newAddress = baseAddress &+ UInt16(self.xRegister)
             return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
+        case .absoluteXDummyRead:
+            let baseAddress = self.readWord(address: address)
+            let newAddress = baseAddress &+ UInt16(self.xRegister)
+
+            let dummyAddress = UInt16(baseAddress.highByte) << 8 | (UInt16(baseAddress.lowByte) + UInt16(self.xRegister)) & 0xFF
+            let _ = self.readByte(address: dummyAddress)
+
+            return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .absoluteY:
             let baseAddress = self.readWord(address: address)
             let newAddress = baseAddress &+ UInt16(self.yRegister)
+            return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
+        case .absoluteYDummyRead:
+            let baseAddress = self.readWord(address: address)
+            let newAddress = baseAddress &+ UInt16(self.yRegister)
+
+            let dummyAddress = UInt16(baseAddress.highByte) << 8 | (UInt16(baseAddress.lowByte) + UInt16(self.yRegister)) & 0xFF
+            let _ = self.readByte(address: dummyAddress)
+
             return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .indirect:
             // See http://www.6502.org/tutorials/6502opcodes.html#JMP for more details
@@ -64,6 +80,19 @@ extension CPU {
             let baseAddress = UInt16(lowByte: lowByte, highByte: highByte)
             let newAddress = baseAddress &+ UInt16(self.yRegister)
             return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
+        case .indirectYDummyRead:
+            let zeroPageAddress = self.readByte(address: address)
+
+            let lowByte = self.readByte(address: UInt16(zeroPageAddress))
+            let highByte = self.readByte(address: UInt16(zeroPageAddress &+ 1))
+
+            let baseAddress = UInt16(lowByte: lowByte, highByte: highByte)
+            let newAddress = baseAddress &+ UInt16(self.yRegister)
+
+            let dummyAddress = UInt16(baseAddress.highByte) << 8 | (UInt16(baseAddress.lowByte) + UInt16(self.yRegister)) & 0xFF
+            let _ = self.readByte(address: dummyAddress)
+
+            return (newAddress, wasPageCrossed(fromAddress: baseAddress, toAddress: newAddress))
         case .relative:
             let signedOffset = Int(Int8(bitPattern: self.readByte(address: address)))
             let signedNewAddress = Int(self.programCounter) + signedOffset + 1
@@ -90,10 +119,10 @@ extension CPU {
             return UInt16(baseAddress &+ self.yRegister)
         case .absolute:
             return self.readWordWithoutMutating(address: address)
-        case .absoluteX:
+        case .absoluteX, .absoluteXDummyRead:
             let baseAddress = self.readWordWithoutMutating(address: address)
             return baseAddress &+ UInt16(self.xRegister)
-        case .absoluteY:
+        case .absoluteY, .absoluteYDummyRead:
             let baseAddress = self.readWordWithoutMutating(address: address)
             return baseAddress &+ UInt16(self.yRegister)
         case .indirect:
@@ -116,7 +145,7 @@ extension CPU {
             let highByte = self.readByteWithoutMutating(address: UInt16(indirectAddress &+ 1))
 
             return UInt16(highByte) << 8 | UInt16(lowByte)
-        case .indirectY:
+        case .indirectY, .indirectYDummyRead:
             // operand_ptr = *((void **)constant_byte) + y_register
             let baseAddress = self.readByteWithoutMutating(address: address)
 
