@@ -41,6 +41,19 @@ func makeCpu(programBytes: [UInt8]) -> CPU {
     return cpu
 }
 
+func loadRomFile(romName: String, cpu: CPU) throws {
+    guard let romUrl = Bundle(for: ROMTests.self).url(forResource: romName, withExtension: "nes") else {
+        XCTFail("ROM file could not be found")
+        return
+    }
+    let romData: Data = try Data(contentsOf: romUrl)
+    let cartridge = try Cartridge(romData: romData,
+                                  interruptible: cpu.bus)
+
+    cpu.loadCartridge(cartridge: cartridge)
+    cpu.reset()
+}
+
 func hasBlarggTestBegun(cpu: CPU) -> Bool {
     let statusBytes = (0x6001 ... 0x6003).map { address in
         cpu.readByteWithoutMutating(address: address)
@@ -85,16 +98,7 @@ func getBlarggTestStatus(cpu: CPU) -> BlarggTestStatus {
 }
 
 func testBlarggRom(romName: String, cpu: CPU) throws {
-    guard let romUrl = Bundle(for: ROMTests.self).url(forResource: romName, withExtension: "nes") else {
-        XCTFail("ROM file could not be found")
-        return
-    }
-    let romData: Data = try Data(contentsOf: romUrl)
-    let cartridge = try Cartridge(romData: romData,
-                                  interruptible: cpu.bus)
-
-    cpu.loadCartridge(cartridge: cartridge)
-    cpu.reset()
+    try loadRomFile(romName: romName, cpu: cpu)
 
     while true {
         let _ = cpu.executeInstruction()
