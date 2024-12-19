@@ -31,6 +31,7 @@ public struct PPU {
     public var oamData: [UInt8]
     public var status: Register
     public var suppressVerticalBlank: Bool = false
+    public var openBus: OpenBus
 
     // ACHTUNG! This field is shared between rendering and PPUADDR/PPUDATA when not rendering
     public var nextSharedAddress: Address = 0
@@ -66,6 +67,7 @@ public struct PPU {
         self.oamAddress = 0x00
         self.oamData = [UInt8](repeating: 0x00, count: 256)
         self.status = 0x00
+        self.openBus = OpenBus()
 
         self.cycles = 0
         self.scanline = 0
@@ -240,6 +242,8 @@ public struct PPU {
         var redrawScreen = false
 
         for _ in 0 ..< 3 {
+            self.openBus.tick()
+
             self.handleNmiState()
             self.handleRendering()
             self.handleCaching()

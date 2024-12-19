@@ -61,6 +61,9 @@
 		878D81482C815E760076ED30 /* NESError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878D81462C815E760076ED30 /* NESError.swift */; };
 		878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */; };
 		879F665B2D0FB1BC00DF8AB1 /* Interruptible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */; };
+		879F66A52D125F4800DF8AB1 /* OpenBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879F66A42D125F4200DF8AB1 /* OpenBus.swift */; };
+		879F66A72D137E9D00DF8AB1 /* official_only.nes in Resources */ = {isa = PBXBuildFile; fileRef = 879F66A62D137E9D00DF8AB1 /* official_only.nes */; };
+		879F66A92D137EDB00DF8AB1 /* test_ppu_read_buffer.nes in Resources */ = {isa = PBXBuildFile; fileRef = 879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */; };
 		87C5B3272CD9C3C9008580A6 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3222CD9C3C9008580A6 /* Axrom.swift */; };
 		87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3232CD9C3C9008580A6 /* Cnrom.swift */; };
 		87C5B3292CD9C3C9008580A6 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3242CD9C3C9008580A6 /* Mmc1.swift */; };
@@ -183,6 +186,9 @@
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
 		878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseChannel.swift; sourceTree = "<group>"; };
 		879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interruptible.swift; sourceTree = "<group>"; };
+		879F66A42D125F4200DF8AB1 /* OpenBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenBus.swift; sourceTree = "<group>"; };
+		879F66A62D137E9D00DF8AB1 /* official_only.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = official_only.nes; sourceTree = "<group>"; };
+		879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = test_ppu_read_buffer.nes; sourceTree = "<group>"; };
 		87C5B3222CD9C3C9008580A6 /* Axrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
 		87C5B3232CD9C3C9008580A6 /* Cnrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cnrom.swift; sourceTree = "<group>"; };
 		87C5B3242CD9C3C9008580A6 /* Mmc1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
@@ -360,6 +366,7 @@
 				878D81462C815E760076ED30 /* NESError.swift */,
 				87E981522CD8B5990090A200 /* NMIDelayState.swift */,
 				8744B18E2C1CBB46001B44B5 /* Opcode.swift */,
+				879F66A42D125F4200DF8AB1 /* OpenBus.swift */,
 				871F622F2C62FE9E00132962 /* PPU.swift */,
 				870AABD72CB32FAA00E9F3B6 /* PPU+caching.swift */,
 				870AABDD2CB36D4100E9F3B6 /* PPU+rendering.swift */,
@@ -414,6 +421,8 @@
 		87E981542CD9A6170090A200 /* roms */ = {
 			isa = PBXGroup;
 			children = (
+				879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */,
+				879F66A62D137E9D00DF8AB1 /* official_only.nes */,
 				87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */,
 				87E981552CD9A6950090A200 /* nestest.nes */,
 			);
@@ -569,6 +578,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				879F66A92D137EDB00DF8AB1 /* test_ppu_read_buffer.nes in Resources */,
+				879F66A72D137E9D00DF8AB1 /* official_only.nes in Resources */,
 				87E981582CD9A6BF0090A200 /* ppu_vbl_nmi.nes in Resources */,
 				87E981562CD9A6950090A200 /* nestest.nes in Resources */,
 			);
@@ -639,6 +650,7 @@
 				87F234532CE8567F00D2FDA6 /* Filter.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 				874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */,
+				879F66A52D125F4800DF8AB1 /* OpenBus.swift in Sources */,
 				874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */,
 				874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */,
 				87C5B3272CD9C3C9008580A6 /* Axrom.swift in Sources */,

@@ -8,7 +8,7 @@
 extension PPU {
     // NOTA BENE: Called directly by the tracer, as well as by readStatus()
     public func readPpuStatusWithoutMutating() -> UInt8 {
-        self.status
+        self.status | (self.openBus.value & 0b0001_1111)
     }
 
     mutating private func readPpuStatus() -> UInt8 {
@@ -215,7 +215,7 @@ extension PPU {
         case 0x2000 ... 0x3EFF:
             return self.vram[self.vramIndex(from: mirroredAddress)]
         case 0x3F00 ... 0x3FFF:
-            return self.paletteTable[self.paletteIndex(from: mirroredAddress)]
+            return self.paletteTable[self.paletteIndex(from: mirroredAddress)] & 0b0011_1111
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
@@ -231,7 +231,7 @@ extension PPU {
         case 0x0000 ... 0x3EFF:
             return self.internalDataBuffer
         case 0x3F00 ... 0x3FFF:
-            return self.readByteInternal(address: mirroredAddress)
+            return self.readByteInternal(address: mirroredAddress) | (self.openBus.value & 0b1100_0000)
         default:
             fatalError("We should never get here")
         }
@@ -252,7 +252,7 @@ extension PPU {
         case 0x3F00 ... 0x3FFF:
             let otherByte = self.readByteInternal(address: mirroredAddress - 0x1000)
             self.internalDataBuffer = otherByte
-            return byte
+            return byte | (self.openBus.value & 0b1100_0000)
         default:
             fatalError("We should never get here")
         }
@@ -284,7 +284,7 @@ extension PPU {
         case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006:
             // Reads from these addresses should not happen as they are write-only,
             // but we return 0x00 nonetheless.
-            return 0x00
+            return self.openBus.value
         case 0x2002:
             return self.readPpuStatusWithoutMutating()
         case 0x2004:
@@ -300,25 +300,31 @@ extension PPU {
     mutating public func readByte(address: Address) -> UInt8 {
         let mirroredAddress = address & 0b0010_0000_0000_0111
 
+        var value: UInt8
         switch mirroredAddress {
         case 0x2000, 0x2001, 0x2003, 0x2005, 0x2006:
-            // Reads from these addresses should not happen as they are write-only,
-            // but we return 0x00 nonetheless.
-            return 0x00
+            value = self.openBus.value
         case 0x2002:
-            return self.readPpuStatus()
+            value = self.readPpuStatus()
         case 0x2004:
-            return self.readOamData()
+            self.openBus.refreshDecayCycles()
+            value = self.readOamData()
         case 0x2007:
-            return self.readPpuData()
+            self.openBus.refreshDecayCycles()
+            value = self.readPpuData()
         default:
             fatalError("We should not have gotten here in PPU.readByte()")
         }
+
+        self.openBus.value = value
+        return value
     }
 
     // NOTA BENE: This method is called externally from the Bus
     mutating public func writeByte(address: Address, byte: UInt8) {
         let mirrorDownAddr = address & 0b0010_0000_0000_0111
+
+        self.openBus.value = byte
 
         switch mirrorDownAddr {
         case 0x2000:
@@ -338,5 +344,7 @@ extension PPU {
         default:
             break
         }
+
+        self.openBus.refreshDecayCycles()
     }
 }

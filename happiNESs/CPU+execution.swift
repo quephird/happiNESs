@@ -63,7 +63,7 @@ extension CPU {
                 self.adc(addressingMode: opcode.addressingMode)
             case .andImmediate, .andZeroPage, .andZeroPageX, .andAbsolute, .andAbsoluteX, .andAbsoluteY, .andIndirectX, .andIndirectY:
                 self.and(addressingMode: opcode.addressingMode)
-            case .aslAccumulator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteX:
+            case .aslAccumulator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteXDummyRead:
                 self.asl(addressingMode: opcode.addressingMode)
             case .bcc:
                 self.bcc()
@@ -99,9 +99,9 @@ extension CPU {
                 self.cpx(addressingMode: opcode.addressingMode)
             case .cpyImmediate, .cpyZeroPage, .cpyAbsolute:
                 self.cpy(addressingMode: opcode.addressingMode)
-            case .dcpAbsolute, .dcpAbsoluteX, .dcpAbsoluteY, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectY:
+            case .dcpAbsolute, .dcpAbsoluteXDummyRead, .dcpAbsoluteYDummyRead, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectYDummyRead:
                 self.dcp(addressingMode: opcode.addressingMode)
-            case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteX:
+            case .decZeroPage, .decZeroPageX, .decAbsolute, .decAbsoluteXDummyRead:
                 self.dec(addressingMode: opcode.addressingMode)
             case .dex:
                 self.dex()
@@ -109,13 +109,13 @@ extension CPU {
                 self.dey()
             case .eorImmediate, .eorZeroPage, .eorZeroPageX, .eorAbsolute, .eorAbsoluteX, .eorAbsoluteY, .eorIndirectX, .eorIndirectY:
                 self.eor(addressingMode: opcode.addressingMode)
-            case .incZeroPage, .incZeroPageX, .incAbsolute, .incAbsoluteX:
+            case .incZeroPage, .incZeroPageX, .incAbsolute, .incAbsoluteXDummyRead:
                 self.inc(addressingMode: opcode.addressingMode)
             case .inx:
                 self.inx()
             case .iny:
                 self.iny()
-            case .isbAbsolute, .isbAbsoluteX, .isbAbsoluteY, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectY:
+            case .isbAbsolute, .isbAbsoluteXDummyRead, .isbAbsoluteYDummyRead, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectYDummyRead:
                 self.isb(addressingMode: opcode.addressingMode)
             case .jmpAbsolute, .jmpIndirect:
                 self.jmp(addressingMode: opcode.addressingMode)
@@ -129,7 +129,7 @@ extension CPU {
                 self.ldx(addressingMode: opcode.addressingMode)
             case .ldyImmediate, .ldyZeroPage, .ldyZeroPageX, .ldyAbsolute, .ldyAbsoluteX:
                 self.ldy(addressingMode: opcode.addressingMode)
-            case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteX:
+            case .lsrAccumulator, .lsrZeroPage, .lsrZeroPageX, .lsrAbsolute, .lsrAbsoluteXDummyRead:
                 self.lsr(addressingMode: opcode.addressingMode)
             case .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit6, .nopImplicit7,
                     .nopImmediate1, .nopImmediate2, .nopImmediate3, .nopImmediate4, .nopImmediate5,
@@ -148,13 +148,13 @@ extension CPU {
                 self.pla()
             case .plp:
                 self.plp()
-            case .rlaAbsolute, .rlaAbsoluteX, .rlaAbsoluteY, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectY:
+            case .rlaAbsolute, .rlaAbsoluteXDummyRead, .rlaAbsoluteYDummyRead, .rlaZeroPage, .rlaZeroPageX, .rlaIndirectX, .rlaIndirectYDummyRead:
                 self.rla(addressingMode: opcode.addressingMode)
-            case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteX:
+            case .rolAccumulator, .rolZeroPage, .rolZeroPageX, .rolAbsolute, .rolAbsoluteXDummyRead:
                 self.rol(addressingMode: opcode.addressingMode)
-            case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteX:
+            case .rorAccumulator, .rorZeroPage, .rorZeroPageX, .rorAbsolute, .rorAbsoluteXDummyRead:
                 self.ror(addressingMode: opcode.addressingMode)
-            case .rraAbsolute, .rraAbsoluteX, .rraAbsoluteY, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectY:
+            case .rraAbsolute, .rraAbsoluteXDummyRead, .rraAbsoluteYDummyRead, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectYDummyRead:
                 self.rra(addressingMode: opcode.addressingMode)
             case .rti:
                 self.rti()
@@ -170,13 +170,13 @@ extension CPU {
                 self.sed()
             case .sei:
                 self.sei()
-            case .shaAbsoluteY, .shaIndirectY:
+            case .shaAbsoluteYDummyRead, .shaIndirectYDummyRead:
                 self.sha(addressingMode: opcode.addressingMode)
-            case .sloAbsolute, .sloAbsoluteX, .sloAbsoluteY, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectY:
+            case .sloAbsolute, .sloAbsoluteXDummyRead, .sloAbsoluteYDummyRead, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectYDummyRead:
                 self.slo(addressingMode: opcode.addressingMode)
-            case .sreAbsolute, .sreAbsoluteX, .sreAbsoluteY, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectY:
+            case .sreAbsolute, .sreAbsoluteXDummyRead, .sreAbsoluteYDummyRead, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectYDummyRead:
                 self.sre(addressingMode: opcode.addressingMode)
-            case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteX, .staAbsoluteY, .staIndirectX, .staIndirectY:
+            case .staZeroPage, .staZeroPageX, .staAbsolute, .staAbsoluteXDummyRead, .staAbsoluteYDummyRead, .staIndirectX, .staIndirectYDummyRead:
                 self.sta(addressingMode: opcode.addressingMode)
             case .stxZeroPage, .stxZeroPageY, .stxAbsolute:
                 self.stx(addressingMode: opcode.addressingMode)

@@ -131,9 +131,19 @@ C00C  10 FB     BPL $C009                       A:00 X:FF Y:00 P:26 SP:FF PPU:  
 .
 ```
 
-Doing this _will slow performance down significantly_ and so is only intended for debugging purposes. You can also run the latest `nestest.nes` ROM and at the moment all tests pass:
+Doing this _will slow performance down significantly_ and so is only intended for debugging purposes. 
+
+So far, the following test ROMs all pass:
+
+- nestest.nes
+- official\_only.nes
+- ppu\_vbl\_nmi.nes
+- test\_ppu\_read\_buffer.nes
+
+For example, running `nestest.nes` results in the following:
 
 <img src="./images/nestest.png" />
+
 
 ### Error handling
 

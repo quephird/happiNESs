@@ -15,8 +15,11 @@ enum AddressingMode {
     case zeroPageY
     case absolute
     case absoluteX
+    case absoluteXDummyRead
     case absoluteY
+    case absoluteYDummyRead
     case indirect
     case indirectX
     case indirectY
+    case indirectYDummyRead
 }
