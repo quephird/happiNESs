@@ -215,7 +215,7 @@ extension PPU {
         case 0x2000 ... 0x3EFF:
             return self.vram[self.vramIndex(from: mirroredAddress)]
         case 0x3F00 ... 0x3FFF:
-            return self.paletteTable[self.paletteIndex(from: mirroredAddress)]
+            return self.paletteTable[self.paletteIndex(from: mirroredAddress)] & 0b0011_1111
         default:
             let message = String(format: "Unexpected access to mirrored space %04X", address)
             fatalError(message)
