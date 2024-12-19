@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NESError: Equatable, Error, LocalizedError {
+public enum NESError: Equatable, Error, LocalizedError {
     case romFileCouldNotBeSelected
     case romFileCouldNotBeOpened
     case romNotInInesFormat
@@ -18,7 +18,7 @@ enum NESError: Equatable, Error, LocalizedError {
     case invalidSaveDatafile
     case unableToSaveDataFile(String)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .romFileCouldNotBeSelected:
             "Unable to select file"

@@ -8,7 +8,7 @@
 public typealias Register = UInt8
 
 extension Register {
-    subscript (_ flag: RegisterBit) -> Bool {
+    package subscript (_ flag: RegisterBit) -> Bool {
         get {
             (self & (1 << flag.bitIndex)) > 0
         }

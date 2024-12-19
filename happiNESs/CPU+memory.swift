@@ -171,18 +171,18 @@ extension CPU {
         }
     }
 
-    func readWord(address: UInt16) -> UInt16 {
+    public func readWord(address: UInt16) -> UInt16 {
         let lowByte = self.readByte(address: address)
         let highByte = self.readByte(address: address + 1)
         return UInt16(lowByte: lowByte, highByte: highByte)
     }
 
-    func readByte(address: UInt16) -> UInt8 {
+    public func readByte(address: UInt16) -> UInt8 {
         self.bus.readByte(address: address)
     }
 
     // NOTA BENE: Called directly by the tracer, as well as by readByte()
-    func readByteWithoutMutating(address: UInt16) -> UInt8 {
+    package func readByteWithoutMutating(address: UInt16) -> UInt8 {
         self.bus.readByteWithoutMutating(address: address)
     }
 
