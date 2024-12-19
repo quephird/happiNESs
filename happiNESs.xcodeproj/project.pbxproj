@@ -64,6 +64,7 @@
 		879F66A52D125F4800DF8AB1 /* OpenBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879F66A42D125F4200DF8AB1 /* OpenBus.swift */; };
 		879F66A72D137E9D00DF8AB1 /* official_only.nes in Resources */ = {isa = PBXBuildFile; fileRef = 879F66A62D137E9D00DF8AB1 /* official_only.nes */; };
 		879F66A92D137EDB00DF8AB1 /* test_ppu_read_buffer.nes in Resources */ = {isa = PBXBuildFile; fileRef = 879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */; };
+		879F66C32D13C0F500DF8AB1 /* ROMTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 879F66C22D13C0E800DF8AB1 /* ROMTests.swift */; };
 		87C5B3272CD9C3C9008580A6 /* Axrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3222CD9C3C9008580A6 /* Axrom.swift */; };
 		87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3232CD9C3C9008580A6 /* Cnrom.swift */; };
 		87C5B3292CD9C3C9008580A6 /* Mmc1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B3242CD9C3C9008580A6 /* Mmc1.swift */; };
@@ -189,6 +190,7 @@
 		879F66A42D125F4200DF8AB1 /* OpenBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenBus.swift; sourceTree = "<group>"; };
 		879F66A62D137E9D00DF8AB1 /* official_only.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = official_only.nes; sourceTree = "<group>"; };
 		879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = test_ppu_read_buffer.nes; sourceTree = "<group>"; };
+		879F66C22D13C0E800DF8AB1 /* ROMTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ROMTests.swift; sourceTree = "<group>"; };
 		87C5B3222CD9C3C9008580A6 /* Axrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Axrom.swift; sourceTree = "<group>"; };
 		87C5B3232CD9C3C9008580A6 /* Cnrom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cnrom.swift; sourceTree = "<group>"; };
 		87C5B3242CD9C3C9008580A6 /* Mmc1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mmc1.swift; sourceTree = "<group>"; };
@@ -390,6 +392,7 @@
 				8744B1812C1CB9B3001B44B5 /* CPUTests.swift */,
 				8763D0672C39B61F006C1B4F /* Helpers.swift */,
 				8763D0692C39B719006C1B4F /* CartridgeTests.swift */,
+				879F66C22D13C0E800DF8AB1 /* ROMTests.swift */,
 			);
 			path = happiNESsTests;
 			sourceTree = "<group>";
@@ -665,6 +668,7 @@
 			files = (
 				8763D06A2C39B719006C1B4F /* CartridgeTests.swift in Sources */,
 				8744B1822C1CB9B3001B44B5 /* CPUTests.swift in Sources */,
+				879F66C32D13C0F500DF8AB1 /* ROMTests.swift in Sources */,
 				8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -847,6 +851,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
