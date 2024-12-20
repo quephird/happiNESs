@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 10/15/24.
 //
 
-enum RegisterBit {
+package enum RegisterBit {
     // CPU status register flags
     case carry
     case zero

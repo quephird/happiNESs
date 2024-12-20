@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import happiNESs
+import happiNESs
 
 final class CPUTests: XCTestCase {
     func testAdcImmediate() {

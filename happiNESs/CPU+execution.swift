@@ -33,7 +33,7 @@ extension CPU {
 
     // This method returns the value from the call to Bus.tick()
     // which represents whether or not the screen needs to be redrawn
-    func executeInstruction() -> Bool {
+    public func executeInstruction() -> Bool {
         if self.stall > 0 {
             self.stall -= 1
             return self.tick(cycles: 1)
