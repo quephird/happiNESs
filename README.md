@@ -151,7 +151,7 @@ Since this is a GUI application, most errors result in a dialog box being displa
 
 # Unit testing
 
-For the time being, the unit tests are primarily focused on the implementations of the 6502 opcodes. This is admittedly bad, and my hope is that I get around to writing tests to exercise other parts of the codebase.
+The unit tests are primarily focused on the implementations of the 6502 opcodes, but there are a few other suites including one for running the set of test ROMs listed above. To run them all, hit ⌘-U while in the happiNESs scheme within Xcode.
 
 # Relevant links
 
@@ -169,6 +169,8 @@ For the time being, the unit tests are primarily focused on the implementations 
   <a href="https://6502disassembly.com/nes-smb/SuperMarioBros.html">https://6502disassembly.com/nes-smb/SuperMarioBros.html</a>
 - A Go implementation of an NES emulator  
   <a href="https://github.com/fogleman/nes">https://github.com/fogleman/nes</a>
+- Another Go implementation that is more thorough and feature complete.  
+  <a href="https://github.com/ichirin2501/rgnes">https://github.com/ichirin2501/rgnes</a>
 - A page on Apple's Developer web site with an example project that you can download and experiment with to learn how to use part of the AVFAudio framework.  
   <a href="https://developer.apple.com/documentation/avfaudio/audio_engine/building_a_signal_generator">https://developer.apple.com/documentation/avfaudio/audio\_engine/building\_a\_signal\_generator</a>
 - GitHub repo with a ROM that comprehensively exercises the APU's sound capabilities.  
