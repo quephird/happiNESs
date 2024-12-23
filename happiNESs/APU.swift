@@ -26,7 +26,7 @@ public struct APU {
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
     private var sequencerCount: Int = 0
-    private var frameIrqEnabled: Bool = false
+    private var frameIrqInhibited: Bool = false
     public var sampleRate: Float
 
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
@@ -68,13 +68,16 @@ public struct APU {
 }
 
 extension APU {
-    public func readByte(address: UInt16) -> UInt8 {
-        switch address {
+    mutating public func readByte(address: UInt16) -> UInt8 {
+        let value = switch address {
         case 0x4015:
-            self.status[.apuStatus]
+            self.status
         default:
-            0x00
+            UInt8(0x00)
         }
+
+        self.status[.frameIrqEnabled] = false
+        return value
     }
 
     mutating public func writeByte(address: UInt16, byte: UInt8) {
@@ -132,13 +135,11 @@ extension APU {
     }
 
     mutating public func updateStatus(byte: UInt8) {
-        self.status = byte[.apuStatus]
-
-        self.pulse1.enabled = self.status[.pulse1Enabled]
-        self.pulse2.enabled = self.status[.pulse2Enabled]
-        self.triangle.enabled = self.status[.triangleEnabled]
-        self.noise.enabled = self.status[.noiseEnabled]
-        self.dmc.enabled = self.status[.dmcEnabled]
+        self.pulse1.enabled = byte[.pulse1Enabled]
+        self.pulse2.enabled = byte[.pulse2Enabled]
+        self.triangle.enabled = byte[.triangleEnabled]
+        self.noise.enabled = byte[.noiseEnabled]
+        self.dmc.enabled = byte[.dmcEnabled]
 
         if !self.pulse1.enabled {
             self.pulse1.lengthCounterValue = 0x00
@@ -163,7 +164,12 @@ extension APU {
 
     mutating public func updateSequencer(byte: UInt8) {
         self.sequencerMode = byte[.sequencerMode] ? .five : .four
-        self.frameIrqEnabled = !byte[.frameIrqInhibited]
+        if (byte & 0b0100_0000) > 0 {
+            self.frameIrqInhibited = true
+            self.status[.frameIrqEnabled] = false
+        } else {
+            self.frameIrqInhibited = false
+        }
 
         if self.sequencerMode == .five {
             self.stepEnvelope()
@@ -236,14 +242,23 @@ extension APU {
             case 22373: // Step 3
                 self.stepEnvelope()
             case 29830:
-                self.generateIRQ()
+                if !self.frameIrqInhibited {
+                    self.status[.frameIrqEnabled] = true
+                    self.generateIRQ()
+                }
             case 29831: // Step 4
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-                self.generateIRQ()
+                if !self.frameIrqInhibited {
+                    self.status[.frameIrqEnabled] = true
+                    self.generateIRQ()
+                }
             case 29832:
-                self.generateIRQ()
+                if !self.frameIrqInhibited {
+                    self.status[.frameIrqEnabled] = true
+                    self.generateIRQ()
+                }
                 self.sequencerCount = 2
             default:
                 break
@@ -327,7 +342,7 @@ extension APU {
     }
 
     mutating private func generateIRQ() {
-        if self.frameIrqEnabled {
+        if self.status[.frameIrqEnabled] {
             self.bus!.triggerIrq()
         }
     }
