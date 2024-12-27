@@ -38,6 +38,8 @@ public struct APU {
 
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
+    private var newSequencerValue: UInt8?
+    private var newSequencerValueDelay: Int = 0
 
     public init(sampleRate: Float) {
         self.sampleRate = sampleRate
@@ -62,6 +64,9 @@ public struct APU {
         self.noise.reset()
         self.dmc.reset()
         self.buffer.reset()
+
+        self.newSequencerValue = nil
+        self.newSequencerValueDelay = 0
 
         self.sequencerCount = 0
     }
@@ -135,6 +140,8 @@ extension APU {
     }
 
     mutating public func updateStatus(byte: UInt8) {
+        self.status = byte
+
         self.pulse1.enabled = byte[.pulse1Enabled]
         self.pulse2.enabled = byte[.pulse2Enabled]
         self.triangle.enabled = byte[.triangleEnabled]
@@ -163,18 +170,25 @@ extension APU {
     }
 
     mutating public func updateSequencer(byte: UInt8) {
-        self.sequencerMode = byte[.sequencerMode] ? .five : .four
+        // NOTA BENE: The setting of the sequencer mode is _not_ immediate
+        // and instead is delayed by 3 or 4 APU cycles, depending on whether
+        // the write to 0x4017 took place _during_ an APU cycle or between them,
+        // which we approximate below by checking the parity of the current value
+        // of cycles. See this wiki article for more details:
+        //
+        //     https://www.nesdev.org/wiki/APU_Frame_Counter
+        self.newSequencerValue = byte
+        if self.cycles % 2 == 0 {
+            self.newSequencerValueDelay = 3
+        } else {
+            self.newSequencerValueDelay = 4
+        }
+
         if (byte & 0b0100_0000) > 0 {
             self.frameIrqInhibited = true
             self.status[.frameIrqEnabled] = false
         } else {
             self.frameIrqInhibited = false
-        }
-
-        if self.sequencerMode == .five {
-            self.stepEnvelope()
-            self.stepSweep()
-            self.stepLength()
         }
     }
 }
@@ -193,13 +207,38 @@ extension APU {
     // This function needs executes its body of instructions once for every tick
     // of the CPU, unlike for the PPU and mapper tick() functions.
     mutating public func tick() {
+        self.maybeUpdateSequencerMode()
         self.cycles += 1
 
-        self.stepTimer()
         self.stepSequencer()
+        self.stepTimer()
 
         if self.shouldSendSample {
             self.sendSample()
+        }
+    }
+
+    mutating private func maybeUpdateSequencerMode() {
+        if let frameCountValue = self.newSequencerValue {
+            if self.newSequencerValueDelay > 0 {
+                self.newSequencerValueDelay -= 1
+            } else {
+                // If the delay count is zero, then finally
+                // update the sequencer mode accordingly.
+                self.sequencerCount = 0
+
+                if frameCountValue[.sequencerMode] {
+                    self.sequencerMode = .five
+                    self.stepEnvelope()
+                    self.stepSweep()
+                    self.stepLength()
+                } else {
+                    self.sequencerMode = .four
+                }
+
+                self.newSequencerValueDelay = 0
+                self.newSequencerValue = nil
+            }
         }
     }
 
@@ -225,7 +264,7 @@ extension APU {
 
         // NOTA BENE: Constants used below taken from:
         //
-        //     https://github.com/starrhorne/nes-rust/blob/master/src/apu/frame_counter.rs#L66-L109
+        //     https://github.com/ichirin2501/rgnes/blob/master/nes/apu.go#L16-L19
         //
         // Note that the figures are doubled here because the sequencer clocks
         // at _half_ the rate of the CPU. Also, this is hardcoded to work with
@@ -233,53 +272,54 @@ extension APU {
         switch self.sequencerMode {
         case .four:
             switch self.sequencerCount {
-            case 7459: // Step 1
+            case 7457: // Step 1
                 self.stepEnvelope()
-            case 14915: // Step 2
+            case 14913: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 22373: // Step 3
+            case 22371: // Step 3
                 self.stepEnvelope()
+            case 29828:
+                if !self.frameIrqInhibited {
+                    self.status[.frameIrqEnabled] = true
+                    self.generateIRQ()
+                }
+            case 29829: // Step 4
+                self.stepEnvelope()
+                self.stepSweep()
+                self.stepLength()
+                if !self.frameIrqInhibited {
+                    self.status[.frameIrqEnabled] = true
+                    self.generateIRQ()
+                }
             case 29830:
                 if !self.frameIrqInhibited {
                     self.status[.frameIrqEnabled] = true
                     self.generateIRQ()
                 }
-            case 29831: // Step 4
-                self.stepEnvelope()
-                self.stepSweep()
-                self.stepLength()
-                if !self.frameIrqInhibited {
-                    self.status[.frameIrqEnabled] = true
-                    self.generateIRQ()
-                }
-            case 29832:
-                if !self.frameIrqInhibited {
-                    self.status[.frameIrqEnabled] = true
-                    self.generateIRQ()
-                }
-                self.sequencerCount = 2
+                self.sequencerCount = 0
             default:
                 break
             }
         case .five:
             switch self.sequencerCount {
-            case 7459: // Step 1
+            case 7457: // Step 1
                 self.stepEnvelope()
-            case 14915: // Step 2
+            case 14913: // Step 2
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-            case 22373: // Step 3
+            case 22371: // Step 3
                 self.stepEnvelope()
-            case 29831: // Step 4
+            case 29829: // Step 4
                 break
-            case 37283: // Step 5
+            case 37281: // Step 5
                 self.stepEnvelope()
                 self.stepSweep()
                 self.stepLength()
-                self.sequencerCount = 1
+            case 37282:
+                self.sequencerCount = 0
             default:
                 break
             }
