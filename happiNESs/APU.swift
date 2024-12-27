@@ -88,47 +88,47 @@ extension APU {
     mutating public func writeByte(address: UInt16, byte: UInt8) {
         switch address {
         case 0x4000:
-            self.pulse1.updateRegister1(byte: byte)
+            self.pulse1.writeController(byte: byte)
         case 0x4001:
-            self.pulse1.updateRegister2(byte: byte)
+            self.pulse1.writeSweep(byte: byte)
         case 0x4002:
-            self.pulse1.updateRegister3(byte: byte)
+            self.pulse1.writeTimerLow(byte: byte)
         case 0x4003:
-            self.pulse1.updateRegister4(byte: byte)
+            self.pulse1.writeLengthAndTimerHigh(byte: byte)
         case 0x4004:
-            self.pulse2.updateRegister1(byte: byte)
+            self.pulse2.writeController(byte: byte)
         case 0x4005:
-            self.pulse2.updateRegister2(byte: byte)
+            self.pulse2.writeSweep(byte: byte)
         case 0x4006:
-            self.pulse2.updateRegister3(byte: byte)
+            self.pulse2.writeTimerLow(byte: byte)
         case 0x4007:
-            self.pulse2.updateRegister4(byte: byte)
+            self.pulse2.writeLengthAndTimerHigh(byte: byte)
         case 0x4008:
-            self.triangle.updateRegister1(byte: byte)
+            self.triangle.writeController(byte: byte)
         case 0x4009:
             // Unused register
             break
         case 0x400A:
-            self.triangle.updateRegister3(byte: byte)
+            self.triangle.writeTimerLow(byte: byte)
         case 0x400B:
-            self.triangle.updateRegister4(byte: byte)
+            self.triangle.writeLengthAndTimerHigh(byte: byte)
         case 0x400C:
-            self.noise.updateRegister1(byte: byte)
+            self.noise.writeController(byte: byte)
         case 0x400D:
             // Unused register
             break
         case 0x400E:
-            self.noise.updateRegister3(byte: byte)
+            self.noise.writeLoopAndPeriod(byte: byte)
         case 0x400F:
-            self.noise.updateRegister4(byte: byte)
+            self.noise.writeLength(byte: byte)
         case 0x4010:
-            self.dmc.updateRegister1(byte: byte)
+            self.dmc.writeController(byte: byte)
         case 0x4011:
-            self.dmc.updateRegister2(byte: byte)
+            self.dmc.writeLoadCounter(byte: byte)
         case 0x4012:
-            self.dmc.updateRegister3(byte: byte)
+            self.dmc.writeSampleAddress(byte: byte)
         case 0x4013:
-            self.dmc.updateRegister4(byte: byte)
+            self.dmc.writeSampleLength(byte: byte)
         case 0x4015:
             self.updateStatus(byte: byte)
         case 0x4017:

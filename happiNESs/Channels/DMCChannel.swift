@@ -49,21 +49,21 @@ public struct DMCChannel {
 }
 
 extension DMCChannel {
-    mutating public func updateRegister1(byte: UInt8) {
+    mutating public func writeController(byte: UInt8) {
         self.irqEnabled = byte[.dmcIrqEnabled] == 1
         self.loopEnabled = byte[.dmcLoopEnabled] == 1
         self.loopPeriod = Self.periodTable[Int(byte[.dmcPeriod])]
     }
 
-    mutating public func updateRegister2(byte: UInt8) {
+    mutating public func writeLoadCounter(byte: UInt8) {
         self.loadCounter = byte[.dmcLoadCounter]
     }
 
-    mutating public func updateRegister3(byte: UInt8) {
+    mutating public func writeSampleAddress(byte: UInt8) {
         self.sampleAddress = 0xC000 | (UInt16(byte) << 6)
     }
 
-    mutating public func updateRegister4(byte: UInt8) {
+    mutating public func writeSampleLength(byte: UInt8) {
         self.sampleLength = (UInt16(byte) << 4) | 0x0001
     }
 }

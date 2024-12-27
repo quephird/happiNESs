@@ -50,7 +50,7 @@ public struct NoiseChannel {
 }
 
 extension NoiseChannel {
-    mutating public func updateRegister1(byte: UInt8) {
+    mutating public func writeController(byte: UInt8) {
         self.controlFlag = byte[.noiseControlFlag] == 1 ? .envelopeLoop : .lengthCounterEnabled
         self.constantVolumeFlag = byte[.noiseConstantVolumeFlag] == 1
         self.envelopePeriod = byte[.noiseVolume]
@@ -58,12 +58,12 @@ extension NoiseChannel {
         self.envelopeStart = true
     }
 
-    mutating public func updateRegister3(byte: UInt8) {
+    mutating public func writeLoopAndPeriod(byte: UInt8) {
         self.mode = byte[.noiseMode] == 1 ? 6 : 1
         self.timerPeriod = Self.timerPeriods[Int(byte[.noisePeriod])]
     }
 
-    mutating public func updateRegister4(byte: UInt8) {
+    mutating public func writeLength(byte: UInt8) {
         self.lengthCounterValue = APU.lengthTable[Int(byte[.noiseLengthCounter])]
         self.envelopeStart = true
     }

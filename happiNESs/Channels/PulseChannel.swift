@@ -84,7 +84,7 @@ public struct PulseChannel {
 }
 
 extension PulseChannel {
-    mutating public func updateRegister1(byte: UInt8) {
+    mutating public func writeController(byte: UInt8) {
         self.dutyMode = Int(byte[.pulseDutyMode])
         self.controlFlag = byte[.pulseControlFlag] == 1 ? .envelopeLoop : .lengthCounterEnabled
         self.constantVolumeFlag = byte[.pulseConstantVolumeFlag] == 1
@@ -93,7 +93,7 @@ extension PulseChannel {
         self.envelopeStart = true
     }
 
-    mutating public func updateRegister2(byte: UInt8) {
+    mutating public func writeSweep(byte: UInt8) {
         self.sweepEnabled = byte[.pulseSweepEnabled] == 1
         self.sweepPeriod = byte[.pulseSweepPeriod] + 1
         self.sweepNegated = byte[.pulseSweepNegated] == 1
@@ -101,11 +101,11 @@ extension PulseChannel {
         self.sweepReloaded = true
     }
 
-    mutating public func updateRegister3(byte: UInt8) {
+    mutating public func writeTimerLow(byte: UInt8) {
         self.timerPeriod = (self.timerPeriod & 0b0000_0111_0000_0000) | UInt16(byte)
     }
 
-    mutating public func updateRegister4(byte: UInt8) {
+    mutating public func writeLengthAndTimerHigh(byte: UInt8) {
         self.lengthCounterValue = APU.lengthTable[Int(byte[.triangleLengthCounter])]
         self.timerPeriod = (self.timerPeriod & 0b0000_0000_1111_1111) | UInt16(byte[.triangleTimerHigh]) << 8
         self.envelopeStart = true

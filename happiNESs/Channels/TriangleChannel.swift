@@ -39,16 +39,16 @@ public struct TriangleChannel {
 }
 
 extension TriangleChannel {
-    mutating public func updateRegister1(byte: UInt8) {
+    mutating public func writeController(byte: UInt8) {
         self.controlFlagEnabled = byte[.triangleControlFlag] == 0
         self.linearCounterReload = byte[.triangleLinearCounterReload]
     }
 
-    mutating public func updateRegister3(byte: UInt8) {
+    mutating public func writeTimerLow(byte: UInt8) {
         self.timerPeriod = (self.timerPeriod & 0b0000_0111_0000_0000) | UInt16(byte)
     }
 
-    mutating public func updateRegister4(byte: UInt8) {
+    mutating public func writeLengthAndTimerHigh(byte: UInt8) {
         self.lengthCounterValue = APU.lengthTable[Int(byte[.triangleLengthCounter])]
         self.timerPeriod = (self.timerPeriod & 0b0000_0000_1111_1111) | UInt16(byte[.triangleTimerHigh]) << 8
         self.timerValue = self.timerPeriod + 1
