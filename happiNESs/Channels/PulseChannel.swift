@@ -86,7 +86,7 @@ extension PulseChannel {
         self.updateTargetPeriod()
     }
 
-    mutating public func writeLengthAndTimerHigh(byte: UInt8) {
+    mutating public func writeLengthCounterAndTimerHigh(byte: UInt8) {
         self.lengthCounter.setValue(index: byte[.pulseLengthCounter])
         self.timer.setValueHigh(value: byte)
         self.updateTargetPeriod()
@@ -136,7 +136,7 @@ extension PulseChannel {
         }
     }
 
-    mutating public func stepLength() {
+    mutating public func stepLengthCounter() {
         self.lengthCounter.step()
     }
 

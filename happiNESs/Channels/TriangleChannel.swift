@@ -51,7 +51,7 @@ extension TriangleChannel {
         self.timer.setValueLow(value: byte)
     }
 
-    mutating public func writeLengthAndTimerHigh(byte: UInt8) {
+    mutating public func writeLengthCounterAndTimerHigh(byte: UInt8) {
         self.lengthCounter.setValue(index: byte[.triangleLengthCounter])
         self.timer.setValueHigh(value: byte[.triangleTimerHigh])
         self.linearCounterReload = true
@@ -65,7 +65,7 @@ extension TriangleChannel {
         }
     }
 
-    mutating public func stepCounter() {
+    mutating public func stepLinearCounter() {
         if self.linearCounterReload {
             self.linearCounterValue = self.linearCounterPeriod
         } else if self.linearCounterValue > 0 {
@@ -77,7 +77,7 @@ extension TriangleChannel {
         }
     }
 
-    mutating public func stepLength() {
+    mutating public func stepLengthCounter() {
         self.lengthCounter.step()
     }
 

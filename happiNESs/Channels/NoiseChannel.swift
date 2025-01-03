@@ -50,7 +50,7 @@ extension NoiseChannel {
         self.timer.period = Self.timerPeriods[Int(byte[.noisePeriod])] - 1
     }
 
-    mutating public func writeLength(byte: UInt8) {
+    mutating public func writeLengthCounter(byte: UInt8) {
         self.lengthCounter.setValue(index: byte[.noiseLengthCounter])
         self.envelope.started = true
     }
@@ -68,7 +68,7 @@ extension NoiseChannel {
         self.envelope.step()
     }
 
-    mutating public func stepLength() {
+    mutating public func stepLengthCounter() {
         self.lengthCounter.step()
     }
 

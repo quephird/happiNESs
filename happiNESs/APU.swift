@@ -109,7 +109,7 @@ extension APU {
         case 0x4002:
             self.pulse1.writeTimerLow(byte: byte)
         case 0x4003:
-            self.pulse1.writeLengthAndTimerHigh(byte: byte)
+            self.pulse1.writeLengthCounterAndTimerHigh(byte: byte)
         case 0x4004:
             self.pulse2.writeController(byte: byte)
         case 0x4005:
@@ -117,7 +117,7 @@ extension APU {
         case 0x4006:
             self.pulse2.writeTimerLow(byte: byte)
         case 0x4007:
-            self.pulse2.writeLengthAndTimerHigh(byte: byte)
+            self.pulse2.writeLengthCounterAndTimerHigh(byte: byte)
         case 0x4008:
             self.triangle.writeController(byte: byte)
         case 0x4009:
@@ -126,7 +126,7 @@ extension APU {
         case 0x400A:
             self.triangle.writeTimerLow(byte: byte)
         case 0x400B:
-            self.triangle.writeLengthAndTimerHigh(byte: byte)
+            self.triangle.writeLengthCounterAndTimerHigh(byte: byte)
         case 0x400C:
             self.noise.writeController(byte: byte)
         case 0x400D:
@@ -135,7 +135,7 @@ extension APU {
         case 0x400E:
             self.noise.writeLoopAndPeriod(byte: byte)
         case 0x400F:
-            self.noise.writeLength(byte: byte)
+            self.noise.writeLengthCounter(byte: byte)
         case 0x4010:
             self.dmc.writeController(byte: byte)
         case 0x4011:
@@ -331,7 +331,7 @@ extension APU {
     mutating private func stepEnvelope() {
         self.pulse1.stepEnvelope()
         self.pulse2.stepEnvelope()
-        self.triangle.stepCounter()
+        self.triangle.stepLinearCounter()
         self.noise.stepEnvelope()
     }
 
@@ -341,10 +341,10 @@ extension APU {
     }
 
     mutating private func stepLength() {
-        self.pulse1.stepLength()
-        self.pulse2.stepLength()
-        self.triangle.stepLength()
-        self.noise.stepLength()
+        self.pulse1.stepLengthCounter()
+        self.pulse2.stepLengthCounter()
+        self.triangle.stepLengthCounter()
+        self.noise.stepLengthCounter()
     }
 
     mutating private func sendSample() {
