@@ -13,7 +13,7 @@ public struct DMCChannel {
     public var bus: Bus? = nil
     public var enabled: Bool = false
 
-    private var irqEnabled: Bool = false
+    public var irqEnabled: Bool = false
     private var loopEnabled: Bool = false
     private var loopPeriod: UInt8 = 0x00
     private var loopValue: UInt8 = 0x00

@@ -27,6 +27,7 @@ public struct APU {
     private var sequencerMode: SequencerMode = .four
     private var sequencerCount: Int = 0
     private var frameIrqInhibited: Bool = false
+    private var frameIrqEnabled: Bool = false
     public var sampleRate: Float
 
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
@@ -56,7 +57,8 @@ public struct APU {
     }
 
     mutating public func reset() {
-        self.status = 0x00
+        self.frameIrqInhibited = false
+        self.frameIrqEnabled = false
 
         self.pulse1.reset()
         self.pulse2.reset()
@@ -73,15 +75,28 @@ public struct APU {
 }
 
 extension APU {
+    private func readStatus() -> UInt8 {
+        var value: UInt8 = 0x00
+        value[.pulse1Enabled] = self.pulse1.lengthCounter.value > 0
+        value[.pulse2Enabled] = self.pulse2.lengthCounter.value > 0
+        value[.triangleEnabled] = self.triangle.lengthCounter.value > 0
+        value[.noiseEnabled] = self.noise.lengthCounter.value > 0
+        value[.dmcEnabled] = self.dmc.currentLength > 0
+        value[.frameIrqEnabled] = self.frameIrqEnabled
+        value[.apuStatusUnused3] = self.dmc.irqEnabled
+
+        return value
+    }
+
     mutating public func readByte(address: UInt16) -> UInt8 {
         let value = switch address {
         case 0x4015:
-            self.status
+            self.readStatus()
         default:
             UInt8(0x00)
         }
 
-        self.status[.frameIrqEnabled] = false
+        self.frameIrqEnabled = false
         return value
     }
 
@@ -140,26 +155,13 @@ extension APU {
     }
 
     mutating public func updateStatus(byte: UInt8) {
-        self.status = byte
-
-        self.pulse1.enabled = byte[.pulse1Enabled]
-        self.pulse2.enabled = byte[.pulse2Enabled]
-        self.triangle.enabled = byte[.triangleEnabled]
-        self.noise.enabled = byte[.noiseEnabled]
+        self.pulse1.setEnabled(enabled: byte[.pulse1Enabled])
+        self.pulse2.setEnabled(enabled: byte[.pulse2Enabled])
+        self.triangle.setEnabled(enabled: byte[.triangleEnabled])
+        self.noise.setEnabled(enabled: byte[.noiseEnabled])
         self.dmc.enabled = byte[.dmcEnabled]
+        self.dmc.irqEnabled = false
 
-        if !self.pulse1.enabled {
-            self.pulse1.lengthCounterValue = 0x00
-        }
-        if !self.pulse2.enabled {
-            self.pulse2.lengthCounterValue = 0x00
-        }
-        if !self.triangle.enabled {
-            self.triangle.lengthCounterValue = 0x00
-        }
-        if !self.noise.enabled {
-            self.noise.lengthCounterValue = 0x00
-        }
         if !self.dmc.enabled {
             self.dmc.currentLength = 0
         } else {
@@ -186,7 +188,7 @@ extension APU {
 
         if (byte & 0b0100_0000) > 0 {
             self.frameIrqInhibited = true
-            self.status[.frameIrqEnabled] = false
+            self.frameIrqEnabled = false
         } else {
             self.frameIrqInhibited = false
         }
@@ -230,8 +232,8 @@ extension APU {
                 if frameCountValue[.sequencerMode] {
                     self.sequencerMode = .five
                     self.stepEnvelope()
-                    self.stepSweep()
                     self.stepLength()
+                    self.stepSweep()
                 } else {
                     self.sequencerMode = .four
                 }
@@ -276,26 +278,26 @@ extension APU {
                 self.stepEnvelope()
             case 14913: // Step 2
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
+                self.stepSweep()
             case 22371: // Step 3
                 self.stepEnvelope()
             case 29828:
                 if !self.frameIrqInhibited {
-                    self.status[.frameIrqEnabled] = true
+                    self.frameIrqEnabled = true
                     self.generateIRQ()
                 }
             case 29829: // Step 4
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
+                self.stepSweep()
                 if !self.frameIrqInhibited {
-                    self.status[.frameIrqEnabled] = true
+                    self.frameIrqEnabled = true
                     self.generateIRQ()
                 }
             case 29830:
                 if !self.frameIrqInhibited {
-                    self.status[.frameIrqEnabled] = true
+                    self.frameIrqEnabled = true
                     self.generateIRQ()
                 }
                 self.sequencerCount = 0
@@ -308,16 +310,16 @@ extension APU {
                 self.stepEnvelope()
             case 14913: // Step 2
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
+                self.stepSweep()
             case 22371: // Step 3
                 self.stepEnvelope()
             case 29829: // Step 4
                 break
             case 37281: // Step 5
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
+                self.stepSweep()
             case 37282:
                 self.sequencerCount = 0
             default:
