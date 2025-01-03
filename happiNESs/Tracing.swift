@@ -61,7 +61,7 @@ func trace(cpu: CPU) -> String {
             partialAsm = String(format: "$%02X,Y @ %02X = %02X", nextByte, absoluteAddress, value)
         case .indirectX:
             partialAsm = String(format: "($%02X,X) @ %02X = %04X = %02X", nextByte, nextByte &+ cpu.xRegister, absoluteAddress, value)
-        case .indirectY:
+        case .indirectY, .indirectYDummyRead:
             partialAsm = String(format: "($%02X),Y = %04X @ %04X = %02X", nextByte, absoluteAddress &- UInt16(cpu.yRegister), absoluteAddress, value)
         case .relative:
             let address = if nextByte >> 7 == 0 {
@@ -94,9 +94,9 @@ func trace(cpu: CPU) -> String {
             } else {
                 partialAsm = String(format: "$%04X = %02X", absoluteAddress, value)
             }
-        case .absoluteX:
+        case .absoluteX, .absoluteXDummyRead:
             partialAsm = String(format: "$%04X,X @ %04X = %02X", address, absoluteAddress, value)
-        case .absoluteY:
+        case .absoluteY, .absoluteYDummyRead:
             partialAsm = String(format: "$%04X,Y @ %04X = %02X", address, absoluteAddress, value)
         default:
             fatalError("Unexpected addressing mode encountered while tracing!")
