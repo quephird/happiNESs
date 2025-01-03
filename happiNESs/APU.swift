@@ -83,7 +83,7 @@ extension APU {
         value[.noiseEnabled] = self.noise.lengthCounter.value > 0
         value[.dmcEnabled] = self.dmc.currentLength > 0
         value[.frameIrqEnabled] = self.frameIrqEnabled
-        value[.apuStatusUnused3] = self.dmc.irqEnabled
+        value[.apuStatusUnused3] = self.dmc.irqTriggered
 
         return value
     }
@@ -160,7 +160,7 @@ extension APU {
         self.triangle.setEnabled(enabled: byte[.triangleEnabled])
         self.noise.setEnabled(enabled: byte[.noiseEnabled])
         self.dmc.enabled = byte[.dmcEnabled]
-        self.dmc.irqEnabled = false
+        self.dmc.irqTriggered = false
 
         if !self.dmc.enabled {
             self.dmc.currentLength = 0

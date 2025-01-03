@@ -14,6 +14,7 @@ public struct DMCChannel {
     public var enabled: Bool = false
 
     public var irqEnabled: Bool = false
+    public var irqTriggered: Bool = false
     private var loopEnabled: Bool = false
     private var loopPeriod: UInt8 = 0x00
     private var loopValue: UInt8 = 0x00
@@ -32,6 +33,7 @@ public struct DMCChannel {
         self.enabled = false
 
         self.irqEnabled = false
+        self.irqTriggered = false
         self.loopEnabled = false
         self.loopPeriod = 0x00
         self.loopValue = 0x00
@@ -51,6 +53,9 @@ public struct DMCChannel {
 extension DMCChannel {
     mutating public func writeController(byte: UInt8) {
         self.irqEnabled = byte[.dmcIrqEnabled] == 1
+        if !self.irqEnabled {
+            self.irqTriggered = false
+        }
         self.loopEnabled = byte[.dmcLoopEnabled] == 1
         self.loopPeriod = Self.periodTable[Int(byte[.dmcPeriod])]
     }
@@ -101,8 +106,13 @@ extension DMCChannel {
             }
 
             self.currentLength -= 1
-            if self.currentLength == 0 && self.loopEnabled {
-                self.restart()
+            if self.currentLength == 0 {
+                if self.loopEnabled {
+                    self.restart()
+                } else if self.irqEnabled {
+                    self.irqTriggered = true
+                    self.bus!.triggerIrq()
+                }
             }
         }
     }
