@@ -57,7 +57,7 @@ extension DMCChannel {
             self.irqTriggered = false
         }
         self.loopEnabled = byte[.dmcLoopEnabled] == 1
-        self.loopPeriod = Self.periodTable[Int(byte[.dmcPeriod])]
+        self.loopPeriod = Self.periodTable[Int(byte[.dmcPeriod])] - 1
     }
 
     mutating public func writeLoadCounter(byte: UInt8) {
