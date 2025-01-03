@@ -15,86 +15,74 @@ public struct TriangleChannel {
     ]
 
     // TODO: Need comments explaining all these fields!!!
-    public var enabled: Bool = false
-    public var controlFlagEnabled: Bool = false
-    public var linearCounterReloadFLag: Bool = false
-    public var linearCounterReload: UInt8 = 0x00
+    public var linearCounterEnabled: Bool = false
+    public var linearCounterReload: Bool = false
+    public var linearCounterPeriod: UInt8 = 0x00
     public var linearCounterValue: UInt8 = 0x00
-    public var lengthCounterValue: UInt8 = 0x00
-    public var timerPeriod: UInt16 = 0x0000
-    public var timerValue: UInt16 = 0x0000
+
+    public var lengthCounter: LengthCounter = LengthCounter()
+    private var timer: Timer = Timer()
     public var dutyIndex: Int = 0
 
     mutating public func reset() {
-        self.enabled = false
-        self.controlFlagEnabled = false
-        self.linearCounterReloadFLag = false
-        self.linearCounterReload = 0x00
+        self.linearCounterEnabled = false
+        self.linearCounterReload = false
+        self.linearCounterPeriod = 0x00
         self.linearCounterValue = 0x00
-        self.lengthCounterValue = 0x00
-        self.timerPeriod = 0x0000
-        self.timerValue = 0x0000
+
+        self.lengthCounter.reset()
+        self.timer.reset()
         self.dutyIndex = 0
     }
 }
 
 extension TriangleChannel {
+    mutating public func setEnabled(enabled: Bool) {
+        self.lengthCounter.setEnabled(enabled: enabled)
+    }
+
     mutating public func writeController(byte: UInt8) {
-        self.controlFlagEnabled = byte[.triangleControlFlag] == 0
-        self.linearCounterReload = byte[.triangleLinearCounterReload]
+        self.lengthCounter.halted = byte[.triangleControlFlag] == 1
+        self.linearCounterEnabled = byte[.triangleControlFlag] == 1
+        self.linearCounterPeriod = byte[.triangleLinearCounterReload]
     }
 
     mutating public func writeTimerLow(byte: UInt8) {
-        self.timerPeriod = (self.timerPeriod & 0b0000_0111_0000_0000) | UInt16(byte)
+        self.timer.setValueLow(value: byte)
     }
 
     mutating public func writeLengthAndTimerHigh(byte: UInt8) {
-        self.lengthCounterValue = APU.lengthTable[Int(byte[.triangleLengthCounter])]
-        self.timerPeriod = (self.timerPeriod & 0b0000_0000_1111_1111) | UInt16(byte[.triangleTimerHigh]) << 8
-        self.timerValue = self.timerPeriod + 1
-        self.linearCounterReloadFLag = true
+        self.lengthCounter.setValue(index: byte[.triangleLengthCounter])
+        self.timer.setValueHigh(value: byte[.triangleTimerHigh])
+        self.linearCounterReload = true
     }
 
     mutating public func stepTimer() {
-        if self.timerValue == 0 {
-            self.timerValue = self.timerPeriod + 1
-
-            if self.lengthCounterValue > 0 && self.linearCounterValue > 0 {
+        if self.timer.step() {
+            if self.lengthCounter.value > 0 && self.linearCounterValue > 0 {
                 self.dutyIndex = (self.dutyIndex + 1) % Self.sampleValues.count
             }
-        } else {
-            self.timerValue -= 1
         }
     }
 
     mutating public func stepCounter() {
-        if self.linearCounterReloadFLag {
-            self.linearCounterValue = self.linearCounterReload
+        if self.linearCounterReload {
+            self.linearCounterValue = self.linearCounterPeriod
         } else if self.linearCounterValue > 0 {
             self.linearCounterValue -= 1
         }
 
-        if self.controlFlagEnabled {
-            self.linearCounterReloadFLag = false
+        if !self.linearCounterEnabled {
+            self.linearCounterReload = false
         }
     }
 
     mutating public func stepLength() {
-        if self.controlFlagEnabled && self.lengthCounterValue > 0 {
-            self.lengthCounterValue -= 1
-        }
+        self.lengthCounter.step()
     }
 
     public func getSample() -> UInt8 {
-        if !self.enabled {
-            return 0
-        }
-
-        if self.timerPeriod < 3 {
-            return 0
-        }
-
-        if self.lengthCounterValue == 0 {
+        if self.lengthCounter.value == 0 {
             return 0
         }
 
@@ -102,6 +90,10 @@ extension TriangleChannel {
             return 0
         }
 
-        return Self.sampleValues[self.dutyIndex]
+        if self.timer.period < 2 {
+            return 7
+        } else {
+            return Self.sampleValues[self.dutyIndex]
+        }
     }
 }
