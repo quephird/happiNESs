@@ -16,46 +16,42 @@ public struct NoiseChannel {
     ]
 
     // TODO: Need comments explaining all these fields!!!
-    public var enabled: Bool = false
     private var controlFlag: NoiseControlFlag = .lengthCounterEnabled
     private var constantVolumeFlag: Bool = false
     private var constantVolume: UInt8 = 0x00
-    private var envelopeStart: Bool = false
-    private var envelopePeriod: UInt8 = 0x00
-    private var envelopeValue: UInt8 = 0x00
-    private var envelopeVolume: UInt8 = 0x00
     private var mode: Int = 1
     private var shiftRegister: UInt16 = 0x0001
     private var timerPeriod: UInt16 = 0x0000
     private var timerValue: UInt16 = 0x0000
-    public var lengthCounterValue: UInt8 = 0x00
+
     private var dutyIndex: Int = 0
+    public var lengthCounter: LengthCounter = LengthCounter()
+    private var envelope: Envelope = Envelope()
 
     mutating public func reset() {
-        self.enabled = false
         self.controlFlag = .lengthCounterEnabled
         self.constantVolumeFlag = false
         self.constantVolume = 0x00
-        self.envelopeStart = false
-        self.envelopePeriod = 0x00
-        self.envelopeValue = 0x00
-        self.envelopeVolume = 0x00
         self.mode = 1
         self.shiftRegister = 0x0001
         self.timerPeriod = 0x0000
         self.timerValue = 0x0000
-        self.lengthCounterValue = 0x00
+        self.lengthCounter.reset()
+        self.envelope.reset()
         self.dutyIndex = 0
     }
 }
 
 extension NoiseChannel {
+    mutating public func setEnabled(enabled: Bool) {
+        self.lengthCounter.setEnabled(enabled: enabled)
+    }
+
     mutating public func writeController(byte: UInt8) {
-        self.controlFlag = byte[.noiseControlFlag] == 1 ? .envelopeLoop : .lengthCounterEnabled
-        self.constantVolumeFlag = byte[.noiseConstantVolumeFlag] == 1
-        self.envelopePeriod = byte[.noiseVolume]
-        self.constantVolume = byte[.noiseVolume]
-        self.envelopeStart = true
+        self.lengthCounter.halted = byte[.noiseControlFlag] == 1
+        self.envelope.loopEnabled = byte[.noiseControlFlag] == 1
+        self.envelope.constantVolume = byte[.noiseConstantVolumeFlag] == 1
+        self.envelope.timer.period = UInt16(byte[.noiseVolume])
     }
 
     mutating public func writeLoopAndPeriod(byte: UInt8) {
@@ -64,8 +60,8 @@ extension NoiseChannel {
     }
 
     mutating public func writeLength(byte: UInt8) {
-        self.lengthCounterValue = APU.lengthTable[Int(byte[.noiseLengthCounter])]
-        self.envelopeStart = true
+        self.lengthCounter.setValue(index: byte[.noiseLengthCounter])
+        self.envelope.started = true
     }
 
     mutating public func stepTimer() {
@@ -82,35 +78,15 @@ extension NoiseChannel {
     }
 
     mutating public func stepEnvelope() {
-        if self.envelopeStart {
-            self.envelopeVolume = 15
-            self.envelopeValue = self.envelopePeriod
-            self.envelopeStart = false
-        } else if self.envelopeValue > 0 {
-            self.envelopeValue -= 1
-        } else {
-            if self.envelopeVolume > 0 {
-                self.envelopeVolume -= 1
-            } else if self.controlFlag == .envelopeLoop {
-                self.envelopeVolume = 15
-            }
-
-            self.envelopeValue = self.envelopePeriod
-        }
+        self.envelope.step()
     }
 
     mutating public func stepLength() {
-        if self.controlFlag == .lengthCounterEnabled && self.lengthCounterValue > 0 {
-            self.lengthCounterValue -= 1
-        }
+        self.lengthCounter.step()
     }
 
     public func getSample() -> UInt8 {
-        if !self.enabled {
-            return 0
-        }
-
-        if self.lengthCounterValue == 0 {
+        if self.lengthCounter.value == 0 {
             return 0
         }
 
@@ -118,10 +94,6 @@ extension NoiseChannel {
             return 0
         }
 
-        if self.constantVolumeFlag {
-            return self.constantVolume
-        } else {
-            return self.envelopeVolume
-        }
+        return self.envelope.getSample()
     }
 }
