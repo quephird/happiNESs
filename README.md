@@ -139,6 +139,7 @@ So far, the following test ROMs all pass:
 - official\_only.nes
 - ppu\_vbl\_nmi.nes
 - test\_ppu\_read\_buffer.nes
+- apu\_test_nes
 
 For example, running `nestest.nes` results in the following:
 
