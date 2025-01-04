@@ -9,7 +9,7 @@ enum RegisterBitMask: Register {
     case apuStatus
 
     case triangleControlFlag
-    case triangleLinearCounterReload
+    case triangleLinearCounterPeriod
 
     case triangleLengthCounter
     case triangleTimerHigh
@@ -47,7 +47,7 @@ enum RegisterBitMask: Register {
         case .apuStatus:                   0b0001_1111
 
         case .triangleControlFlag:         0b1000_0000
-        case .triangleLinearCounterReload: 0b0111_1111
+        case .triangleLinearCounterPeriod: 0b0111_1111
 
         case .triangleLengthCounter:       0b1111_1000
         case .triangleTimerHigh:           0b0000_0111

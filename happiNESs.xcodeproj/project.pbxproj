@@ -77,6 +77,7 @@
 		87DC936A2D247F4F008D65D2 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC93692D247F4C008D65D2 /* Timer.swift */; };
 		87DC936C2D248527008D65D2 /* Envelope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC936B2D248523008D65D2 /* Envelope.swift */; };
 		87DC936E2D28BE54008D65D2 /* apu_test.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87DC936D2D28BE54008D65D2 /* apu_test.nes */; };
+		87DC93702D28C367008D65D2 /* LinearCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC936F2D28C363008D65D2 /* LinearCounter.swift */; };
 		87E981472CD076660090A200 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981462CD076660090A200 /* Mapper.swift */; };
 		87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981522CD8B5990090A200 /* NMIDelayState.swift */; };
 		87E981562CD9A6950090A200 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981552CD9A6950090A200 /* nestest.nes */; };
@@ -207,6 +208,7 @@
 		87DC93692D247F4C008D65D2 /* Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
 		87DC936B2D248523008D65D2 /* Envelope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Envelope.swift; sourceTree = "<group>"; };
 		87DC936D2D28BE54008D65D2 /* apu_test.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = apu_test.nes; sourceTree = "<group>"; };
+		87DC936F2D28C363008D65D2 /* LinearCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinearCounter.swift; sourceTree = "<group>"; };
 		87E981462CD076660090A200 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
 		87E981522CD8B5990090A200 /* NMIDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NMIDelayState.swift; sourceTree = "<group>"; };
 		87E981552CD9A6950090A200 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
@@ -414,6 +416,7 @@
 				874F51B42CC1D05D00B12037 /* PulseChannel.swift */,
 				87DC936B2D248523008D65D2 /* Envelope.swift */,
 				87DC93672D2471DA008D65D2 /* LengthCounter.swift */,
+				87DC936F2D28C363008D65D2 /* LinearCounter.swift */,
 				87DC93692D247F4C008D65D2 /* Timer.swift */,
 			);
 			path = Channels;
@@ -653,6 +656,7 @@
 				870AABE02CB37EA000E9F3B6 /* CPU+instructions.swift in Sources */,
 				8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */,
 				87F2345A2CE85E0100D2FDA6 /* HighPassFilter.swift in Sources */,
+				87DC93702D28C367008D65D2 /* LinearCounter.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
 				879F665B2D0FB1BC00DF8AB1 /* Interruptible.swift in Sources */,

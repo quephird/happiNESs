@@ -14,23 +14,14 @@ public struct TriangleChannel {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
     ]
 
-    // TODO: Need comments explaining all these fields!!!
-    public var linearCounterEnabled: Bool = false
-    public var linearCounterReload: Bool = false
-    public var linearCounterPeriod: UInt8 = 0x00
-    public var linearCounterValue: UInt8 = 0x00
-
     public var lengthCounter: LengthCounter = LengthCounter()
+    public var linearCounter: LinearCounter = LinearCounter()
     private var timer: Timer = Timer()
     public var dutyIndex: Int = 0
 
     mutating public func reset() {
-        self.linearCounterEnabled = false
-        self.linearCounterReload = false
-        self.linearCounterPeriod = 0x00
-        self.linearCounterValue = 0x00
-
         self.lengthCounter.reset()
+        self.linearCounter.reset()
         self.timer.reset()
         self.dutyIndex = 0
     }
@@ -43,8 +34,8 @@ extension TriangleChannel {
 
     mutating public func writeController(byte: UInt8) {
         self.lengthCounter.halted = byte[.triangleControlFlag] == 1
-        self.linearCounterEnabled = byte[.triangleControlFlag] == 1
-        self.linearCounterPeriod = byte[.triangleLinearCounterReload]
+        self.linearCounter.enabled = byte[.triangleControlFlag] == 1
+        self.linearCounter.period = byte[.triangleLinearCounterPeriod]
     }
 
     mutating public func writeTimerLow(byte: UInt8) {
@@ -54,27 +45,19 @@ extension TriangleChannel {
     mutating public func writeLengthCounterAndTimerHigh(byte: UInt8) {
         self.lengthCounter.setValue(index: byte[.triangleLengthCounter])
         self.timer.setValueHigh(value: byte[.triangleTimerHigh])
-        self.linearCounterReload = true
+        self.linearCounter.reload = true
     }
 
     mutating public func stepTimer() {
         if self.timer.step() {
-            if self.lengthCounter.value > 0 && self.linearCounterValue > 0 {
+            if self.lengthCounter.value > 0 && self.linearCounter.value > 0 {
                 self.dutyIndex = (self.dutyIndex + 1) % Self.sampleValues.count
             }
         }
     }
 
     mutating public func stepLinearCounter() {
-        if self.linearCounterReload {
-            self.linearCounterValue = self.linearCounterPeriod
-        } else if self.linearCounterValue > 0 {
-            self.linearCounterValue -= 1
-        }
-
-        if !self.linearCounterEnabled {
-            self.linearCounterReload = false
-        }
+        self.linearCounter.step()
     }
 
     mutating public func stepLengthCounter() {
@@ -86,7 +69,7 @@ extension TriangleChannel {
             return 0
         }
 
-        if self.linearCounterValue == 0 {
+        if self.linearCounter.value == 0 {
             return 0
         }
 
