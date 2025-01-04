@@ -40,4 +40,8 @@ final class ROMTests: XCTestCase {
     func testPpuVblNmi() throws {
         try testBlarggRom(romName: "ppu_vbl_nmi", cpu: self.cpu)
     }
+
+    func testApu() throws {
+        try testBlarggRom(romName: "apu_test", cpu: self.cpu)
+    }
 }

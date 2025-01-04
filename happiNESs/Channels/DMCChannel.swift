@@ -13,7 +13,8 @@ public struct DMCChannel {
     public var bus: Bus? = nil
     public var enabled: Bool = false
 
-    private var irqEnabled: Bool = false
+    public var irqEnabled: Bool = false
+    public var irqTriggered: Bool = false
     private var loopEnabled: Bool = false
     private var loopPeriod: UInt8 = 0x00
     private var loopValue: UInt8 = 0x00
@@ -32,6 +33,7 @@ public struct DMCChannel {
         self.enabled = false
 
         self.irqEnabled = false
+        self.irqTriggered = false
         self.loopEnabled = false
         self.loopPeriod = 0x00
         self.loopValue = 0x00
@@ -49,21 +51,37 @@ public struct DMCChannel {
 }
 
 extension DMCChannel {
-    mutating public func updateRegister1(byte: UInt8) {
-        self.irqEnabled = byte[.dmcIrqEnabled] == 1
-        self.loopEnabled = byte[.dmcLoopEnabled] == 1
-        self.loopPeriod = Self.periodTable[Int(byte[.dmcPeriod])]
+    mutating public func setEnabled(enabled: Bool) {
+        self.enabled = enabled
+        self.irqTriggered = false
+
+        if !self.enabled {
+            self.currentLength = 0
+        } else {
+            if self.currentLength == 0 {
+                self.restart()
+            }
+        }
     }
 
-    mutating public func updateRegister2(byte: UInt8) {
+    mutating public func writeController(byte: UInt8) {
+        self.irqEnabled = byte[.dmcIrqEnabled] == 1
+        if !self.irqEnabled {
+            self.irqTriggered = false
+        }
+        self.loopEnabled = byte[.dmcLoopEnabled] == 1
+        self.loopPeriod = Self.periodTable[Int(byte[.dmcPeriod])] - 1
+    }
+
+    mutating public func writeLoadCounter(byte: UInt8) {
         self.loadCounter = byte[.dmcLoadCounter]
     }
 
-    mutating public func updateRegister3(byte: UInt8) {
+    mutating public func writeSampleAddress(byte: UInt8) {
         self.sampleAddress = 0xC000 | (UInt16(byte) << 6)
     }
 
-    mutating public func updateRegister4(byte: UInt8) {
+    mutating public func writeSampleLength(byte: UInt8) {
         self.sampleLength = (UInt16(byte) << 4) | 0x0001
     }
 }
@@ -101,8 +119,13 @@ extension DMCChannel {
             }
 
             self.currentLength -= 1
-            if self.currentLength == 0 && self.loopEnabled {
-                self.restart()
+            if self.currentLength == 0 {
+                if self.loopEnabled {
+                    self.restart()
+                } else if self.irqEnabled {
+                    self.irqTriggered = true
+                    self.bus!.triggerIrq()
+                }
             }
         }
     }

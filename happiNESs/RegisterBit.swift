@@ -63,7 +63,7 @@ package enum RegisterBit {
     case apuFrameCounterUnused4
     case apuFrameCounterUnused5
     case apuFrameCounterUnused6
-    case frameIrqInhibited
+    case frameIrqEnabled
     case sequencerMode
 
     var bitIndex: Int {
@@ -89,7 +89,7 @@ package enum RegisterBit {
             .apuStatusUnused1, .apuFrameCounterUnused6:
             5
         case .overflow, .spriteZeroHit, .masterSlaveSelect, .emphasizeGreen,
-            .apuStatusUnused2, .frameIrqInhibited:
+            .apuStatusUnused2, .frameIrqEnabled:
             6
         case .negative, .verticalBlankStarted, .generateNmi, .emphasizeBlue,
             .apuStatusUnused3, .sequencerMode:

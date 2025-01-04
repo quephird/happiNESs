@@ -73,6 +73,11 @@
 		87C5B32E2CDD71D9008580A6 /* TimingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C5B32D2CDD71D9008580A6 /* TimingMode.swift */; };
 		87D265152C9146F400C143B1 /* ViewPort.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265142C9146F400C143B1 /* ViewPort.swift */; };
 		87D265172C9DECAF00C143B1 /* MapperNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87D265162C9DECAF00C143B1 /* MapperNumber.swift */; };
+		87DC93682D2471DF008D65D2 /* LengthCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC93672D2471DA008D65D2 /* LengthCounter.swift */; };
+		87DC936A2D247F4F008D65D2 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC93692D247F4C008D65D2 /* Timer.swift */; };
+		87DC936C2D248527008D65D2 /* Envelope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC936B2D248523008D65D2 /* Envelope.swift */; };
+		87DC936E2D28BE54008D65D2 /* apu_test.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87DC936D2D28BE54008D65D2 /* apu_test.nes */; };
+		87DC93702D28C367008D65D2 /* LinearCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC936F2D28C363008D65D2 /* LinearCounter.swift */; };
 		87E981472CD076660090A200 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981462CD076660090A200 /* Mapper.swift */; };
 		87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981522CD8B5990090A200 /* NMIDelayState.swift */; };
 		87E981562CD9A6950090A200 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981552CD9A6950090A200 /* nestest.nes */; };
@@ -199,6 +204,11 @@
 		87C5B32D2CDD71D9008580A6 /* TimingMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimingMode.swift; sourceTree = "<group>"; };
 		87D265142C9146F400C143B1 /* ViewPort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPort.swift; sourceTree = "<group>"; };
 		87D265162C9DECAF00C143B1 /* MapperNumber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapperNumber.swift; sourceTree = "<group>"; };
+		87DC93672D2471DA008D65D2 /* LengthCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LengthCounter.swift; sourceTree = "<group>"; };
+		87DC93692D247F4C008D65D2 /* Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
+		87DC936B2D248523008D65D2 /* Envelope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Envelope.swift; sourceTree = "<group>"; };
+		87DC936D2D28BE54008D65D2 /* apu_test.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = apu_test.nes; sourceTree = "<group>"; };
+		87DC936F2D28C363008D65D2 /* LinearCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinearCounter.swift; sourceTree = "<group>"; };
 		87E981462CD076660090A200 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
 		87E981522CD8B5990090A200 /* NMIDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NMIDelayState.swift; sourceTree = "<group>"; };
 		87E981552CD9A6950090A200 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
@@ -404,6 +414,10 @@
 				878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */,
 				874F51AE2CBF10DA00B12037 /* TriangleChannel.swift */,
 				874F51B42CC1D05D00B12037 /* PulseChannel.swift */,
+				87DC936B2D248523008D65D2 /* Envelope.swift */,
+				87DC93672D2471DA008D65D2 /* LengthCounter.swift */,
+				87DC936F2D28C363008D65D2 /* LinearCounter.swift */,
+				87DC93692D247F4C008D65D2 /* Timer.swift */,
 			);
 			path = Channels;
 			sourceTree = "<group>";
@@ -424,6 +438,7 @@
 		87E981542CD9A6170090A200 /* roms */ = {
 			isa = PBXGroup;
 			children = (
+				87DC936D2D28BE54008D65D2 /* apu_test.nes */,
 				879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */,
 				879F66A62D137E9D00DF8AB1 /* official_only.nes */,
 				87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */,
@@ -582,6 +597,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				879F66A92D137EDB00DF8AB1 /* test_ppu_read_buffer.nes in Resources */,
+				87DC936E2D28BE54008D65D2 /* apu_test.nes in Resources */,
 				879F66A72D137E9D00DF8AB1 /* official_only.nes in Resources */,
 				87E981582CD9A6BF0090A200 /* ppu_vbl_nmi.nes in Resources */,
 				87E981562CD9A6950090A200 /* nestest.nes in Resources */,
@@ -621,8 +637,10 @@
 				874F51A92CBEEBA700B12037 /* APU.swift in Sources */,
 				875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */,
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
+				87DC936C2D248527008D65D2 /* Envelope.swift in Sources */,
 				8744B18F2C1CBB46001B44B5 /* Opcode.swift in Sources */,
 				874F51922CB9B51C00B12037 /* CachedSprite.swift in Sources */,
+				87DC93682D2471DF008D65D2 /* LengthCounter.swift in Sources */,
 				87C5B3292CD9C3C9008580A6 /* Mmc1.swift in Sources */,
 				874F51AD2CBF05BC00B12037 /* Register.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
@@ -638,6 +656,7 @@
 				870AABE02CB37EA000E9F3B6 /* CPU+instructions.swift in Sources */,
 				8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */,
 				87F2345A2CE85E0100D2FDA6 /* HighPassFilter.swift in Sources */,
+				87DC93702D28C367008D65D2 /* LinearCounter.swift in Sources */,
 				871932102C372F6900A73C22 /* Bus.swift in Sources */,
 				871932122C37985700A73C22 /* Mirroring.swift in Sources */,
 				879F665B2D0FB1BC00DF8AB1 /* Interruptible.swift in Sources */,
@@ -651,6 +670,7 @@
 				87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
 				87F234532CE8567F00D2FDA6 /* Filter.swift in Sources */,
+				87DC936A2D247F4F008D65D2 /* Timer.swift in Sources */,
 				8744B1772C1CB9B3001B44B5 /* happiNESs.docc in Sources */,
 				874F51B12CC03F1500B12037 /* RegisterBitMask.swift in Sources */,
 				879F66A52D125F4800DF8AB1 /* OpenBus.swift in Sources */,

@@ -26,6 +26,7 @@ public struct APU {
     public var cycles: Int = 0
     private var sequencerMode: SequencerMode = .four
     private var sequencerCount: Int = 0
+    private var frameIrqInhibited: Bool = false
     private var frameIrqEnabled: Bool = false
     public var sampleRate: Float
 
@@ -38,6 +39,8 @@ public struct APU {
 
     public var status: Register = 0x00
     public var buffer = AudioRingBuffer()
+    private var newSequencerValue: UInt8?
+    private var newSequencerValueDelay: Int = 0
 
     public init(sampleRate: Float) {
         self.sampleRate = sampleRate
@@ -54,7 +57,8 @@ public struct APU {
     }
 
     mutating public func reset() {
-        self.status = 0x00
+        self.frameIrqInhibited = false
+        self.frameIrqEnabled = false
 
         self.pulse1.reset()
         self.pulse2.reset()
@@ -63,64 +67,83 @@ public struct APU {
         self.dmc.reset()
         self.buffer.reset()
 
+        self.newSequencerValue = nil
+        self.newSequencerValueDelay = 0
+
         self.sequencerCount = 0
     }
 }
 
 extension APU {
-    public func readByte(address: UInt16) -> UInt8 {
-        switch address {
+    private func readStatus() -> UInt8 {
+        var value: UInt8 = 0x00
+        value[.pulse1Enabled] = self.pulse1.lengthCounter.value > 0
+        value[.pulse2Enabled] = self.pulse2.lengthCounter.value > 0
+        value[.triangleEnabled] = self.triangle.lengthCounter.value > 0
+        value[.noiseEnabled] = self.noise.lengthCounter.value > 0
+        value[.dmcEnabled] = self.dmc.currentLength > 0
+        value[.frameIrqEnabled] = self.frameIrqEnabled
+        value[.apuStatusUnused3] = self.dmc.irqTriggered
+
+        return value
+    }
+
+    mutating public func readByte(address: UInt16) -> UInt8 {
+        let value = switch address {
         case 0x4015:
-            self.status[.apuStatus]
+            self.readStatus()
         default:
-            0x00
+            UInt8(0x00)
         }
+
+        self.frameIrqEnabled = false
+        return value
     }
 
     mutating public func writeByte(address: UInt16, byte: UInt8) {
         switch address {
         case 0x4000:
-            self.pulse1.updateRegister1(byte: byte)
+            self.pulse1.writeController(byte: byte)
         case 0x4001:
-            self.pulse1.updateRegister2(byte: byte)
+            self.pulse1.writeSweep(byte: byte)
         case 0x4002:
-            self.pulse1.updateRegister3(byte: byte)
+            self.pulse1.writeTimerLow(byte: byte)
         case 0x4003:
-            self.pulse1.updateRegister4(byte: byte)
+            self.pulse1.writeLengthCounterAndTimerHigh(byte: byte)
         case 0x4004:
-            self.pulse2.updateRegister1(byte: byte)
+            self.pulse2.writeController(byte: byte)
         case 0x4005:
-            self.pulse2.updateRegister2(byte: byte)
+            self.pulse2.writeSweep(byte: byte)
         case 0x4006:
-            self.pulse2.updateRegister3(byte: byte)
+            self.pulse2.writeTimerLow(byte: byte)
         case 0x4007:
-            self.pulse2.updateRegister4(byte: byte)
+            self.pulse2.writeLengthCounterAndTimerHigh(byte: byte)
         case 0x4008:
-            self.triangle.updateRegister1(byte: byte)
+            self.triangle.writeController(byte: byte)
         case 0x4009:
             // Unused register
             break
         case 0x400A:
-            self.triangle.updateRegister3(byte: byte)
+            self.triangle.writeTimerLow(byte: byte)
         case 0x400B:
-            self.triangle.updateRegister4(byte: byte)
+            self.triangle.writeLengthCounterAndTimerHigh(byte: byte)
         case 0x400C:
-            self.noise.updateRegister1(byte: byte)
+            self.noise.writeController(byte: byte)
         case 0x400D:
             // Unused register
             break
         case 0x400E:
-            self.noise.updateRegister3(byte: byte)
+            self.noise.writeLoopAndPeriod(byte: byte)
         case 0x400F:
-            self.noise.updateRegister4(byte: byte)
+            self.noise.writeLengthCounter(byte: byte)
         case 0x4010:
-            self.dmc.updateRegister1(byte: byte)
+            self.dmc.writeController(byte: byte)
         case 0x4011:
-            self.dmc.updateRegister2(byte: byte)
+            self.dmc.writeLoadCounter(byte: byte)
         case 0x4012:
-            self.dmc.updateRegister3(byte: byte)
+            self.dmc.writeSampleAddress(byte: byte)
         case 0x4013:
-            self.dmc.updateRegister4(byte: byte)
+            self.dmc.writeSampleLength(byte: byte)
         case 0x4015:
             self.updateStatus(byte: byte)
         case 0x4017:
@@ -132,43 +155,33 @@ extension APU {
     }
 
     mutating public func updateStatus(byte: UInt8) {
-        self.status = byte[.apuStatus]
-
-        self.pulse1.enabled = self.status[.pulse1Enabled]
-        self.pulse2.enabled = self.status[.pulse2Enabled]
-        self.triangle.enabled = self.status[.triangleEnabled]
-        self.noise.enabled = self.status[.noiseEnabled]
-        self.dmc.enabled = self.status[.dmcEnabled]
-
-        if !self.pulse1.enabled {
-            self.pulse1.lengthCounterValue = 0x00
-        }
-        if !self.pulse2.enabled {
-            self.pulse2.lengthCounterValue = 0x00
-        }
-        if !self.triangle.enabled {
-            self.triangle.lengthCounterValue = 0x00
-        }
-        if !self.noise.enabled {
-            self.noise.lengthCounterValue = 0x00
-        }
-        if !self.dmc.enabled {
-            self.dmc.currentLength = 0
-        } else {
-            if self.dmc.currentLength == 0 {
-                self.dmc.restart()
-            }
-        }
+        self.pulse1.setEnabled(enabled: byte[.pulse1Enabled])
+        self.pulse2.setEnabled(enabled: byte[.pulse2Enabled])
+        self.triangle.setEnabled(enabled: byte[.triangleEnabled])
+        self.noise.setEnabled(enabled: byte[.noiseEnabled])
+        self.dmc.setEnabled(enabled: byte[.dmcEnabled])
     }
 
     mutating public func updateSequencer(byte: UInt8) {
-        self.sequencerMode = byte[.sequencerMode] ? .five : .four
-        self.frameIrqEnabled = !byte[.frameIrqInhibited]
+        // NOTA BENE: The setting of the sequencer mode is _not_ immediate
+        // and instead is delayed by 3 or 4 APU cycles, depending on whether
+        // the write to 0x4017 took place _during_ an APU cycle or between them,
+        // which we approximate below by checking the parity of the current value
+        // of cycles. See this wiki article for more details:
+        //
+        //     https://www.nesdev.org/wiki/APU_Frame_Counter
+        self.newSequencerValue = byte
+        if self.cycles % 2 == 0 {
+            self.newSequencerValueDelay = 3
+        } else {
+            self.newSequencerValueDelay = 4
+        }
 
-        if self.sequencerMode == .five {
-            self.stepEnvelope()
-            self.stepSweep()
-            self.stepLength()
+        if (byte & 0b0100_0000) > 0 {
+            self.frameIrqInhibited = true
+            self.frameIrqEnabled = false
+        } else {
+            self.frameIrqInhibited = false
         }
     }
 }
@@ -187,13 +200,38 @@ extension APU {
     // This function needs executes its body of instructions once for every tick
     // of the CPU, unlike for the PPU and mapper tick() functions.
     mutating public func tick() {
+        self.maybeUpdateSequencerMode()
         self.cycles += 1
 
-        self.stepTimer()
         self.stepSequencer()
+        self.stepTimer()
 
         if self.shouldSendSample {
             self.sendSample()
+        }
+    }
+
+    mutating private func maybeUpdateSequencerMode() {
+        if let frameCountValue = self.newSequencerValue {
+            if self.newSequencerValueDelay > 0 {
+                self.newSequencerValueDelay -= 1
+            } else {
+                // If the delay count is zero, then finally
+                // update the sequencer mode accordingly.
+                self.sequencerCount = 0
+
+                if frameCountValue[.sequencerMode] {
+                    self.sequencerMode = .five
+                    self.stepEnvelope()
+                    self.stepLength()
+                    self.stepSweep()
+                } else {
+                    self.sequencerMode = .four
+                }
+
+                self.newSequencerValueDelay = 0
+                self.newSequencerValue = nil
+            }
         }
     }
 
@@ -203,7 +241,16 @@ extension APU {
         //     "The triangle channel's timer is clocked on every CPU cycle,
         //     but the pulse, noise, and DMC timers are clocked only on every
         //     second CPU cycle and thus produce only even periods."
-
+        //
+        //     https://www.nesdev.org/wiki/APU#Glossary
+        //
+        // However, the NTSC numbers sourced from the wiki are double what they should be:
+        //
+        //     https://www.nesdev.org/wiki/APU_DMC
+        //
+        // This discussion clarifies this:
+        //
+        //     https://forums.nesdev.org/viewtopic.php?t=11277
         if self.cycles % 2 == 0 {
             self.pulse1.stepTimer()
             self.pulse2.stepTimer()
@@ -219,52 +266,58 @@ extension APU {
 
         // NOTA BENE: Constants used below taken from:
         //
-        //     https://github.com/starrhorne/nes-rust/blob/master/src/apu/frame_counter.rs#L66-L109
-        //
-        // Note that the figures are doubled here because the sequencer clocks
-        // at _half_ the rate of the CPU. Also, this is hardcoded to work with
-        // NTSC timings.
+        //     https://github.com/ichirin2501/rgnes/blob/master/nes/apu.go#L16-L19
         switch self.sequencerMode {
         case .four:
             switch self.sequencerCount {
-            case 7459: // Step 1
+            case 7457: // Step 1
                 self.stepEnvelope()
-            case 14915: // Step 2
+            case 14913: // Step 2
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
-            case 22373: // Step 3
+                self.stepSweep()
+            case 22371: // Step 3
                 self.stepEnvelope()
+            case 29828:
+                if !self.frameIrqInhibited {
+                    self.frameIrqEnabled = true
+                    self.generateIRQ()
+                }
+            case 29829: // Step 4
+                self.stepEnvelope()
+                self.stepLength()
+                self.stepSweep()
+                if !self.frameIrqInhibited {
+                    self.frameIrqEnabled = true
+                    self.generateIRQ()
+                }
             case 29830:
-                self.generateIRQ()
-            case 29831: // Step 4
-                self.stepEnvelope()
-                self.stepSweep()
-                self.stepLength()
-                self.generateIRQ()
-            case 29832:
-                self.generateIRQ()
-                self.sequencerCount = 2
+                if !self.frameIrqInhibited {
+                    self.frameIrqEnabled = true
+                    self.generateIRQ()
+                }
+                self.sequencerCount = 0
             default:
                 break
             }
         case .five:
             switch self.sequencerCount {
-            case 7459: // Step 1
+            case 7457: // Step 1
                 self.stepEnvelope()
-            case 14915: // Step 2
+            case 14913: // Step 2
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
-            case 22373: // Step 3
+                self.stepSweep()
+            case 22371: // Step 3
                 self.stepEnvelope()
-            case 29831: // Step 4
+            case 29829: // Step 4
                 break
-            case 37283: // Step 5
+            case 37281: // Step 5
                 self.stepEnvelope()
-                self.stepSweep()
                 self.stepLength()
-                self.sequencerCount = 1
+                self.stepSweep()
+            case 37282:
+                self.sequencerCount = 0
             default:
                 break
             }
@@ -274,7 +327,7 @@ extension APU {
     mutating private func stepEnvelope() {
         self.pulse1.stepEnvelope()
         self.pulse2.stepEnvelope()
-        self.triangle.stepCounter()
+        self.triangle.stepLinearCounter()
         self.noise.stepEnvelope()
     }
 
@@ -284,10 +337,10 @@ extension APU {
     }
 
     mutating private func stepLength() {
-        self.pulse1.stepLength()
-        self.pulse2.stepLength()
-        self.triangle.stepLength()
-        self.noise.stepLength()
+        self.pulse1.stepLengthCounter()
+        self.pulse2.stepLengthCounter()
+        self.triangle.stepLengthCounter()
+        self.noise.stepLengthCounter()
     }
 
     mutating private func sendSample() {
@@ -327,7 +380,7 @@ extension APU {
     }
 
     mutating private func generateIRQ() {
-        if self.frameIrqEnabled {
+        if self.status[.frameIrqEnabled] {
             self.bus!.triggerIrq()
         }
     }
