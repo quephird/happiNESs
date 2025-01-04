@@ -241,7 +241,16 @@ extension APU {
         //     "The triangle channel's timer is clocked on every CPU cycle,
         //     but the pulse, noise, and DMC timers are clocked only on every
         //     second CPU cycle and thus produce only even periods."
-
+        //
+        //     https://www.nesdev.org/wiki/APU#Glossary
+        //
+        // However, the NTSC numbers sourced from the wiki are double what they should be:
+        //
+        //     https://www.nesdev.org/wiki/APU_DMC
+        //
+        // This discussion clarifies this:
+        //
+        //     https://forums.nesdev.org/viewtopic.php?t=11277
         if self.cycles % 2 == 0 {
             self.pulse1.stepTimer()
             self.pulse2.stepTimer()
@@ -258,10 +267,6 @@ extension APU {
         // NOTA BENE: Constants used below taken from:
         //
         //     https://github.com/ichirin2501/rgnes/blob/master/nes/apu.go#L16-L19
-        //
-        // Note that the figures are doubled here because the sequencer clocks
-        // at _half_ the rate of the CPU. Also, this is hardcoded to work with
-        // NTSC timings.
         switch self.sequencerMode {
         case .four:
             switch self.sequencerCount {
