@@ -76,6 +76,7 @@
 		87DC93682D2471DF008D65D2 /* LengthCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC93672D2471DA008D65D2 /* LengthCounter.swift */; };
 		87DC936A2D247F4F008D65D2 /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC93692D247F4C008D65D2 /* Timer.swift */; };
 		87DC936C2D248527008D65D2 /* Envelope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87DC936B2D248523008D65D2 /* Envelope.swift */; };
+		87DC936E2D28BE54008D65D2 /* apu_test.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87DC936D2D28BE54008D65D2 /* apu_test.nes */; };
 		87E981472CD076660090A200 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981462CD076660090A200 /* Mapper.swift */; };
 		87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E981522CD8B5990090A200 /* NMIDelayState.swift */; };
 		87E981562CD9A6950090A200 /* nestest.nes in Resources */ = {isa = PBXBuildFile; fileRef = 87E981552CD9A6950090A200 /* nestest.nes */; };
@@ -205,6 +206,7 @@
 		87DC93672D2471DA008D65D2 /* LengthCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LengthCounter.swift; sourceTree = "<group>"; };
 		87DC93692D247F4C008D65D2 /* Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
 		87DC936B2D248523008D65D2 /* Envelope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Envelope.swift; sourceTree = "<group>"; };
+		87DC936D2D28BE54008D65D2 /* apu_test.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = apu_test.nes; sourceTree = "<group>"; };
 		87E981462CD076660090A200 /* Mapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mapper.swift; sourceTree = "<group>"; };
 		87E981522CD8B5990090A200 /* NMIDelayState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NMIDelayState.swift; sourceTree = "<group>"; };
 		87E981552CD9A6950090A200 /* nestest.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = nestest.nes; sourceTree = "<group>"; };
@@ -433,6 +435,7 @@
 		87E981542CD9A6170090A200 /* roms */ = {
 			isa = PBXGroup;
 			children = (
+				87DC936D2D28BE54008D65D2 /* apu_test.nes */,
 				879F66A82D137EDB00DF8AB1 /* test_ppu_read_buffer.nes */,
 				879F66A62D137E9D00DF8AB1 /* official_only.nes */,
 				87E981572CD9A6BF0090A200 /* ppu_vbl_nmi.nes */,
@@ -591,6 +594,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				879F66A92D137EDB00DF8AB1 /* test_ppu_read_buffer.nes in Resources */,
+				87DC936E2D28BE54008D65D2 /* apu_test.nes in Resources */,
 				879F66A72D137E9D00DF8AB1 /* official_only.nes in Resources */,
 				87E981582CD9A6BF0090A200 /* ppu_vbl_nmi.nes in Resources */,
 				87E981562CD9A6950090A200 /* nestest.nes in Resources */,
