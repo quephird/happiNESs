@@ -51,6 +51,19 @@ public struct DMCChannel {
 }
 
 extension DMCChannel {
+    mutating public func setEnabled(enabled: Bool) {
+        self.enabled = enabled
+        self.irqTriggered = false
+
+        if !self.enabled {
+            self.currentLength = 0
+        } else {
+            if self.currentLength == 0 {
+                self.restart()
+            }
+        }
+    }
+
     mutating public func writeController(byte: UInt8) {
         self.irqEnabled = byte[.dmcIrqEnabled] == 1
         if !self.irqEnabled {

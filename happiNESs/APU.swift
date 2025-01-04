@@ -159,16 +159,7 @@ extension APU {
         self.pulse2.setEnabled(enabled: byte[.pulse2Enabled])
         self.triangle.setEnabled(enabled: byte[.triangleEnabled])
         self.noise.setEnabled(enabled: byte[.noiseEnabled])
-        self.dmc.enabled = byte[.dmcEnabled]
-        self.dmc.irqTriggered = false
-
-        if !self.dmc.enabled {
-            self.dmc.currentLength = 0
-        } else {
-            if self.dmc.currentLength == 0 {
-                self.dmc.restart()
-            }
-        }
+        self.dmc.setEnabled(enabled: byte[.dmcEnabled])
     }
 
     mutating public func updateSequencer(byte: UInt8) {
