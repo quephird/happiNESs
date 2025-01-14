@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 10/15/24.
 //
 
-package enum RegisterBit {
+public enum RegisterBit {
     // CPU status register flags
     case carry
     case zero
@@ -15,6 +15,16 @@ package enum RegisterBit {
     case cpuStatusUnused
     case overflow
     case negative
+
+    // CPU joypad 1 status flags
+    case buttonA
+    case buttonB
+    case select
+    case start
+    case up
+    case down
+    case left
+    case right
 
     // PPU status register flags
     case ppuStatusUnused1
@@ -68,30 +78,30 @@ package enum RegisterBit {
 
     var bitIndex: Int {
         switch self {
-        case .carry, .ppuStatusUnused1, .nametable1, .greyscale, .pulse1Enabled,
+        case .carry, .buttonA, .ppuStatusUnused1, .nametable1, .greyscale, .pulse1Enabled,
             .apuFrameCounterUnused1:
             0
-        case .zero, .ppuStatusUnused2, .nametable2,
+        case .zero, .buttonB, .ppuStatusUnused2, .nametable2,
             .showBackgroundLeftmostPixels, .pulse2Enabled,
             .apuFrameCounterUnused2:
             1
-        case .interruptsDisabled, .ppuStatusUnused3, .vramAddressIncrement,
+        case .interruptsDisabled, .select, .ppuStatusUnused3, .vramAddressIncrement,
             .showSpritesLeftmostPixels, .triangleEnabled,
             .apuFrameCounterUnused3:
             2
-        case .decimalMode, .ppuStatusUnused4, .spritePatternBankIndex,
+        case .decimalMode, .start, .ppuStatusUnused4, .spritePatternBankIndex,
             .showBackground, .noiseEnabled, .apuFrameCounterUnused4:
             3
-        case .break, .ppuStatusUnused5, .backgroundPatternBankIndex,
+        case .break, .up, .ppuStatusUnused5, .backgroundPatternBankIndex,
             .showSprites, .dmcEnabled, .apuFrameCounterUnused5:
             4
-        case .cpuStatusUnused, .spriteOverflow, .spritesAre8x16, .emphasizeRed,
+        case .cpuStatusUnused, .down, .spriteOverflow, .spritesAre8x16, .emphasizeRed,
             .apuStatusUnused1, .apuFrameCounterUnused6:
             5
-        case .overflow, .spriteZeroHit, .masterSlaveSelect, .emphasizeGreen,
+        case .overflow, .left, .spriteZeroHit, .masterSlaveSelect, .emphasizeGreen,
             .apuStatusUnused2, .frameIrqEnabled:
             6
-        case .negative, .verticalBlankStarted, .generateNmi, .emphasizeBlue,
+        case .negative, .right, .verticalBlankStarted, .generateNmi, .emphasizeBlue,
             .apuStatusUnused3, .sequencerMode:
             7
         }

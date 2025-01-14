@@ -62,7 +62,7 @@ public class CPU {
         let _ = self.tick(cycles: 7)
     }
 
-    public func handleButton(button: JoypadButton, status: Bool) {
+    public func handleButton(button: RegisterBit, status: Bool) {
         self.bus.joypad.updateButtonStatus(button: button, status: status)
     }
 

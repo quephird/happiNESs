@@ -20,7 +20,6 @@
 		871931F72C30BB2C00A73C22 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */; };
 		871931FF2C30C3A500A73C22 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
 		871932002C30C3A500A73C22 /* happiNESs.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932042C30C6DC00A73C22 /* JoypadButton.swift */; };
 		871932072C30E91D00A73C22 /* NESColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932062C30E91D00A73C22 /* NESColor.swift */; };
 		8719320C2C3366B000A73C22 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320A2C3366A900A73C22 /* Console.swift */; };
 		871932102C372F6900A73C22 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320F2C372F6900A73C22 /* Bus.swift */; };
@@ -151,7 +150,6 @@
 		871931F32C30BB2C00A73C22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = happiNESsApp.entitlements; sourceTree = "<group>"; };
-		871932042C30C6DC00A73C22 /* JoypadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadButton.swift; sourceTree = "<group>"; };
 		871932062C30E91D00A73C22 /* NESColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESColor.swift; sourceTree = "<group>"; };
 		8719320A2C3366A900A73C22 /* Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Console.swift; path = happiNESsApp/Console.swift; sourceTree = SOURCE_ROOT; };
 		8719320F2C372F6900A73C22 /* Bus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bus.swift; sourceTree = "<group>"; };
@@ -366,7 +364,6 @@
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */,
 				877E970A2C7E4716007513B5 /* Joypad.swift */,
-				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
 				87E981462CD076660090A200 /* Mapper.swift */,
 				87D265162C9DECAF00C143B1 /* MapperNumber.swift */,
 				87C5B32C2CD9C40A008580A6 /* Mappers */,
@@ -641,7 +638,6 @@
 				874F51AD2CBF05BC00B12037 /* Register.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				87C5B32B2CD9C3C9008580A6 /* Nrom.swift in Sources */,
-				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				87E981472CD076660090A200 /* Mapper.swift in Sources */,

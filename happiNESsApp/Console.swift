@@ -15,7 +15,7 @@ import SwiftUI
     static let frameRate = 60
     static let defaultScale = 2.0
 
-    public static let keyMappings: [KeyEquivalent : JoypadButton] = [
+    public static let keyMappings: [KeyEquivalent : RegisterBit] = [
         .upArrow : .up,
         .downArrow : .down,
         .leftArrow : .left,
@@ -134,7 +134,7 @@ import SwiftUI
         self.cpu.handleButton(button: .right, status: dpadElement.right.value > 0.5)
     }
 
-    public func handleButton(buttonElement: GCButtonElement, button: JoypadButton) {
+    public func handleButton(buttonElement: GCButtonElement, button: RegisterBit) {
         self.cpu.handleButton(button: button, status: buttonElement.pressedInput.isPressed)
     }
 
