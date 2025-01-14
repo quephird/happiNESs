@@ -5,6 +5,9 @@
 //  Created by Danielle Kefford on 6/29/24.
 //
 
+import happiNESs
+
+import GameController
 import SwiftUI
 
 struct ContentView: View {
@@ -40,6 +43,9 @@ struct ContentView: View {
                     .onKeyPress(phases: .all) { keyPress in
                         return console.handleKey(keyPress) ? .handled : .ignored
                     }
+                    .task {
+                        await self.setupGamepad()
+                    }
                     if self.console.isPaused {
                         Text("PAUSED")
                             .font(.zelda)
@@ -59,6 +65,35 @@ struct ContentView: View {
             }
         }
         .scaledToFit()
+    }
+
+    private func setupGamepad() async {
+        let controllers = NotificationCenter.default.notifications(
+            named: .GCControllerDidConnect
+        ).map(
+            {
+                $0.object as! GCController
+            })
+
+        for await controller in controllers {
+            controller.input.elementValueDidChangeHandler = { (input: GCDevicePhysicalInput, element: GCPhysicalInputElement) in
+                if let dpadElement = element as? GCDirectionPadElement {
+                    self.console.handleDpad(dpadElement: dpadElement)
+                }
+
+                if let buttonElement = element as? GCButtonElement {
+                    if buttonElement === input.buttons[.a] {
+                        self.console.handleButton(buttonElement: buttonElement, button: .buttonA)
+                    } else if buttonElement === input.buttons[.b] {
+                        self.console.handleButton(buttonElement: buttonElement, button: .buttonB)
+                    } else if buttonElement === input.buttons[.menu] {
+                        self.console.handleButton(buttonElement: buttonElement, button: .start)
+                    } else if buttonElement === input.buttons[.home] {
+                        self.console.handleButton(buttonElement: buttonElement, button: .select)
+                    }
+                }
+            }
+        }
     }
 }
 

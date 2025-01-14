@@ -6,6 +6,8 @@
 //
 
 import happiNESs
+
+import GameController
 import Observation
 import SwiftUI
 
@@ -123,6 +125,17 @@ import SwiftUI
 
         cpu.handleButton(button: button, status: keyPress.phase != .up)
         return true
+    }
+
+    public func handleDpad(dpadElement: GCDirectionPadElement) {
+        self.cpu.handleButton(button: .up, status: dpadElement.up.value > 0.5)
+        self.cpu.handleButton(button: .down, status: dpadElement.down.value > 0.5)
+        self.cpu.handleButton(button: .left, status: dpadElement.left.value > 0.5)
+        self.cpu.handleButton(button: .right, status: dpadElement.right.value > 0.5)
+    }
+
+    public func handleButton(buttonElement: GCButtonElement, button: JoypadButton) {
+        self.cpu.handleButton(button: button, status: buttonElement.pressedInput.isPressed)
     }
 
     public func dumpPpu() {
