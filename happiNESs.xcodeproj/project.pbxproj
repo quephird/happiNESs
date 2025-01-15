@@ -50,7 +50,7 @@
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
-		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
+		877E970B2C7E4716007513B5 /* JoypadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* JoypadStatus.swift */; };
 		878A82C52D064042005E7011 /* Font+custom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878A82C42D064036005E7011 /* Font+custom.swift */; };
 		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
 		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
@@ -181,7 +181,7 @@
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
-		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
+		877E970A2C7E4716007513B5 /* JoypadStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadStatus.swift; sourceTree = "<group>"; };
 		878A82C42D064036005E7011 /* Font+custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+custom.swift"; sourceTree = "<group>"; };
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
@@ -363,7 +363,7 @@
 				87F234542CE856C400D2FDA6 /* Filters */,
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */,
-				877E970A2C7E4716007513B5 /* Joypad.swift */,
+				877E970A2C7E4716007513B5 /* JoypadStatus.swift */,
 				87E981462CD076660090A200 /* Mapper.swift */,
 				87D265162C9DECAF00C143B1 /* MapperNumber.swift */,
 				87C5B32C2CD9C40A008580A6 /* Mappers */,
@@ -658,7 +658,7 @@
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,
 				870AABDA2CB34E3000E9F3B6 /* PPU+tracing.swift in Sources */,
-				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
+				877E970B2C7E4716007513B5 /* JoypadStatus.swift in Sources */,
 				87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
 				87F234532CE8567F00D2FDA6 /* Filter.swift in Sources */,

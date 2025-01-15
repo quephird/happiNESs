@@ -5,7 +5,7 @@
 //  Created by Danielle Kefford on 8/27/24.
 //
 
-public struct Joypad {
+public struct JoypadStatus {
     public var strobe: Bool
     public var buttonIndex: Int
     public var buttons: Register
@@ -17,7 +17,7 @@ public struct Joypad {
     }
 }
 
-extension Joypad {
+extension JoypadStatus {
     public func readByteWithoutMutating() -> UInt8 {
         return (self.buttons >> self.buttonIndex) & 0b0000_0001
     }
@@ -38,8 +38,8 @@ extension Joypad {
         return self.readByteWithoutMutating()
     }
 
-    mutating public func writeByte(byte: UInt8) {
-        self.strobe = (byte & 0b0000_0001) == 1
+    mutating public func writeStrobe(strobe: Bool) {
+        self.strobe = strobe
 
         if self.strobe {
             self.buttonIndex = 0

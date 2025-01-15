@@ -35,6 +35,8 @@ import SwiftUI
     private var saveSramPath: URL?
     public var lastSavedDate: Date = Date.now
     public var currentError: NESError? = nil
+    private var controller1: GCController?
+    private var controller2: GCController?
 
     // NOTA BENE: We don't want the screen updated every single time something inside
     // this class changes, which is the one being observed by `ContentView`. We're only
@@ -60,6 +62,10 @@ import SwiftUI
             try fileManager.createDirectory(at: saveSramDirectory, withIntermediateDirectories: true)
         } catch {
             throw NESError.cannotCreateSaveDataDirectory
+        }
+
+        Task {
+            await self.setupGamepad()
         }
     }
 
@@ -117,25 +123,73 @@ import SwiftUI
             }
         }
     }
+    
+    private func setupGamepad() async {
+        let newControllers = NotificationCenter.default.notifications(
+            named: .GCControllerDidConnect
+        ).map(
+            {
+                $0.object as! GCController
+            })
+
+        for await controller in newControllers {
+            if self.controller1 == nil {
+                self.controller1 = controller
+            } else if self.controller2 == nil {
+                self.controller2 = controller
+            } else {
+                // Ignore other controllers
+            }
+
+            controller.input.elementValueDidChangeHandler = { (input: GCDevicePhysicalInput, element: GCPhysicalInputElement) in
+                if let dpadElement = element as? GCDirectionPadElement {
+                    self.handleDpad(controller: controller, dpadElement: dpadElement)
+                }
+
+                if let buttonElement = element as? GCButtonElement {
+                    if buttonElement === input.buttons[.a] {
+                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .buttonA)
+                    } else if buttonElement === input.buttons[.b] {
+                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .buttonB)
+                    } else if buttonElement === input.buttons[.menu] || buttonElement === input.buttons[.x] {
+                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .start)
+                    } else if buttonElement === input.buttons[.home] || buttonElement === input.buttons[.y] {
+                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .select)
+                    }
+                }
+            }
+        }
+    }
 
     func handleKey(_ keyPress: KeyPress) -> Bool {
         guard let button = Self.keyMappings[keyPress.key] else {
             return false
         }
 
-        cpu.handleButton(button: button, status: keyPress.phase != .up)
+        cpu.handleJoypad1Button(button: button, status: keyPress.phase != .up)
         return true
     }
 
-    public func handleDpad(dpadElement: GCDirectionPadElement) {
-        self.cpu.handleButton(button: .up, status: dpadElement.up.value > 0.5)
-        self.cpu.handleButton(button: .down, status: dpadElement.down.value > 0.5)
-        self.cpu.handleButton(button: .left, status: dpadElement.left.value > 0.5)
-        self.cpu.handleButton(button: .right, status: dpadElement.right.value > 0.5)
+    public func handleDpad(controller: GCController, dpadElement: GCDirectionPadElement) {
+        if self.controller1 === controller {
+            self.cpu.handleJoypad1Button(button: .up, status: dpadElement.up.value > 0.5)
+            self.cpu.handleJoypad1Button(button: .down, status: dpadElement.down.value > 0.5)
+            self.cpu.handleJoypad1Button(button: .left, status: dpadElement.left.value > 0.5)
+            self.cpu.handleJoypad1Button(button: .right, status: dpadElement.right.value > 0.5)
+        } else {
+            self.cpu.handleJoypad2Button(button: .up, status: dpadElement.up.value > 0.5)
+            self.cpu.handleJoypad2Button(button: .down, status: dpadElement.down.value > 0.5)
+            self.cpu.handleJoypad2Button(button: .left, status: dpadElement.left.value > 0.5)
+            self.cpu.handleJoypad2Button(button: .right, status: dpadElement.right.value > 0.5)
+        }
     }
 
-    public func handleButton(buttonElement: GCButtonElement, button: RegisterBit) {
-        self.cpu.handleButton(button: button, status: buttonElement.pressedInput.isPressed)
+    public func handleButton(controller: GCController, buttonElement: GCButtonElement, button: RegisterBit) {
+        if self.controller1 === controller {
+            self.cpu.handleJoypad1Button(button: button, status: buttonElement.pressedInput.isPressed)
+        } else {
+            self.cpu.handleJoypad2Button(button: button, status: buttonElement.pressedInput.isPressed)
+        }
     }
 
     public func dumpPpu() {

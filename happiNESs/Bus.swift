@@ -16,7 +16,8 @@ public class Bus {
     public var apu: APU
     public var cartridge: Cartridge?
     var vram: [UInt8]
-    var joypad: Joypad
+    var joypad1Status: JoypadStatus
+    var joypad2Status: JoypadStatus
 
     public init() {
         self.ppu = PPU()
@@ -24,7 +25,8 @@ public class Bus {
         self.apu = APU(sampleRate: Float(CPU.frequency) / APU.audioSampleRate)
 
         self.vram = [UInt8](repeating: 0x00, count: 2048)
-        self.joypad = Joypad()
+        self.joypad1Status = JoypadStatus()
+        self.joypad2Status = JoypadStatus()
 
         // NOTA BENE: We need to do this because there needs to be
         // bidirectional communication between the bus and both
@@ -57,7 +59,9 @@ extension Bus {
         case 0x4015:
             return self.apu.readByte(address: address)
         case 0x4016:
-            return self.joypad.readByteWithoutMutating()
+            return self.joypad1Status.readByteWithoutMutating()
+        case 0x4017:
+            return self.joypad2Status.readByteWithoutMutating()
         case 0x6000 ... 0xFFFF:
             return self.cartridge!.readByte(address: address)
         default:
@@ -70,7 +74,9 @@ extension Bus {
         case 0x2000 ... 0x3FFF:
             return self.ppu.readByte(address: address)
         case 0x4016:
-            return self.joypad.readByte()
+            return self.joypad1Status.readByte()
+        case 0x4017:
+            return self.joypad2Status.readByte()
         default:
             return self.readByteWithoutMutating(address: address)
         }
@@ -99,7 +105,9 @@ extension Bus {
         case 0x4000 ... 0x4008, 0x400A ... 0x400C, 0x400E ... 0x4013, 0x4015, 0x4017:
             self.apu.writeByte(address: address, byte: byte)
         case 0x4016:
-            self.joypad.writeByte(byte: byte)
+            let strobe = (byte & 0b0000_0001) == 1
+            self.joypad1Status.writeStrobe(strobe: strobe)
+            self.joypad2Status.writeStrobe(strobe: strobe)
         case 0x6000 ... 0xFFFF:
             self.cartridge!.writeByte(address: address, byte: byte)
         default:
