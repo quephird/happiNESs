@@ -86,9 +86,9 @@ struct ContentView: View {
                         self.console.handleButton(buttonElement: buttonElement, button: .buttonA)
                     } else if buttonElement === input.buttons[.b] {
                         self.console.handleButton(buttonElement: buttonElement, button: .buttonB)
-                    } else if buttonElement === input.buttons[.menu] {
+                    } else if buttonElement === input.buttons[.menu] || buttonElement === input.buttons[.x] {
                         self.console.handleButton(buttonElement: buttonElement, button: .start)
-                    } else if buttonElement === input.buttons[.home] {
+                    } else if buttonElement === input.buttons[.home] || buttonElement === input.buttons[.y] {
                         self.console.handleButton(buttonElement: buttonElement, button: .select)
                     }
                 }
