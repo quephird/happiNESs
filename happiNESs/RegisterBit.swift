@@ -16,7 +16,7 @@ public enum RegisterBit {
     case overflow
     case negative
 
-    // CPU joypad 1 status flags
+    // CPU joypad status flags
     case buttonA
     case buttonB
     case select
