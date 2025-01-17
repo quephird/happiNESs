@@ -50,6 +50,7 @@
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
+		877AE74E2D39CF5F006B9F54 /* JoypadIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877AE74D2D39CF58006B9F54 /* JoypadIndex.swift */; };
 		877E970B2C7E4716007513B5 /* JoypadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* JoypadStatus.swift */; };
 		878A82C52D064042005E7011 /* Font+custom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878A82C42D064036005E7011 /* Font+custom.swift */; };
 		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
@@ -181,6 +182,7 @@
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
+		877AE74D2D39CF58006B9F54 /* JoypadIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadIndex.swift; sourceTree = "<group>"; };
 		877E970A2C7E4716007513B5 /* JoypadStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadStatus.swift; sourceTree = "<group>"; };
 		878A82C42D064036005E7011 /* Font+custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+custom.swift"; sourceTree = "<group>"; };
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
@@ -363,6 +365,7 @@
 				87F234542CE856C400D2FDA6 /* Filters */,
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */,
+				877AE74D2D39CF58006B9F54 /* JoypadIndex.swift */,
 				877E970A2C7E4716007513B5 /* JoypadStatus.swift */,
 				87E981462CD076660090A200 /* Mapper.swift */,
 				87D265162C9DECAF00C143B1 /* MapperNumber.swift */,
@@ -627,6 +630,7 @@
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
 				878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
+				877AE74E2D39CF5F006B9F54 /* JoypadIndex.swift in Sources */,
 				874F51A92CBEEBA700B12037 /* APU.swift in Sources */,
 				875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */,
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,

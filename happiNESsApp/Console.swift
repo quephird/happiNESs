@@ -26,6 +26,24 @@ import SwiftUI
         KeyEquivalent("s") : .buttonB,
     ]
 
+    private static let buttonMappings: [GCButtonElementName: RegisterBit] = [
+        .a: .buttonA,
+        .b: .buttonB,
+        .menu: .start,
+        .x: .start,
+        .home: .select,
+        .y: .select,
+    ]
+
+    typealias GCDirectionPadProperty = any GCLinearInput & GCPressedStateInput
+    typealias GCDirectionPadKeyPath = KeyPath<GCDirectionPadElement, GCDirectionPadProperty>
+    private static let dpadMappings: [RegisterBit : GCDirectionPadKeyPath] = [
+        .up: \.up,
+        .down: \.down,
+        .left: \.left,
+        .right: \.right,
+    ]
+
     public var isPaused: Bool = false
     private var speaker: Speaker
     var cartridgeLoaded: Bool = false
@@ -147,14 +165,11 @@ import SwiftUI
                 }
 
                 if let buttonElement = element as? GCButtonElement {
-                    if buttonElement === input.buttons[.a] {
-                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .buttonA)
-                    } else if buttonElement === input.buttons[.b] {
-                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .buttonB)
-                    } else if buttonElement === input.buttons[.menu] || buttonElement === input.buttons[.x] {
-                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .start)
-                    } else if buttonElement === input.buttons[.home] || buttonElement === input.buttons[.y] {
-                        self.handleButton(controller: controller, buttonElement: buttonElement, button: .select)
+                    for (buttonName, buttonBit) in Self.buttonMappings {
+                        if buttonElement === input.buttons[buttonName] {
+                            self.handleButton(controller: controller, buttonElement: buttonElement, button: buttonBit)
+                            return
+                        }
                     }
                 }
             }
@@ -166,30 +181,26 @@ import SwiftUI
             return false
         }
 
-        cpu.handleJoypad1Button(button: button, status: keyPress.phase != .up)
+        cpu.handleJoypadButton(index: .one, button: button, status: keyPress.phase != .up)
         return true
     }
 
     public func handleDpad(controller: GCController, dpadElement: GCDirectionPadElement) {
-        if self.controller1 === controller {
-            self.cpu.handleJoypad1Button(button: .up, status: dpadElement.up.value > 0.5)
-            self.cpu.handleJoypad1Button(button: .down, status: dpadElement.down.value > 0.5)
-            self.cpu.handleJoypad1Button(button: .left, status: dpadElement.left.value > 0.5)
-            self.cpu.handleJoypad1Button(button: .right, status: dpadElement.right.value > 0.5)
-        } else {
-            self.cpu.handleJoypad2Button(button: .up, status: dpadElement.up.value > 0.5)
-            self.cpu.handleJoypad2Button(button: .down, status: dpadElement.down.value > 0.5)
-            self.cpu.handleJoypad2Button(button: .left, status: dpadElement.left.value > 0.5)
-            self.cpu.handleJoypad2Button(button: .right, status: dpadElement.right.value > 0.5)
+        let index: JoypadIndex = controller === self.controller1 ? .one : .two
+
+        for (buttonBit, dpadKeyPath) in Self.dpadMappings {
+            self.cpu.handleJoypadButton(index: index,
+                                        button: buttonBit,
+                                        status: dpadElement[keyPath: dpadKeyPath].value > 0.5)
         }
     }
 
     public func handleButton(controller: GCController, buttonElement: GCButtonElement, button: RegisterBit) {
-        if self.controller1 === controller {
-            self.cpu.handleJoypad1Button(button: button, status: buttonElement.pressedInput.isPressed)
-        } else {
-            self.cpu.handleJoypad2Button(button: button, status: buttonElement.pressedInput.isPressed)
-        }
+        let index: JoypadIndex = controller === self.controller1 ? .one : .two
+
+        self.cpu.handleJoypadButton(index: index,
+                                    button: button,
+                                    status: buttonElement.pressedInput.isPressed)
     }
 
     public func dumpPpu() {
