@@ -20,7 +20,6 @@
 		871931F72C30BB2C00A73C22 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */; };
 		871931FF2C30C3A500A73C22 /* happiNESs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; };
 		871932002C30C3A500A73C22 /* happiNESs.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8744B1722C1CB9B3001B44B5 /* happiNESs.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932042C30C6DC00A73C22 /* JoypadButton.swift */; };
 		871932072C30E91D00A73C22 /* NESColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871932062C30E91D00A73C22 /* NESColor.swift */; };
 		8719320C2C3366B000A73C22 /* Console.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320A2C3366A900A73C22 /* Console.swift */; };
 		871932102C372F6900A73C22 /* Bus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8719320F2C372F6900A73C22 /* Bus.swift */; };
@@ -46,13 +45,13 @@
 		874F51B52CC1D05D00B12037 /* PulseChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B42CC1D05D00B12037 /* PulseChannel.swift */; };
 		874F51B72CC1E7D800B12037 /* AudioRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */; };
 		875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */; };
-		8763D0652C386A17006C1B4F /* snake.nes in Resources */ = {isa = PBXBuildFile; fileRef = 8763D0642C386A17006C1B4F /* snake.nes */; };
 		8763D0682C39B61F006C1B4F /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0672C39B61F006C1B4F /* Helpers.swift */; };
 		8763D06A2C39B719006C1B4F /* CartridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D0692C39B719006C1B4F /* CartridgeTests.swift */; };
 		8763D06C2C39E528006C1B4F /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06B2C39E528006C1B4F /* Screen.swift */; };
 		8763D06E2C3A340C006C1B4F /* Tracing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8763D06D2C3A340C006C1B4F /* Tracing.swift */; };
 		8771BFA82CCD62C500306E13 /* Interrupt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8771BFA72CCD62C500306E13 /* Interrupt.swift */; };
-		877E970B2C7E4716007513B5 /* Joypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* Joypad.swift */; };
+		877AE74E2D39CF5F006B9F54 /* JoypadIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877AE74D2D39CF58006B9F54 /* JoypadIndex.swift */; };
+		877E970B2C7E4716007513B5 /* JoypadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 877E970A2C7E4716007513B5 /* JoypadStatus.swift */; };
 		878A82C52D064042005E7011 /* Font+custom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878A82C42D064036005E7011 /* Font+custom.swift */; };
 		878C69732CAA424400DA9BD4 /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 878C69722CAA424400DA9BD4 /* Address.swift */; };
 		878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 878D81432C7FEE3B0076ED30 /* image.xcassets */; };
@@ -152,7 +151,6 @@
 		871931F32C30BB2C00A73C22 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		871931F62C30BB2C00A73C22 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		871931F82C30BB2C00A73C22 /* happiNESsApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = happiNESsApp.entitlements; sourceTree = "<group>"; };
-		871932042C30C6DC00A73C22 /* JoypadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadButton.swift; sourceTree = "<group>"; };
 		871932062C30E91D00A73C22 /* NESColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESColor.swift; sourceTree = "<group>"; };
 		8719320A2C3366A900A73C22 /* Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Console.swift; path = happiNESsApp/Console.swift; sourceTree = SOURCE_ROOT; };
 		8719320F2C372F6900A73C22 /* Bus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bus.swift; sourceTree = "<group>"; };
@@ -179,13 +177,13 @@
 		874F51B42CC1D05D00B12037 /* PulseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseChannel.swift; sourceTree = "<group>"; };
 		874F51B62CC1E7D800B12037 /* AudioRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRingBuffer.swift; sourceTree = "<group>"; };
 		875F1ED02CCC7D0000DC8B7F /* DMCChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMCChannel.swift; sourceTree = "<group>"; };
-		8763D0642C386A17006C1B4F /* snake.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = snake.nes; sourceTree = "<group>"; };
 		8763D0672C39B61F006C1B4F /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		8763D0692C39B719006C1B4F /* CartridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartridgeTests.swift; sourceTree = "<group>"; };
 		8763D06B2C39E528006C1B4F /* Screen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen.swift; sourceTree = "<group>"; };
 		8763D06D2C3A340C006C1B4F /* Tracing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracing.swift; sourceTree = "<group>"; };
 		8771BFA72CCD62C500306E13 /* Interrupt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interrupt.swift; sourceTree = "<group>"; };
-		877E970A2C7E4716007513B5 /* Joypad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joypad.swift; sourceTree = "<group>"; };
+		877AE74D2D39CF58006B9F54 /* JoypadIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadIndex.swift; sourceTree = "<group>"; };
+		877E970A2C7E4716007513B5 /* JoypadStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoypadStatus.swift; sourceTree = "<group>"; };
 		878A82C42D064036005E7011 /* Font+custom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+custom.swift"; sourceTree = "<group>"; };
 		878C69722CAA424400DA9BD4 /* Address.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
@@ -327,7 +325,6 @@
 			isa = PBXGroup;
 			children = (
 				878D81432C7FEE3B0076ED30 /* image.xcassets */,
-				8763D0642C386A17006C1B4F /* snake.nes */,
 				8744B1742C1CB9B3001B44B5 /* happiNESs */,
 				8744B1802C1CB9B3001B44B5 /* happiNESsTests */,
 				871931EE2C30BB2900A73C22 /* happiNESsApp */,
@@ -368,8 +365,8 @@
 				87F234542CE856C400D2FDA6 /* Filters */,
 				8771BFA72CCD62C500306E13 /* Interrupt.swift */,
 				879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */,
-				877E970A2C7E4716007513B5 /* Joypad.swift */,
-				871932042C30C6DC00A73C22 /* JoypadButton.swift */,
+				877AE74D2D39CF58006B9F54 /* JoypadIndex.swift */,
+				877E970A2C7E4716007513B5 /* JoypadStatus.swift */,
 				87E981462CD076660090A200 /* Mapper.swift */,
 				87D265162C9DECAF00C143B1 /* MapperNumber.swift */,
 				87C5B32C2CD9C40A008580A6 /* Mappers */,
@@ -587,7 +584,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8763D0652C386A17006C1B4F /* snake.nes in Resources */,
 				878D81442C7FEE3B0076ED30 /* image.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -634,6 +630,7 @@
 				8744B1912C1CC0C4001B44B5 /* CPU.swift in Sources */,
 				878DCB8D2CCAB4CC00BE7ABB /* NoiseChannel.swift in Sources */,
 				871932072C30E91D00A73C22 /* NESColor.swift in Sources */,
+				877AE74E2D39CF5F006B9F54 /* JoypadIndex.swift in Sources */,
 				874F51A92CBEEBA700B12037 /* APU.swift in Sources */,
 				875F1ED12CCC7D0000DC8B7F /* DMCChannel.swift in Sources */,
 				878C69732CAA424400DA9BD4 /* Address.swift in Sources */,
@@ -645,7 +642,6 @@
 				874F51AD2CBF05BC00B12037 /* Register.swift in Sources */,
 				87D265152C9146F400C143B1 /* ViewPort.swift in Sources */,
 				87C5B32B2CD9C3C9008580A6 /* Nrom.swift in Sources */,
-				871932052C30C6DC00A73C22 /* JoypadButton.swift in Sources */,
 				87E981532CD8B5990090A200 /* NMIDelayState.swift in Sources */,
 				8744B18D2C1CB9F4001B44B5 /* AddressingMode.swift in Sources */,
 				87E981472CD076660090A200 /* Mapper.swift in Sources */,
@@ -666,7 +662,7 @@
 				871F62342C6541D300132962 /* UInt16+bytes.swift in Sources */,
 				878D81472C815E760076ED30 /* NESError.swift in Sources */,
 				870AABDA2CB34E3000E9F3B6 /* PPU+tracing.swift in Sources */,
-				877E970B2C7E4716007513B5 /* Joypad.swift in Sources */,
+				877E970B2C7E4716007513B5 /* JoypadStatus.swift in Sources */,
 				87C5B3282CD9C3C9008580A6 /* Cnrom.swift in Sources */,
 				870AABD82CB32FAA00E9F3B6 /* PPU+caching.swift in Sources */,
 				87F234532CE8567F00D2FDA6 /* Filter.swift in Sources */,
@@ -729,7 +725,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = happiNESs;
@@ -758,7 +754,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = happiNESs;

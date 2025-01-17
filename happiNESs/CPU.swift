@@ -62,8 +62,13 @@ public class CPU {
         let _ = self.tick(cycles: 7)
     }
 
-    public func handleButton(button: JoypadButton, status: Bool) {
-        self.bus.joypad.updateButtonStatus(button: button, status: status)
+    public func handleJoypadButton(index: JoypadIndex, button: RegisterBit, status: Bool) {
+        switch index {
+        case .one:
+            self.bus.joypad1Status.updateButtonStatus(button: button, status: status)
+        case .two:
+            self.bus.joypad2Status.updateButtonStatus(button: button, status: status)
+        }
     }
 
     public func tick(cycles: Int) -> Bool {

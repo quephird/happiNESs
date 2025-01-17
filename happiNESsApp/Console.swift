@@ -6,6 +6,8 @@
 //
 
 import happiNESs
+
+import GameController
 import Observation
 import SwiftUI
 
@@ -13,7 +15,7 @@ import SwiftUI
     static let frameRate = 60
     static let defaultScale = 2.0
 
-    public static let keyMappings: [KeyEquivalent : JoypadButton] = [
+    public static let keyMappings: [KeyEquivalent : RegisterBit] = [
         .upArrow : .up,
         .downArrow : .down,
         .leftArrow : .left,
@@ -22,6 +24,24 @@ import SwiftUI
         .return : .start,
         KeyEquivalent("a") : .buttonA,
         KeyEquivalent("s") : .buttonB,
+    ]
+
+    private static let buttonMappings: [GCButtonElementName: RegisterBit] = [
+        .a: .buttonA,
+        .b: .buttonB,
+        .menu: .start,
+        .x: .start,
+        .home: .select,
+        .y: .select,
+    ]
+
+    typealias GCDirectionPadProperty = any GCLinearInput & GCPressedStateInput
+    typealias GCDirectionPadKeyPath = KeyPath<GCDirectionPadElement, GCDirectionPadProperty>
+    private static let dpadMappings: [RegisterBit : GCDirectionPadKeyPath] = [
+        .up: \.up,
+        .down: \.down,
+        .left: \.left,
+        .right: \.right,
     ]
 
     public var isPaused: Bool = false
@@ -33,6 +53,8 @@ import SwiftUI
     private var saveSramPath: URL?
     public var lastSavedDate: Date = Date.now
     public var currentError: NESError? = nil
+    private var controller1: GCController?
+    private var controller2: GCController?
 
     // NOTA BENE: We don't want the screen updated every single time something inside
     // this class changes, which is the one being observed by `ContentView`. We're only
@@ -58,6 +80,10 @@ import SwiftUI
             try fileManager.createDirectory(at: saveSramDirectory, withIntermediateDirectories: true)
         } catch {
             throw NESError.cannotCreateSaveDataDirectory
+        }
+
+        Task {
+            await self.setupGamepad()
         }
     }
 
@@ -115,14 +141,66 @@ import SwiftUI
             }
         }
     }
+    
+    private func setupGamepad() async {
+        let newControllers = NotificationCenter.default.notifications(
+            named: .GCControllerDidConnect
+        ).map(
+            {
+                $0.object as! GCController
+            })
+
+        for await controller in newControllers {
+            if self.controller1 == nil {
+                self.controller1 = controller
+            } else if self.controller2 == nil {
+                self.controller2 = controller
+            } else {
+                // Ignore other controllers
+            }
+
+            controller.input.elementValueDidChangeHandler = { (input: GCDevicePhysicalInput, element: GCPhysicalInputElement) in
+                if let dpadElement = element as? GCDirectionPadElement {
+                    self.handleDpad(controller: controller, dpadElement: dpadElement)
+                }
+
+                if let buttonElement = element as? GCButtonElement {
+                    for (buttonName, buttonBit) in Self.buttonMappings {
+                        if buttonElement === input.buttons[buttonName] {
+                            self.handleButton(controller: controller, buttonElement: buttonElement, button: buttonBit)
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     func handleKey(_ keyPress: KeyPress) -> Bool {
         guard let button = Self.keyMappings[keyPress.key] else {
             return false
         }
 
-        cpu.handleButton(button: button, status: keyPress.phase != .up)
+        cpu.handleJoypadButton(index: .one, button: button, status: keyPress.phase != .up)
         return true
+    }
+
+    public func handleDpad(controller: GCController, dpadElement: GCDirectionPadElement) {
+        let index: JoypadIndex = controller === self.controller1 ? .one : .two
+
+        for (buttonBit, dpadKeyPath) in Self.dpadMappings {
+            self.cpu.handleJoypadButton(index: index,
+                                        button: buttonBit,
+                                        status: dpadElement[keyPath: dpadKeyPath].value > 0.5)
+        }
+    }
+
+    public func handleButton(controller: GCController, buttonElement: GCButtonElement, button: RegisterBit) {
+        let index: JoypadIndex = controller === self.controller1 ? .one : .two
+
+        self.cpu.handleJoypadButton(index: index,
+                                    button: button,
+                                    status: buttonElement.pressedInput.isPressed)
     }
 
     public func dumpPpu() {

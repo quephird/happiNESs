@@ -35,6 +35,12 @@ You can also specify the scale of the screen between 1x, 2x, and 3x through the 
 
 Hitting ⌘-R within happiNESs at any time while playing a game will reset it. You can also pause any game at any time by hitting ⌘-P; hitting that chord again will unpause it.
 
+You can also use external controllers, both wired and wireless, and with both basic and extended gamepad layouts. happiNESs also supports up to two controllers connected simultaneously and so you can play two-player games such as head-to-head Dr. Mario. The following controllers have been tested and work properly:
+
+- Steelseries Nimbus Bluetooth Controller
+- Logitech Dual Action Gamepad
+- suily USB Controller for NES Gaming
+
 # Supported games
 
 So far, the following mappers and associated games have been tested in this emulator and are largely playable:
@@ -176,3 +182,7 @@ The unit tests are primarily focused on the implementations of the 6502 opcodes,
   <a href="https://developer.apple.com/documentation/avfaudio/audio_engine/building_a_signal_generator">https://developer.apple.com/documentation/avfaudio/audio\_engine/building\_a\_signal\_generator</a>
 - GitHub repo with a ROM that comprehensively exercises the APU's sound capabilities.  
   <a href="https://github.com/nesdoug/NES_SOUND">https://github.com/nesdoug/NES_SOUND</a>
+- Short Medium post on how to use the Game Controller framework in a SpriteKit project  
+  <a href="https://medium.com/@Antoniowski/implementing-game-controller-for-your-ios-or-mac-app-361d97b07ab7">https://medium.com/@Antoniowski/implementing-game-controller-for-your-ios-or-mac-app-361d97b07ab7</a>
+- Official documentation for Game Controller framework  
+  <a href="https://developer.apple.com/documentation/gamecontroller">https://developer.apple.com/documentation/gamecontroller</a>
