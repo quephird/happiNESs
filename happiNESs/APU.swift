@@ -11,7 +11,7 @@ enum SequencerMode {
 }
 
 public struct APU {
-    public static let audioSampleRate: Float = 44100.0
+    public static let audioSampleRate: Double = 44100.0
     static let frameCounterRate = CPU.frequency / 240.0
 
     // Values for this table taken from:
@@ -28,7 +28,7 @@ public struct APU {
     private var sequencerCount: Int = 0
     private var frameIrqInhibited: Bool = false
     private var frameIrqEnabled: Bool = false
-    public var sampleRate: Float
+    public var sampleSize: Double
 
     public var pulse1: PulseChannel = PulseChannel(channelNumber: .one)
     public var pulse2: PulseChannel = PulseChannel(channelNumber: .two)
@@ -42,8 +42,8 @@ public struct APU {
     private var newSequencerValue: UInt8?
     private var newSequencerValueDelay: Int = 0
 
-    public init(sampleRate: Float) {
-        self.sampleRate = sampleRate
+    public init(sampleSize: Double) {
+        self.sampleSize = sampleSize
         // NOTA BENE: Even though according to the following section in the NESDev
         // wiki that there ought to be two high pass filters, I found that adding
         // the one for 400 Hz made the resultant audio sound way too tinny, and so
@@ -51,8 +51,8 @@ public struct APU {
         //
         //     https://www.nesdev.org/wiki/APU_Mixer
         self.filterChain = FilterChain(filters: [
-            HighPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 90),
-            LowPassFilter(sampleRate: Self.audioSampleRate, cutoffFrequency: 14000),
+            HighPassFilter(sampleRate: Float(Self.audioSampleRate), cutoffFrequency: 90),
+            LowPassFilter(sampleRate: Float(Self.audioSampleRate), cutoffFrequency: 14000),
         ])
     }
 
@@ -189,11 +189,11 @@ extension APU {
 extension APU {
     var shouldSendSample: Bool {
         // NOTA BENE: We can't just use simple modulo arithmetic here
-        // because we're dealing with Floats and Doubles and need to avoid
+        // because we're dealing with Doubles and need to avoid
         // truncation errors. For the time being, this is the most
-        // reliable way to detect if and when to send a sample.
-        let oldSampleNumber = Int(Float(self.cycles - 1) / self.sampleRate)
-        let newSampleNumber = Int(Float(self.cycles) / self.sampleRate)
+        // reliable way to detect if and when to send samples.
+        let oldSampleNumber = Int(Double(self.cycles - 1) / self.sampleSize)
+        let newSampleNumber = Int(Double(self.cycles) / self.sampleSize)
         return newSampleNumber != oldSampleNumber
     }
 
