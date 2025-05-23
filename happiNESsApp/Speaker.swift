@@ -29,19 +29,11 @@ struct Speaker {
                                         channels: 1,
                                         interleaved: outputFormat.isInterleaved)
 
-        var cachedBufferValue: Float = 0.0
         let sourceNode = AVAudioSourceNode { [inputBuffer] _, _, frameCount, audioBufferList -> OSStatus in
             let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
 
             for frame in 0..<Int(frameCount) {
-                // NOTA BENE: Because the emulated timing between the CPU and APU
-                // is not quite accurate, the buffer is sometimes empty, and so
-                // if we put a zero value into the output buffer, the result is a
-                // popping/slapping sound. So for now, we cache the previous value
-                // of the sample and use that in the event that the buffer, resulting
-                // in a much smoother audio output.
-                let value = inputBuffer.take() ?? cachedBufferValue
-                cachedBufferValue = value
+                let value = inputBuffer.take() ?? 0.0
 
                 for outputAudioBuffer in ablPointer {
                     let outputBuffer: UnsafeMutableBufferPointer<Float> = UnsafeMutableBufferPointer(outputAudioBuffer)

@@ -22,7 +22,7 @@ public class Bus {
     public init() {
         self.ppu = PPU()
         // TODO: Need to explain this!!!
-        self.apu = APU(sampleRate: Float(CPU.frequency) / APU.audioSampleRate)
+        self.apu = APU(sampleSize: Double(CPU.frequency) / APU.audioSampleRate)
 
         self.vram = [UInt8](repeating: 0x00, count: 2048)
         self.joypad1Status = JoypadStatus()
