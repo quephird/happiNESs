@@ -65,6 +65,8 @@ extension CPU {
                 self.and(addressingMode: opcode.addressingMode)
             case .aslAccumulator, .aslZeroPage, .aslZeroPageX, .aslAbsolute, .aslAbsoluteXDummyRead:
                 self.asl(addressingMode: opcode.addressingMode)
+            case .asr:
+                self.asr(addressingMode: opcode.addressingMode)
             case .bcc:
                 self.bcc()
             case .bcs:
@@ -164,6 +166,8 @@ extension CPU {
                 self.sax(addressingMode: opcode.addressingMode)
             case .sbcImmediate1, .sbcImmediate2, .sbcZeroPage, .sbcZeroPageX, .sbcAbsolute, .sbcAbsoluteX, .sbcAbsoluteY, .sbcIndirectX, .sbcIndirectY:
                 self.sbc(addressingMode: opcode.addressingMode)
+            case .sbx:
+                self.sbx(addressingMode: opcode.addressingMode)
             case .sec:
                 self.sec()
             case .sed:

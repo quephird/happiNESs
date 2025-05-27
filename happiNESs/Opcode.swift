@@ -30,6 +30,8 @@ enum Opcode: UInt8 {
     case aslAbsolute = 0x0E
     case aslAbsoluteXDummyRead = 0x1E
 
+    case asr = 0x4B
+
     case bcc = 0x90
     case bcs = 0xB0
     case beq = 0xF0
@@ -238,6 +240,8 @@ enum Opcode: UInt8 {
     case sbcIndirectX = 0xE1
     case sbcIndirectY = 0xF1
 
+    case sbx = 0xCB
+
     case sec = 0x38
     case sed = 0xF8
     case sei = 0x78
@@ -311,6 +315,8 @@ extension Opcode {
         case .aslZeroPageX: .zeroPageX
         case .aslAbsolute: .absolute
         case .aslAbsoluteXDummyRead: .absoluteXDummyRead
+
+        case .asr: .immediate
 
         case .bcc: .relative
         case .bcs: .relative
@@ -520,6 +526,8 @@ extension Opcode {
         case .sbcIndirectX: .indirectX
         case .sbcIndirectY: .indirectY
 
+        case .sbx: .immediate
+
         case .sec: .implicit
         case .sed: .implicit
         case .sei: .implicit
@@ -595,6 +603,8 @@ extension Opcode {
         case .aslZeroPageX: 2
         case .aslAbsolute: 3
         case .aslAbsoluteXDummyRead: 3
+
+        case .asr: 2
 
         case .bcc: 2
         case .bcs: 2
@@ -804,6 +814,8 @@ extension Opcode {
         case .sbcIndirectX: 2
         case .sbcIndirectY: 2
 
+        case .sbx: 2
+
         case .sec: 1
         case .sed: 1
         case .sei: 1
@@ -864,7 +876,8 @@ extension Opcode {
 extension Opcode {
     var isDocumented: Bool {
         switch self {
-        case .dcpAbsolute, .dcpAbsoluteXDummyRead, .dcpAbsoluteYDummyRead, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectYDummyRead,
+        case .asr,
+                .dcpAbsolute, .dcpAbsoluteXDummyRead, .dcpAbsoluteYDummyRead, .dcpZeroPage, .dcpZeroPageX, .dcpIndirectX, .dcpIndirectYDummyRead,
                 .isbAbsolute, .isbAbsoluteXDummyRead, .isbAbsoluteYDummyRead, .isbZeroPage, .isbZeroPageX, .isbIndirectX, .isbIndirectYDummyRead,
                 .laxImmediate, .laxZeroPage, .laxZeroPageY, .laxAbsolute, .laxAbsoluteY, .laxIndirectX, .laxIndirectY,
                 .nopImplicit1, .nopImplicit2, .nopImplicit3, .nopImplicit4, .nopImplicit5, .nopImplicit7,
@@ -877,6 +890,7 @@ extension Opcode {
                 .rraAbsolute, .rraAbsoluteXDummyRead, .rraAbsoluteYDummyRead, .rraZeroPage, .rraZeroPageX, .rraIndirectX, .rraIndirectYDummyRead,
                 .saxZeroPage, .saxZeroPageY, .saxAbsolute, .saxIndirectX,
                 .sbcImmediate2,
+                .sbx,
                 .shaAbsoluteYDummyRead, .shaIndirectYDummyRead,
                 .sloAbsolute, .sloAbsoluteXDummyRead, .sloAbsoluteYDummyRead, .sloZeroPage, .sloZeroPageX, .sloIndirectX, .sloIndirectYDummyRead,
                 .sreAbsolute, .sreAbsoluteXDummyRead, .sreAbsoluteYDummyRead, .sreZeroPage, .sreZeroPageX, .sreIndirectX, .sreIndirectYDummyRead:
@@ -913,6 +927,8 @@ extension Opcode {
         case .aslZeroPageX: 6
         case .aslAbsolute: 6
         case .aslAbsoluteXDummyRead: 7
+
+        case .asr: 2
 
         case .bcc: 2
         case .bcs: 2
@@ -1121,6 +1137,8 @@ extension Opcode {
         case .sbcAbsoluteY: 4
         case .sbcIndirectX: 6
         case .sbcIndirectY: 5
+
+        case .sbx: 2
 
         case .sec: 2
         case .sed: 2

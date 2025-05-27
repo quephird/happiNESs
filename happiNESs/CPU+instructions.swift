@@ -46,6 +46,19 @@ extension CPU {
         return (false, 0)
     }
 
+    func asr(addressingMode: AddressingMode) -> (Bool, Int) {
+        let (address, _) = self.getAbsoluteAddress(addressingMode: addressingMode);
+        let value = self.readByte(address: address);
+
+        let aAndMemory = self.accumulator & value
+        self.status[.carry] = (aAndMemory & 0b0000_0001) == 1
+        self.accumulator = aAndMemory >> 1
+
+        self.updateZeroAndNegativeFlags(result: self.accumulator)
+
+        return (false, 0)
+    }
+
     func bcc() -> (Bool, Int) {
         return self.branch(condition: !self.status[.carry])
     }
@@ -498,6 +511,20 @@ extension CPU {
         self.status[.carry] = Int16(oldAccumulator) - Int16(value) - Int16(1 - carry) >= 0
         self.status[.overflow] = (oldAccumulator ^ value) & 0x80 != 0 && (oldAccumulator ^ self.accumulator) & 0x80 != 0
         self.updateZeroAndNegativeFlags(result: self.accumulator)
+
+        return (false, pageCrossed ? 1 : 0)
+    }
+
+    func sbx(addressingMode: AddressingMode) -> (Bool, Int) {
+        let (address, pageCrossed) = self.getAbsoluteAddress(addressingMode: addressingMode)
+        let value = self.readByte(address: address)
+
+        let aAndX = self.accumulator & self.xRegister
+        let carry: UInt8 = self.status[.carry] ? 0x01 : 0x00
+        self.xRegister = (aAndX) &- value
+
+        self.status[.carry] = Int16(aAndX) - Int16(value) - Int16(1 - carry) >= 0
+        self.updateZeroAndNegativeFlags(result: self.xRegister)
 
         return (false, pageCrossed ? 1 : 0)
     }
