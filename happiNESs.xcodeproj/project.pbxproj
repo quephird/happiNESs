@@ -189,6 +189,7 @@
 		878D81432C7FEE3B0076ED30 /* image.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = image.xcassets; sourceTree = "<group>"; };
 		878D81462C815E760076ED30 /* NESError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NESError.swift; sourceTree = "<group>"; };
 		878DCB8C2CCAB4CC00BE7ABB /* NoiseChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoiseChannel.swift; sourceTree = "<group>"; };
+		87930B612DE6738800CAA84F /* happiNESsTests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = happiNESsTests; sourceTree = "<group>"; };
 		879F665A2D0FB1B500DF8AB1 /* Interruptible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interruptible.swift; sourceTree = "<group>"; };
 		879F66A42D125F4200DF8AB1 /* OpenBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenBus.swift; sourceTree = "<group>"; };
 		879F66A62D137E9D00DF8AB1 /* official_only.nes */ = {isa = PBXFileReference; lastKnownFileType = file; path = official_only.nes; sourceTree = "<group>"; };
@@ -324,6 +325,7 @@
 		8744B1682C1CB9B3001B44B5 = {
 			isa = PBXGroup;
 			children = (
+				87930B612DE6738800CAA84F /* happiNESsTests */,
 				878D81432C7FEE3B0076ED30 /* image.xcassets */,
 				8744B1742C1CB9B3001B44B5 /* happiNESs */,
 				8744B1802C1CB9B3001B44B5 /* happiNESsTests */,
@@ -535,7 +537,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1520;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					871931EC2C30BB2900A73C22 = {
@@ -725,7 +727,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.0;
+				MARKETING_VERSION = 0.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = happiNESs;
@@ -754,7 +756,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.9.0;
+				MARKETING_VERSION = 0.9.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quephird.happiNESsApp;
 				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PRODUCT_NAME = happiNESs;
