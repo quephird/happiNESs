@@ -250,6 +250,17 @@ final class CPUTests: XCTestCase {
         XCTAssertTrue(cpu.status[.carry])
     }
 
+    func testAsr() {
+        let program: [UInt8] = [0xA9, 0b1111_1111, 0x4B, 0b0000_1111]
+        let cpu = makeCpu(programBytes: program)
+        cpu.executeInstructions(stoppingAfter: 2)
+
+        XCTAssertEqual(cpu.accumulator, 0b0000_0111)
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+        XCTAssertTrue(cpu.status[.carry])
+    }
+
     func testBcc() {
         // NOTA BENE: This program loads the accumlator with the value 0x10,
         // then executes the `BCC` instrcution which checks if the carry bit is
@@ -1444,6 +1455,18 @@ final class CPUTests: XCTestCase {
         XCTAssertEqual(cpu.accumulator, 0x0F)
         XCTAssertTrue(cpu.status[.carry])
         XCTAssertTrue(!cpu.status[.overflow])
+        XCTAssertTrue(!cpu.status[.zero])
+        XCTAssertTrue(!cpu.status[.negative])
+    }
+
+    func testSbx() {
+        let program: [UInt8] = [0xA9, 0b1111_1111, 0xA2, 0b0000_1111, 0xCB, 0b0000_0011]
+        let cpu = makeCpu(programBytes: program)
+        cpu.executeInstructions(stoppingAfter: 3)
+
+        XCTAssertEqual(cpu.accumulator, 0b1111_1111)
+        XCTAssertEqual(cpu.xRegister, 0b0000_1100)
+        XCTAssertTrue(cpu.status[.carry])
         XCTAssertTrue(!cpu.status[.zero])
         XCTAssertTrue(!cpu.status[.negative])
     }
