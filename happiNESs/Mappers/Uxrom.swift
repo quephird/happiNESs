@@ -7,9 +7,11 @@
 
 class Uxrom: Mapper {
     public unowned var cartridge: Cartridge
+    private var prgBankCount: Int
 
     init(cartridge: Cartridge) {
         self.cartridge = cartridge
+        self.prgBankCount = cartridge.prgMemory.count / 0x4000
     }
 
     public func readByte(address: UInt16) -> UInt8 {
@@ -24,7 +26,7 @@ class Uxrom: Mapper {
             let memoryIndex = self.cartridge.prgBankIndex * 0x4000 + Int(address - 0x8000)
             return self.cartridge.prgMemory[Int(memoryIndex)]
         case 0xC000 ... 0xFFFF:
-            let lastBankStart = 7 * 0x4000
+            let lastBankStart = (self.prgBankCount - 1) * 0x4000
             let memoryIndex = lastBankStart + Int(address - 0xC000)
             return self.cartridge.prgMemory[Int(memoryIndex)]
         default:
